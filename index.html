@@ -28,9 +28,22 @@ header h1 { font-size: 16px; font-weight: 700; flex: 1; min-width: 0; }
 .icon-btn:active { transform: scale(0.94); background: var(–ink); color: var(–paper); }
 
 .table-tabs { flex-shrink: 0; display: flex; background: var(–paper); border-bottom: 1px solid var(–line); }
-.table-tab { flex: 1; padding: 12px 8px; font-size: 13px; font-weight: 600; background: transparent; border: 0; cursor: pointer; color: var(–muted); border-bottom: 3px solid transparent; transition: all .15s; }
-.table-tab.active { color: var(–ink); border-bottom-color: var(–ink); background: var(–bg); }
+.table-tab {
+flex: 1; padding: 10px 6px; font-size: 12px; font-weight: 500;
+background: transparent; border: 0; cursor: pointer;
+color: var(–muted); border-bottom: 3px solid transparent;
+transition: all .18s;
+}
+.table-tab.active {
+color: var(–red);
+border-bottom-color: var(–red);
+background: var(–bg);
+font-weight: 800;
+font-size: 16px;
+letter-spacing: -0.01em;
+}
 .table-tab small { display: block; font-size: 9px; font-weight: 500; margin-top: 2px; opacity: 0.7; font-family: ‘JetBrains Mono’, monospace; letter-spacing: 0.05em; }
+.table-tab.active small { opacity: 0.85; font-size: 10px; font-weight: 700; }
 
 .toolbar { flex-shrink: 0; padding: 8px 12px; background: var(–paper); border-bottom: 1px solid var(–line); display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .toolbar::-webkit-scrollbar { display: none; }
@@ -48,9 +61,10 @@ border-bottom: 1px solid var(–line);
 padding: 10px 14px;
 }
 .meta-title {
-font-size: 14px;
-font-weight: 700;
-margin-bottom: 6px;
+font-size: 16px;
+font-weight: 800;
+color: var(–red);
+margin-bottom: 8px;
 letter-spacing: -0.01em;
 cursor: pointer;
 display: inline-block;
@@ -128,12 +142,12 @@ font-size: 12px;
 .model-cell.empty-clickable { color: var(–muted); font-style: italic; cursor: pointer; }
 .model-cell.empty-clickable::before { content: ’＋ ’; }
 
-.color-cell { width: 50px; height: 36px; border: 1.5px solid var(–line); border-radius: 8px; background: var(–paper); cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: ‘JetBrains Mono’, monospace; font-size: 13px; font-weight: 700; color: var(–ink); }
-.color-cell:active { transform: scale(0.93); }
+.color-cell { width: 50px; height: 38px; border: 2px solid var(–ink); border-radius: 8px; background: var(–paper); cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: ‘JetBrains Mono’, monospace; font-size: 14px; font-weight: 700; color: var(–ink); flex-shrink: 0; box-sizing: border-box; }
+.color-cell:active { transform: scale(0.92); }
 .color-cell[data-color=“red”] { background: var(–red); border-color: var(–red); color: white; }
-.color-cell[data-color=“yellow”] { background: var(–yellow); }
+.color-cell[data-color=“yellow”] { background: var(–yellow); border-color: #c79900; }
 .color-cell[data-color=“green”] { background: var(–green); border-color: var(–green); color: white; }
-.color-cell .qty-zero { color: var(–muted); font-weight: 400; font-style: italic; }
+.color-cell .qty-zero { display: none; }
 
 .grid-view { padding: 10px; padding-bottom: 100px; display: none; }
 .grid-view.active { display: block; }
@@ -160,9 +174,16 @@ font-size: 12px;
 .fab { position: fixed; right: 14px; bottom: calc(14px + var(–safe-bottom)); width: 52px; height: 52px; border-radius: 50%; background: var(–ink); color: var(–paper); border: 0; font-size: 24px; font-weight: 300; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25); z-index: 50; }
 .fab:active { transform: scale(0.9); }
 
-.sheet-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: flex-end; justify-content: center; }
+.sheet-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: flex-end; justify-content: center; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
 .sheet-backdrop.show { display: flex; }
-.sheet { width: 100%; max-width: 480px; background: var(–paper); border-radius: 18px 18px 0 0; padding: 18px 18px calc(18px + var(–safe-bottom)); border: 1px solid var(–line); border-bottom: 0; animation: slideUp .25s cubic-bezier(.2,.9,.3,1); max-height: 85vh; overflow-y: auto; }
+.sheet { width: 100%; max-width: 480px; background: var(–paper); border-radius: 18px 18px 0 0; padding: 0; border: 1px solid var(–line); border-bottom: 0; animation: slideUp .25s cubic-bezier(.2,.9,.3,1); max-height: 88vh; display: flex; flex-direction: column; }
+.sheet-body { padding: 18px 18px 8px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+.sheet-footer { padding: 10px 18px calc(14px + var(–safe-bottom)); border-top: 1px solid rgba(0,0,0,0.08); background: var(–paper); position: sticky; bottom: 0; }
+
+/* Centered modal variant for camera/picker - higher visibility */
+.sheet-backdrop.modal-style { align-items: center; }
+.sheet-backdrop.modal-style .sheet { border-radius: 16px; max-height: 92vh; max-width: 460px; width: calc(100% - 24px); border-bottom: 1px solid var(–line); animation: fadeIn .2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } }
 @keyframes slideUp { from { transform: translateY(100%); } }
 .sheet h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; color: var(–muted); }
 
@@ -272,101 +293,125 @@ font-size: 12px;
   <div class="delete-zone" id="delete-zone">🗑️ 拖到这里删除整箱(已搬走)</div>
 </div>
 
-<div class="sheet-backdrop" id="color-sheet">
+<div class="sheet-backdrop modal-style" id="color-sheet">
   <div class="sheet">
-    <h3>库存状态颜色</h3>
-    <div class="color-options">
-      <div class="color-opt" data-color="red">无货</div>
-      <div class="color-opt" data-color="yellow">少量</div>
-      <div class="color-opt" data-color="green">充足</div>
-      <div class="color-opt" data-color="none">清除</div>
+    <div class="sheet-body">
+      <h3>库存状态颜色</h3>
+      <div class="color-options">
+        <div class="color-opt" data-color="red">无货</div>
+        <div class="color-opt" data-color="yellow">少量</div>
+        <div class="color-opt" data-color="green">充足</div>
+        <div class="color-opt" data-color="none">清除</div>
+      </div>
     </div>
-    <button class="sheet-cancel" data-close>取消</button>
+    <div class="sheet-footer">
+      <button class="sheet-cancel" data-close>取消</button>
+    </div>
   </div>
 </div>
 
-<div class="sheet-backdrop" id="qty-sheet">
+<div class="sheet-backdrop modal-style" id="qty-sheet">
   <div class="sheet">
-    <h3 id="qty-title">输入数量</h3>
-    <div class="qty-input-wrap">
-      <button class="qty-btn" id="qty-minus">−</button>
-      <input type="number" inputmode="numeric" pattern="[0-9]*" id="qty-input" min="0" step="1">
-      <button class="qty-btn" id="qty-plus">+</button>
+    <div class="sheet-body">
+      <h3 id="qty-title">输入数量</h3>
+      <div class="qty-input-wrap">
+        <button class="qty-btn" id="qty-minus">−</button>
+        <input type="number" inputmode="numeric" pattern="[0-9]*" id="qty-input" min="0" step="1">
+        <button class="qty-btn" id="qty-plus">+</button>
+      </div>
     </div>
-    <button class="sheet-confirm" id="qty-confirm">确定</button>
-    <button class="sheet-cancel" data-close>取消</button>
+    <div class="sheet-footer">
+      <button class="sheet-confirm" id="qty-confirm">确定</button>
+      <button class="sheet-cancel" data-close>取消</button>
+    </div>
   </div>
 </div>
 
 <div class="sheet-backdrop" id="save-sheet">
   <div class="sheet">
-    <h3>保存 / 导出</h3>
-    <div class="actions-list">
-      <button class="action-row" data-act="download-json"><span class="ico">📁</span>下载到本地 (JSON)</button>
-      <button class="action-row" data-act="download-csv"><span class="ico">📊</span>导出 CSV 表格</button>
-      <button class="action-row" data-act="share"><span class="ico">📤</span>分享 (微信/Drive...)</button>
-      <button class="action-row" data-act="load-json"><span class="ico">📂</span>从本地导入 JSON</button>
+    <div class="sheet-body">
+      <h3>保存 / 导出</h3>
+      <div class="actions-list">
+        <button class="action-row" data-act="download-json"><span class="ico">📁</span>下载到本地 (JSON)</button>
+        <button class="action-row" data-act="download-csv"><span class="ico">📊</span>导出 CSV 表格</button>
+        <button class="action-row" data-act="share"><span class="ico">📤</span>分享 (微信/Drive...)</button>
+        <button class="action-row" data-act="load-json"><span class="ico">📂</span>从本地导入 JSON</button>
+      </div>
     </div>
-    <button class="sheet-cancel" data-close>取消</button>
+    <div class="sheet-footer">
+      <button class="sheet-cancel" data-close>取消</button>
+    </div>
   </div>
 </div>
 
 <div class="sheet-backdrop" id="upload-sheet">
   <div class="sheet">
-    <h3>导入型号清单</h3>
-    <div class="actions-list">
-      <button class="action-row" data-act="upload-replace"><span class="ico">🔄</span>替换型号库 (清空两表重建)</button>
-      <button class="action-row" data-act="upload-append"><span class="ico">➕</span>追加型号 (加到货架/型号库)</button>
+    <div class="sheet-body">
+      <h3>导入型号清单</h3>
+      <div class="actions-list">
+        <button class="action-row" data-act="upload-replace"><span class="ico">🔄</span>替换型号库 (清空两表重建)</button>
+        <button class="action-row" data-act="upload-append"><span class="ico">➕</span>追加型号 (加到货架/型号库)</button>
+      </div>
     </div>
-    <button class="sheet-cancel" data-close>取消</button>
+    <div class="sheet-footer">
+      <button class="sheet-cancel" data-close>取消</button>
+    </div>
   </div>
 </div>
 
 <div class="sheet-backdrop" id="legend-sheet">
   <div class="sheet">
-    <h3>说明</h3>
-    <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px; font-size:13px;">
-      <div style="display:flex; align-items:center; gap:10px; padding:8px; background:var(--bg); border-radius:8px;">
-        <div style="width:36px; height:24px; background:var(--red); border-radius:4px;"></div>
-        <div><strong>红色</strong> · 无货 (一个都没有)</div>
-      </div>
-      <div style="display:flex; align-items:center; gap:10px; padding:8px; background:var(--bg); border-radius:8px;">
-        <div style="width:36px; height:24px; background:var(--yellow); border-radius:4px;"></div>
-        <div><strong>黄色</strong> · 少量</div>
-      </div>
-      <div style="display:flex; align-items:center; gap:10px; padding:8px; background:var(--bg); border-radius:8px;">
-        <div style="width:36px; height:24px; background:var(--green); border-radius:4px;"></div>
-        <div><strong>绿色</strong> · 充足</div>
-      </div>
-      <div style="font-size:12px; color:var(--muted); padding:10px; background:var(--bg); border-radius:8px; line-height:1.7;">
-        · <b>单击</b>颜色格 → 改颜色<br>
-        · <b>双击</b>颜色格 → 输入数量(整数)<br>
-        · <b>双击</b>型号 → 拍照识别 / 修改型号<br>
-        · <b>双击</b>表标题 / 通道名 / 货架层名 → 修改<br>
-        · <b>长按拖动</b>型号 → 移到其他位置<br>
-        · <b>长按 ⠿ 把手</b> → 整层拖到别处(序号自动重排)<br>
-        · 货架行右边 <b>+</b> → 在该层后插入新一层<br>
-        · 整箱表上 <b>拖到底部</b> → 删除(整箱搬走)<br>
-        · 整箱表 <b>空层点击</b> → 拍照识别新增
+    <div class="sheet-body">
+      <h3>说明</h3>
+      <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px; font-size:13px;">
+        <div style="display:flex; align-items:center; gap:10px; padding:8px; background:var(--bg); border-radius:8px;">
+          <div style="width:36px; height:24px; background:var(--red); border-radius:4px;"></div>
+          <div><strong>红色</strong> · 无货 (一个都没有)</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; padding:8px; background:var(--bg); border-radius:8px;">
+          <div style="width:36px; height:24px; background:var(--yellow); border-radius:4px;"></div>
+          <div><strong>黄色</strong> · 少量</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; padding:8px; background:var(--bg); border-radius:8px;">
+          <div style="width:36px; height:24px; background:var(--green); border-radius:4px;"></div>
+          <div><strong>绿色</strong> · 充足</div>
+        </div>
+        <div style="font-size:12px; color:var(--muted); padding:10px; background:var(--bg); border-radius:8px; line-height:1.7;">
+          · <b>单击</b>颜色格 → 改颜色<br>
+          · <b>双击</b>颜色格 → 输入数量(整数)<br>
+          · <b>双击</b>型号 → 拍照识别 / 修改型号<br>
+          · <b>双击</b>表标题 / 通道名 / 货架层名 → 修改<br>
+          · <b>长按拖动</b>型号 → 移到其他位置<br>
+          · <b>长按层名</b>(整行) → 整层拖到别处(序号自动重排)<br>
+          · 货架行右边 <b>+</b> → 在该层后插入新一层<br>
+          · 整箱表上 <b>拖到底部</b> → 删除(整箱搬走)<br>
+          · 整箱表 <b>空层点击</b> → 拍照识别新增
+        </div>
       </div>
     </div>
-    <button class="sheet-cancel" data-close>关闭</button>
+    <div class="sheet-footer">
+      <button class="sheet-cancel" data-close>关闭</button>
+    </div>
   </div>
 </div>
 
-<div class="sheet-backdrop" id="camera-sheet">
+<div class="sheet-backdrop modal-style" id="camera-sheet">
   <div class="sheet">
-    <h3 id="camera-title">添加整箱型号</h3>
-    <video id="camera-video" class="camera-preview" autoplay playsinline muted style="display:none;"></video>
-    <canvas id="camera-canvas" class="camera-preview" style="display:none;"></canvas>
-    <div class="camera-controls">
-      <button id="camera-start">📷 拍照识别</button>
-      <button id="camera-retake" style="display:none;">↻ 重拍</button>
+    <div class="sheet-body">
+      <h3 id="camera-title">添加整箱型号</h3>
+      <video id="camera-video" class="camera-preview" autoplay playsinline muted style="display:none;"></video>
+      <canvas id="camera-canvas" class="camera-preview" style="display:none;"></canvas>
+      <div class="camera-controls">
+        <button id="camera-start">📷 拍照识别</button>
+        <button id="camera-retake" style="display:none;">↻ 重拍</button>
+      </div>
+      <input type="text" class="model-search-input" id="model-search" placeholder="或手动输入型号关键词搜索/新建..." autocomplete="off">
+      <div class="model-suggestions" id="model-suggestions"></div>
     </div>
-    <input type="text" class="model-search-input" id="model-search" placeholder="或手动输入型号关键词搜索/新建..." autocomplete="off">
-    <div class="model-suggestions" id="model-suggestions"></div>
-    <button class="sheet-confirm" id="model-confirm">确定</button>
-    <button class="sheet-cancel" data-close>取消</button>
+    <div class="sheet-footer">
+      <button class="sheet-confirm" id="model-confirm">确定</button>
+      <button class="sheet-cancel" data-close>取消</button>
+    </div>
   </div>
 </div>
 
@@ -666,6 +711,11 @@ function attachListHandlers(root) {
   root.querySelectorAll('.add-child').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); addContainerToAisle(+el.dataset.ai); }); });
   root.querySelectorAll('.add-after-shelf').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); addShelfAfter(+el.dataset.ai, +el.dataset.ci); }); });
   root.querySelectorAll('.shelf-drag-handle').forEach(el => addShelfDrag(el));
+  // Also make the whole container-name row act as a drag handle (long-press)
+  root.querySelectorAll('.container-name').forEach(row => {
+    const handle = row.querySelector('.shelf-drag-handle');
+    if (handle) addShelfDrag(row, handle);
+  });
   // Desktop: container-block accepts shelf drops
   root.querySelectorAll('.container-block').forEach(block => {
     block.addEventListener('dragover', (e) => {
@@ -1114,16 +1164,23 @@ function addShelfAfter(ai, ci) {
   render();
 }
 
-// Touch-drag for entire shelf/layer (the ⠿ handle)
-function addShelfDrag(handle) {
+// Touch-drag for entire shelf/layer. `dragArea` is the element that receives touch events;
+// `handleEl` provides ai/ci data attributes (defaults to dragArea itself).
+function addShelfDrag(dragArea, handleEl) {
+  const handle = handleEl || dragArea;
   let ghost = null, longPressTimer = null, dragging = false, startX = 0, startY = 0;
 
-  handle.addEventListener('touchstart', (e) => {
+  dragArea.addEventListener('touchstart', (e) => {
+    // Don't start drag if user is touching an interactive child (button, editable, etc.)
+    const tgt = e.target;
+    if (tgt.closest('.add-after-shelf, .mini-btn') ||
+        tgt.contentEditable === 'true' ||
+        (tgt.closest('.cont-name') && tgt.closest('.cont-name').contentEditable === 'true')) return;
     const t = e.touches[0];
     startX = t.clientX; startY = t.clientY;
     longPressTimer = setTimeout(() => {
       dragging = true;
-      const block = handle.closest('.container-block');
+      const block = dragArea.closest('.container-block');
       block.classList.add('shelf-dragging');
       const rect = block.getBoundingClientRect();
       ghost = block.cloneNode(true);
@@ -1136,10 +1193,10 @@ function addShelfDrag(handle) {
       });
       document.body.appendChild(ghost);
       if (navigator.vibrate) navigator.vibrate(40);
-    }, 380);
+    }, 420);
   }, { passive: true });
 
-  handle.addEventListener('touchmove', (e) => {
+  dragArea.addEventListener('touchmove', (e) => {
     const t = e.touches[0];
     if (!dragging && Math.hypot(t.clientX - startX, t.clientY - startY) > 10) clearTimeout(longPressTimer);
     if (dragging && ghost) {
@@ -1154,19 +1211,18 @@ function addShelfDrag(handle) {
     }
   }, { passive: false });
 
-  handle.addEventListener('touchend', (e) => {
+  dragArea.addEventListener('touchend', (e) => {
     clearTimeout(longPressTimer);
     if (dragging) {
       const t = e.changedTouches[0];
       ghost.style.display = 'none';
       const under = document.elementFromPoint(t.clientX, t.clientY);
       ghost.remove(); ghost = null;
-      const block = handle.closest('.container-block');
+      const block = dragArea.closest('.container-block');
       block.classList.remove('shelf-dragging');
       document.querySelectorAll('.shelf-drop-target').forEach(x => x.classList.remove('shelf-drop-target'));
       const target = under?.closest('.container-block');
       if (target && !target.isSameNode(block)) {
-        // Find target ai/ci by walking the dom: get the handle inside target
         const targetHandle = target.querySelector('.shelf-drag-handle');
         if (targetHandle) {
           moveShelf(+handle.dataset.ai, +handle.dataset.ci, +targetHandle.dataset.ai, +targetHandle.dataset.ci);
@@ -1176,27 +1232,29 @@ function addShelfDrag(handle) {
     }
   });
 
-  handle.addEventListener('touchcancel', () => {
+  dragArea.addEventListener('touchcancel', () => {
     clearTimeout(longPressTimer);
     if (ghost) { ghost.remove(); ghost = null; }
     dragging = false;
-    const block = handle.closest('.container-block');
+    const block = dragArea.closest('.container-block');
     if (block) block.classList.remove('shelf-dragging');
   });
 
-  // Desktop drag fallback (HTML5 drag)
-  handle.setAttribute('draggable', 'true');
-  handle.addEventListener('dragstart', (e) => {
-    if (e.dataTransfer) {
-      e.dataTransfer.setData('text/shelf', JSON.stringify({ ai: +handle.dataset.ai, ci: +handle.dataset.ci }));
-      e.dataTransfer.effectAllowed = 'move';
-    }
-    handle.closest('.container-block').classList.add('shelf-dragging');
-  });
-  handle.addEventListener('dragend', () => {
-    handle.closest('.container-block').classList.remove('shelf-dragging');
-    document.querySelectorAll('.shelf-drop-target').forEach(x => x.classList.remove('shelf-drop-target'));
-  });
+  // Desktop: only the handle is draggable (avoids accidental drags)
+  if (handle === dragArea && handle.classList.contains('shelf-drag-handle')) {
+    handle.setAttribute('draggable', 'true');
+    handle.addEventListener('dragstart', (e) => {
+      if (e.dataTransfer) {
+        e.dataTransfer.setData('text/shelf', JSON.stringify({ ai: +handle.dataset.ai, ci: +handle.dataset.ci }));
+        e.dataTransfer.effectAllowed = 'move';
+      }
+      handle.closest('.container-block').classList.add('shelf-dragging');
+    });
+    handle.addEventListener('dragend', () => {
+      handle.closest('.container-block').classList.remove('shelf-dragging');
+      document.querySelectorAll('.shelf-drop-target').forEach(x => x.classList.remove('shelf-drop-target'));
+    });
+  }
 }
 
 function moveShelf(srcAi, srcCi, tgtAi, tgtCi) {
