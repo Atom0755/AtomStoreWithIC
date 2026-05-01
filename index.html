@@ -11,16 +11,16 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231a1a1a'/%3E%3Ctext x='90' y='118' font-family='system-ui' font-size='80' font-weight='700' fill='%23faf8f3' text-anchor='middle'%3E库%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
---bg: #f5f3ee; --paper: #faf8f3; --ink: #1a1a1a; --line: #2a2a2a; --muted: #8a8580;
---red: #d63340; --yellow: #f4c430; --green: #4a9b3f;
---shelf-bg: #ebe6dd; --aisle-bg: #ddd5c7; --pallet-bg: #e8dfcf;
---safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom);
-}
-html, body { height: 100%; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
-body { font-family: 'Bricolage Grotesque', system-ui, sans-serif; background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.4; overflow: hidden; padding-top: var(--safe-top); }
-.app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+  *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f3ee; --paper: #faf8f3; --ink: #1a1a1a; --line: #2a2a2a; --muted: #8a8580;
+    --red: #d63340; --yellow: #f4c430; --green: #4a9b3f;
+    --shelf-bg: #ebe6dd; --aisle-bg: #ddd5c7; --pallet-bg: #e8dfcf;
+    --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom);
+  }
+  html, body { height: 100%; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
+  body { font-family: 'Bricolage Grotesque', system-ui, sans-serif; background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.4; overflow: hidden; padding-top: var(--safe-top); }
+  .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 
 header { flex-shrink: 0; padding: 12px 16px 8px; background: var(–paper); border-bottom: 1px solid var(–line); display: flex; align-items: center; gap: 8px; }
 header h1 { font-size: 16px; font-weight: 700; flex: 1; min-width: 0; }
@@ -106,10 +106,17 @@ font-size: 12px;
 .aisle-header .add-child { background: var(–ink); color: var(–paper); border: 0; width: 26px; height: 26px; border-radius: 6px; font-size: 14px; cursor: pointer; }
 .container-block { background: var(–shelf-bg); border: 1px solid var(–line); border-radius: 8px; margin-bottom: 5px; overflow: hidden; }
 .container-block.pallet { background: var(–pallet-bg); }
-.container-name { padding: 5px 10px; background: rgba(0,0,0,0.05); font-family: ‘JetBrains Mono’, monospace; font-size: 10px; font-weight: 700; color: var(–muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
-.container-name .container-tools { display: flex; gap: 4px; }
+.container-name { padding: 5px 10px; background: rgba(0,0,0,0.05); font-family: ‘JetBrains Mono’, monospace; font-size: 10px; font-weight: 700; color: var(–muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.container-name .shelf-drag-handle { cursor: grab; padding: 0 4px; font-size: 14px; color: var(–muted); -webkit-touch-callout: none; }
+.container-name .shelf-drag-handle:active { cursor: grabbing; color: var(–ink); }
+.container-name .cont-name { flex: 1; }
+.container-name .container-tools { display: flex; gap: 4px; align-items: center; }
 .container-name .mini-btn { background: transparent; border: 1px solid rgba(0,0,0,0.2); color: var(–muted); padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; font-family: inherit; }
 .container-name .mini-btn:active { background: var(–ink); color: var(–paper); }
+.container-name .add-after-shelf { background: var(–ink); color: var(–paper); border: 0; width: 22px; height: 22px; border-radius: 5px; font-size: 13px; font-weight: 700; cursor: pointer; line-height: 1; padding: 0; }
+.container-name .add-after-shelf:active { transform: scale(0.92); }
+.container-block.shelf-dragging { opacity: 0.4; }
+.container-block.shelf-drop-target { box-shadow: 0 -3px 0 var(–ink) inset, 0 3px 0 var(–ink) inset; }
 
 .slot { display: grid; grid-template-columns: 30px 1fr 56px; gap: 6px; align-items: center; padding: 7px 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); min-height: 46px; background: var(–paper); }
 .slot:last-child { border-bottom: 0; }
@@ -205,177 +212,180 @@ font-size: 12px;
 </head>
 <body>
 <div class="app">
-<header>
-<h1>MUG 库存标注</h1>
-<button class="icon-btn" id="upload-btn" title="导入型号">📋</button>
-<button class="icon-btn" id="save-btn" title="保存">💾</button>
-</header>
+  <header>
+    <h1>MUG 库存标注</h1>
+    <button class="icon-btn" id="upload-btn" title="导入型号">📋</button>
+    <button class="icon-btn" id="save-btn" title="保存">💾</button>
+  </header>
 
-<div class="table-tabs">
-<button class="table-tab active" data-table="shelfBlack">黑色MUG+IC<small>BLACK SHELF</small></button>
-<button class="table-tab" data-table="shelfWhite">白色BK/CH<small>WHITE SHELF</small></button>
-<button class="table-tab" data-table="pallet">整箱货堆<small>PALLETS</small></button>
-</div>
+  <div class="table-tabs">
+    <button class="table-tab active" data-table="shelfBlack">黑色MUG+IC<small>BLACK SHELF</small></button>
+    <button class="table-tab" data-table="shelfWhite">白色BK/CH<small>WHITE SHELF</small></button>
+    <button class="table-tab" data-table="pallet">整箱货堆<small>PALLETS</small></button>
+  </div>
 
-<div class="toolbar">
-<button class="tool active" data-view="list">列表</button>
-<button class="tool" data-view="grid">总览</button>
-<button class="tool" id="legend-btn">图例</button>
-<button class="tool" id="reset-btn">重置</button>
-</div>
+  <div class="toolbar">
+    <button class="tool active" data-view="list">列表</button>
+    <button class="tool" data-view="grid">总览</button>
+    <button class="tool" id="legend-btn">图例</button>
+    <button class="tool" id="reset-btn">重置</button>
+  </div>
 
-<main>
-<div class="table-pane active" data-table-pane="shelfBlack">
-<div class="meta-bar">
-<div class="meta-title editable" data-meta-title="shelfBlack">黑色 MUG 和 IC 零散货架表</div>
-<div class="meta-fields">
-<label>填表人 <input type="text" data-meta="filler" data-table-meta="shelfBlack" placeholder="姓名"></label>
-<label>日期 <input type="date" data-meta="date" data-table-meta="shelfBlack"></label>
-</div>
-</div>
-<div class="list-view" id="shelfBlack-list"></div>
-<div class="grid-view" id="shelfBlack-grid"></div>
-</div>
-<div class="table-pane" data-table-pane="shelfWhite">
-<div class="meta-bar">
-<div class="meta-title editable" data-meta-title="shelfWhite">白色 BK/CH 零散货架表</div>
-<div class="meta-fields">
-<label>填表人 <input type="text" data-meta="filler" data-table-meta="shelfWhite" placeholder="姓名"></label>
-<label>日期 <input type="date" data-meta="date" data-table-meta="shelfWhite"></label>
-</div>
-</div>
-<div class="list-view" id="shelfWhite-list"></div>
-<div class="grid-view" id="shelfWhite-grid"></div>
-</div>
-<div class="table-pane" data-table-pane="pallet">
-<div class="meta-bar">
-<div class="meta-title editable" data-meta-title="pallet">整箱货堆库存表</div>
-<div class="meta-fields">
-<label>填表人 <input type="text" data-meta="filler" data-table-meta="pallet" placeholder="姓名"></label>
-<label>日期 <input type="date" data-meta="date" data-table-meta="pallet"></label>
-</div>
-</div>
-<div class="list-view" id="pallet-list"></div>
-<div class="grid-view" id="pallet-grid"></div>
-</div>
-</main>
+  <main>
+    <div class="table-pane active" data-table-pane="shelfBlack">
+      <div class="meta-bar">
+        <div class="meta-title editable" data-meta-title="shelfBlack">黑色 MUG 和 IC 零散货架表</div>
+        <div class="meta-fields">
+          <label>填表人 <input type="text" data-meta="filler" data-table-meta="shelfBlack" placeholder="姓名"></label>
+          <label>日期 <input type="date" data-meta="date" data-table-meta="shelfBlack"></label>
+        </div>
+      </div>
+      <div class="list-view" id="shelfBlack-list"></div>
+      <div class="grid-view" id="shelfBlack-grid"></div>
+    </div>
+    <div class="table-pane" data-table-pane="shelfWhite">
+      <div class="meta-bar">
+        <div class="meta-title editable" data-meta-title="shelfWhite">白色 BK/CH 零散货架表</div>
+        <div class="meta-fields">
+          <label>填表人 <input type="text" data-meta="filler" data-table-meta="shelfWhite" placeholder="姓名"></label>
+          <label>日期 <input type="date" data-meta="date" data-table-meta="shelfWhite"></label>
+        </div>
+      </div>
+      <div class="list-view" id="shelfWhite-list"></div>
+      <div class="grid-view" id="shelfWhite-grid"></div>
+    </div>
+    <div class="table-pane" data-table-pane="pallet">
+      <div class="meta-bar">
+        <div class="meta-title editable" data-meta-title="pallet">整箱货堆库存表</div>
+        <div class="meta-fields">
+          <label>填表人 <input type="text" data-meta="filler" data-table-meta="pallet" placeholder="姓名"></label>
+          <label>日期 <input type="date" data-meta="date" data-table-meta="pallet"></label>
+        </div>
+      </div>
+      <div class="list-view" id="pallet-list"></div>
+      <div class="grid-view" id="pallet-grid"></div>
+    </div>
+  </main>
 
 <button class="fab" id="add-aisle">+</button>
 
-<div class="delete-zone" id="delete-zone">🗑️ 拖到这里删除整箱(已搬走)</div>
+  <div class="delete-zone" id="delete-zone">🗑️ 拖到这里删除整箱(已搬走)</div>
 </div>
 
 <div class="sheet-backdrop" id="color-sheet">
-<div class="sheet">
-<h3>库存状态颜色</h3>
-<div class="color-options">
-<div class="color-opt" data-color="red">无货</div>
-<div class="color-opt" data-color="yellow">少量</div>
-<div class="color-opt" data-color="green">充足</div>
-<div class="color-opt" data-color="none">清除</div>
-</div>
-<button class="sheet-cancel" data-close>取消</button>
-</div>
+  <div class="sheet">
+    <h3>库存状态颜色</h3>
+    <div class="color-options">
+      <div class="color-opt" data-color="red">无货</div>
+      <div class="color-opt" data-color="yellow">少量</div>
+      <div class="color-opt" data-color="green">充足</div>
+      <div class="color-opt" data-color="none">清除</div>
+    </div>
+    <button class="sheet-cancel" data-close>取消</button>
+  </div>
 </div>
 
 <div class="sheet-backdrop" id="qty-sheet">
-<div class="sheet">
-<h3 id="qty-title">输入数量</h3>
-<div class="qty-input-wrap">
-<button class="qty-btn" id="qty-minus">−</button>
-<input type="number" inputmode="numeric" pattern="[0-9]*" id="qty-input" min="0" step="1">
-<button class="qty-btn" id="qty-plus">+</button>
-</div>
-<button class="sheet-confirm" id="qty-confirm">确定</button>
-<button class="sheet-cancel" data-close>取消</button>
-</div>
+  <div class="sheet">
+    <h3 id="qty-title">输入数量</h3>
+    <div class="qty-input-wrap">
+      <button class="qty-btn" id="qty-minus">−</button>
+      <input type="number" inputmode="numeric" pattern="[0-9]*" id="qty-input" min="0" step="1">
+      <button class="qty-btn" id="qty-plus">+</button>
+    </div>
+    <button class="sheet-confirm" id="qty-confirm">确定</button>
+    <button class="sheet-cancel" data-close>取消</button>
+  </div>
 </div>
 
 <div class="sheet-backdrop" id="save-sheet">
-<div class="sheet">
-<h3>保存 / 导出</h3>
-<div class="actions-list">
-<button class="action-row" data-act="download-json"><span class="ico">📁</span>下载到本地 (JSON)</button>
-<button class="action-row" data-act="download-csv"><span class="ico">📊</span>导出 CSV 表格</button>
-<button class="action-row" data-act="share"><span class="ico">📤</span>分享 (微信/Drive...)</button>
-<button class="action-row" data-act="load-json"><span class="ico">📂</span>从本地导入 JSON</button>
-</div>
-<button class="sheet-cancel" data-close>取消</button>
-</div>
+  <div class="sheet">
+    <h3>保存 / 导出</h3>
+    <div class="actions-list">
+      <button class="action-row" data-act="download-json"><span class="ico">📁</span>下载到本地 (JSON)</button>
+      <button class="action-row" data-act="download-csv"><span class="ico">📊</span>导出 CSV 表格</button>
+      <button class="action-row" data-act="share"><span class="ico">📤</span>分享 (微信/Drive...)</button>
+      <button class="action-row" data-act="load-json"><span class="ico">📂</span>从本地导入 JSON</button>
+    </div>
+    <button class="sheet-cancel" data-close>取消</button>
+  </div>
 </div>
 
 <div class="sheet-backdrop" id="upload-sheet">
-<div class="sheet">
-<h3>导入型号清单</h3>
-<div class="actions-list">
-<button class="action-row" data-act="upload-replace"><span class="ico">🔄</span>替换型号库 (清空两表重建)</button>
-<button class="action-row" data-act="upload-append"><span class="ico">➕</span>追加型号 (加到货架/型号库)</button>
-</div>
-<button class="sheet-cancel" data-close>取消</button>
-</div>
+  <div class="sheet">
+    <h3>导入型号清单</h3>
+    <div class="actions-list">
+      <button class="action-row" data-act="upload-replace"><span class="ico">🔄</span>替换型号库 (清空两表重建)</button>
+      <button class="action-row" data-act="upload-append"><span class="ico">➕</span>追加型号 (加到货架/型号库)</button>
+    </div>
+    <button class="sheet-cancel" data-close>取消</button>
+  </div>
 </div>
 
 <div class="sheet-backdrop" id="legend-sheet">
-<div class="sheet">
-<h3>说明</h3>
-<div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px; font-size:13px;">
-<div style="display:flex; align-items:center; gap:10px; padding:8px; background:var(--bg); border-radius:8px;">
-<div style="width:36px; height:24px; background:var(--red); border-radius:4px;"></div>
-<div><strong>红色</strong> · 无货 (一个都没有)</div>
-</div>
-<div style="display:flex; align-items:center; gap:10px; padding:8px; background:var(--bg); border-radius:8px;">
-<div style="width:36px; height:24px; background:var(--yellow); border-radius:4px;"></div>
-<div><strong>黄色</strong> · 少量</div>
-</div>
-<div style="display:flex; align-items:center; gap:10px; padding:8px; background:var(--bg); border-radius:8px;">
-<div style="width:36px; height:24px; background:var(--green); border-radius:4px;"></div>
-<div><strong>绿色</strong> · 充足</div>
-</div>
-<div style="font-size:12px; color:var(--muted); padding:10px; background:var(--bg); border-radius:8px; line-height:1.7;">
-· <b>单击</b>颜色格 → 改颜色<br>
-· <b>双击</b>颜色格 → 输入数量(整数)<br>
-· <b>双击</b>表标题 / 通道名 / 货架层名 / 型号名 → 修改<br>
-· <b>长按拖动</b>型号 → 移到其他位置<br>
-· 整箱表上 <b>拖到底部</b> → 删除(整箱搬走)<br>
-· 整箱表 <b>空位点击 ➕</b> → 拍照识别新增
-</div>
-</div>
-<button class="sheet-cancel" data-close>关闭</button>
-</div>
+  <div class="sheet">
+    <h3>说明</h3>
+    <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px; font-size:13px;">
+      <div style="display:flex; align-items:center; gap:10px; padding:8px; background:var(--bg); border-radius:8px;">
+        <div style="width:36px; height:24px; background:var(--red); border-radius:4px;"></div>
+        <div><strong>红色</strong> · 无货 (一个都没有)</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; padding:8px; background:var(--bg); border-radius:8px;">
+        <div style="width:36px; height:24px; background:var(--yellow); border-radius:4px;"></div>
+        <div><strong>黄色</strong> · 少量</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; padding:8px; background:var(--bg); border-radius:8px;">
+        <div style="width:36px; height:24px; background:var(--green); border-radius:4px;"></div>
+        <div><strong>绿色</strong> · 充足</div>
+      </div>
+      <div style="font-size:12px; color:var(--muted); padding:10px; background:var(--bg); border-radius:8px; line-height:1.7;">
+        · <b>单击</b>颜色格 → 改颜色<br>
+        · <b>双击</b>颜色格 → 输入数量(整数)<br>
+        · <b>双击</b>型号 → 拍照识别 / 修改型号<br>
+        · <b>双击</b>表标题 / 通道名 / 货架层名 → 修改<br>
+        · <b>长按拖动</b>型号 → 移到其他位置<br>
+        · <b>长按 ⠿ 把手</b> → 整层拖到别处(序号自动重排)<br>
+        · 货架行右边 <b>+</b> → 在该层后插入新一层<br>
+        · 整箱表上 <b>拖到底部</b> → 删除(整箱搬走)<br>
+        · 整箱表 <b>空层点击</b> → 拍照识别新增
+      </div>
+    </div>
+    <button class="sheet-cancel" data-close>关闭</button>
+  </div>
 </div>
 
 <div class="sheet-backdrop" id="camera-sheet">
-<div class="sheet">
-<h3 id="camera-title">添加整箱型号</h3>
-<video id="camera-video" class="camera-preview" autoplay playsinline muted style="display:none;"></video>
-<canvas id="camera-canvas" class="camera-preview" style="display:none;"></canvas>
-<div class="camera-controls">
-<button id="camera-start">📷 拍照识别</button>
-<button id="camera-retake" style="display:none;">↻ 重拍</button>
-</div>
-<input type="text" class="model-search-input" id="model-search" placeholder="或手动输入型号关键词搜索/新建..." autocomplete="off">
-<div class="model-suggestions" id="model-suggestions"></div>
-<button class="sheet-confirm" id="model-confirm">确定</button>
-<button class="sheet-cancel" data-close>取消</button>
-</div>
+  <div class="sheet">
+    <h3 id="camera-title">添加整箱型号</h3>
+    <video id="camera-video" class="camera-preview" autoplay playsinline muted style="display:none;"></video>
+    <canvas id="camera-canvas" class="camera-preview" style="display:none;"></canvas>
+    <div class="camera-controls">
+      <button id="camera-start">📷 拍照识别</button>
+      <button id="camera-retake" style="display:none;">↻ 重拍</button>
+    </div>
+    <input type="text" class="model-search-input" id="model-search" placeholder="或手动输入型号关键词搜索/新建..." autocomplete="off">
+    <div class="model-suggestions" id="model-suggestions"></div>
+    <button class="sheet-confirm" id="model-confirm">确定</button>
+    <button class="sheet-cancel" data-close>取消</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 const INITIAL_MODELS = [
-"VW Golf 6 (2010-2014)","Accord (2003-2007)","Infiniti G35/37 (2007-2015)","Ford Focus (2012-2018)",
-"Lexus IS (2014-2024)","Corolla sed (2003-2008)","Nissan Versa (2010+)","Forte sed (2012-2018)",
-"Lexus GX 460","Nissan Sentra (2020-2025)","Kia K5 (2021)","Honda Civic (2022-2025)",
-"Corolla sed (2014-2019)","Honda Civic (2006-2011)","Lancer EVO X (2008-2017)","Nissan Altima (2013-2018)",
-"Toyota Camry (2018-2024)","Corolla sed (2020-2025)","VW Golf 7 (2015-2019)","VW Jetta (2011-2018)",
-"Lexus GS (2013-2020)","Acura RDX (2019-2024)","Toyota Highlander (2014-2019)","Corolla sed (2007-2013)",
-"Toyota Camry (2012-2017)","Subaru Crosstrek (2014-2025)","Chevy Cruz (2009-2015)","Impreza Hatchback (2017-2021)",
-"Infiniti Q50 (2014+)","Subaru WRX (2015-2021)","Versa sed (2012-2019)","VW Passat sed (2012-2018)",
-"Accord (2013-2017)","Chevy Malibu (2016-2022)","Dodge Charger (2011)","Accord (2018-2022)",
-"Fit HB (2015-2019)","Legacy B4 sed (2014-2019)","Accord (2008-2012)","Subaru WRX (2022-2024)",
-"CRV (2017-2022)","Legacy B4 sed (2009-2014)","Honda CR-Z (2023+)","Nissan Rouge (2014-2019)",
-"Toyota Camry (2025-2026)","Toyota BZ4X (2023-2025)","HRV (2015)"
+  "VW Golf 6 (2010-2014)","Accord (2003-2007)","Infiniti G35/37 (2007-2015)","Ford Focus (2012-2018)",
+  "Lexus IS (2014-2024)","Corolla sed (2003-2008)","Nissan Versa (2010+)","Forte sed (2012-2018)",
+  "Lexus GX 460","Nissan Sentra (2020-2025)","Kia K5 (2021)","Honda Civic (2022-2025)",
+  "Corolla sed (2014-2019)","Honda Civic (2006-2011)","Lancer EVO X (2008-2017)","Nissan Altima (2013-2018)",
+  "Toyota Camry (2018-2024)","Corolla sed (2020-2025)","VW Golf 7 (2015-2019)","VW Jetta (2011-2018)",
+  "Lexus GS (2013-2020)","Acura RDX (2019-2024)","Toyota Highlander (2014-2019)","Corolla sed (2007-2013)",
+  "Toyota Camry (2012-2017)","Subaru Crosstrek (2014-2025)","Chevy Cruz (2009-2015)","Impreza Hatchback (2017-2021)",
+  "Infiniti Q50 (2014+)","Subaru WRX (2015-2021)","Versa sed (2012-2019)","VW Passat sed (2012-2018)",
+  "Accord (2013-2017)","Chevy Malibu (2016-2022)","Dodge Charger (2011)","Accord (2018-2022)",
+  "Fit HB (2015-2019)","Legacy B4 sed (2014-2019)","Accord (2008-2012)","Subaru WRX (2022-2024)",
+  "CRV (2017-2022)","Legacy B4 sed (2009-2014)","Honda CR-Z (2023+)","Nissan Rouge (2014-2019)",
+  "Toyota Camry (2025-2026)","Toyota BZ4X (2023-2025)","HRV (2015)"
 ];
 const SHELF_NAMES = ["顶","上","中","下"];
 const SHELF_AISLE_NAMES = ["左","中","右"];
@@ -389,95 +399,95 @@ let currentTable = 'shelfBlack';
 
 function newSlot() { return { modelId: null, color: null, qty: 0 }; }
 function loadState() {
-try {
-const raw = localStorage.getItem('inventoryV3');
-if (raw) { state = JSON.parse(raw); if (state.models && state.shelfBlackTable && state.shelfWhiteTable && state.palletTable) return; }
-// try migrating from V2
-const oldRaw = localStorage.getItem('inventoryV2');
-if (oldRaw) {
-const old = JSON.parse(oldRaw);
-if (old.models && old.shelfTable && old.palletTable) {
-state = {
-models: old.models,
-shelfBlackTable: old.shelfTable,
-shelfWhiteTable: buildEmptyShelfTable(),
-palletTable: old.palletTable,
-meta: { shelfBlack: { filler: '', date: '' }, shelfWhite: { filler: '', date: '' }, pallet: { filler: '', date: '' } }
-};
-return;
-}
-}
-} catch(e) {}
-state = buildInitial();
+  try {
+    const raw = localStorage.getItem('inventoryV3');
+    if (raw) { state = JSON.parse(raw); if (state.models && state.shelfBlackTable && state.shelfWhiteTable && state.palletTable) return; }
+    // try migrating from V2
+    const oldRaw = localStorage.getItem('inventoryV2');
+    if (oldRaw) {
+      const old = JSON.parse(oldRaw);
+      if (old.models && old.shelfTable && old.palletTable) {
+        state = {
+          models: old.models,
+          shelfBlackTable: old.shelfTable,
+          shelfWhiteTable: buildEmptyShelfTable(),
+          palletTable: old.palletTable,
+          meta: { shelfBlack: { filler: '', date: '' }, shelfWhite: { filler: '', date: '' }, pallet: { filler: '', date: '' } }
+        };
+        return;
+      }
+    }
+  } catch(e) {}
+  state = buildInitial();
 }
 function saveState() { try { localStorage.setItem('inventoryV3', JSON.stringify(state)); } catch(e) {} }
 function buildEmptyShelfTable() {
-return { aisles: SHELF_AISLE_NAMES.map(n => ({ name: n, shelves: SHELF_NAMES.map(sn => ({ name: sn, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) })) };
+  return { aisles: SHELF_AISLE_NAMES.map(n => ({ name: n, shelves: SHELF_NAMES.map(sn => ({ name: sn, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) })) };
 }
 function buildInitial() {
-const models = INITIAL_MODELS.map((n,i) => ({ id: 'm_'+i+'_'+Date.now(), name: n }));
-// Black shelf: filled with all models
-const shelfBlackAisles = SHELF_AISLE_NAMES.map(n => ({ name: n, shelves: SHELF_NAMES.map(sn => ({ name: sn, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) }));
-let mi = 0;
-for (const a of shelfBlackAisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) {
-if (mi < models.length) { s.slots[i].modelId = models[mi].id; mi++; }
-}
-if (mi < models.length) {
-const la = shelfBlackAisles[shelfBlackAisles.length-1];
-while (mi < models.length) {
-const idx = la.shelves.length;
-const slots = Array.from({length: SLOTS_PER_SHELF}, () => newSlot());
-for (let i=0; i<SLOTS_PER_SHELF && mi < models.length; i++) { slots[i].modelId = models[mi].id; mi++; }
-la.shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots });
-}
-}
-// White shelf: same structure, empty (user fills as needed) — but pre-seed with same model layout for convenience
-const shelfWhiteAisles = SHELF_AISLE_NAMES.map(n => ({ name: n, shelves: SHELF_NAMES.map(sn => ({ name: sn, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) }));
-mi = 0;
-for (const a of shelfWhiteAisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) {
-if (mi < models.length) { s.slots[i].modelId = models[mi].id; mi++; }
-}
-if (mi < models.length) {
-const la = shelfWhiteAisles[shelfWhiteAisles.length-1];
-while (mi < models.length) {
-const idx = la.shelves.length;
-const slots = Array.from({length: SLOTS_PER_SHELF}, () => newSlot());
-for (let i=0; i<SLOTS_PER_SHELF && mi < models.length; i++) { slots[i].modelId = models[mi].id; mi++; }
-la.shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots });
-}
-}
-const palletAisles = PALLET_AISLE_NAMES.map(n => ({
-name: n,
-pallets: Array.from({length: PALLETS_PER_AISLE}, (_, pi) => ({ name: 'P'+(pi+1), layers: Array.from({length: LAYERS_PER_PALLET}, () => newSlot()) }))
-}));
-if (palletAisles[0]) {
-for (let p = 0; p < 3 && p < palletAisles[0].pallets.length; p++) {
-const layout = p === 2 ? [20,21,22,23,24] : [p*10, p*10+1, p*10+2, p*10+3, p*10+4, p*10+5, p*10+6, p*10+7, p*10+8, p*10+9];
-layout.forEach((mi, li) => {
-if (mi < models.length) palletAisles[0].pallets[p].layers[li] = { modelId: models[mi].id, color: null, qty: 0 };
-});
-}
-}
-const today = new Date().toISOString().slice(0, 10);
-return {
-models,
-shelfBlackTable: { aisles: shelfBlackAisles },
-shelfWhiteTable: { aisles: shelfWhiteAisles },
-palletTable: { aisles: palletAisles },
-meta: {
-shelfBlack: { filler: '', date: today, title: '黑色 MUG 和 IC 零散货架表' },
-shelfWhite: { filler: '', date: today, title: '白色 BK/CH 零散货架表' },
-pallet: { filler: '', date: today, title: '整箱货堆库存表' }
-}
-};
+  const models = INITIAL_MODELS.map((n,i) => ({ id: 'm_'+i+'_'+Date.now(), name: n }));
+  // Black shelf: filled with all models
+  const shelfBlackAisles = SHELF_AISLE_NAMES.map(n => ({ name: n, shelves: SHELF_NAMES.map(sn => ({ name: sn, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) }));
+  let mi = 0;
+  for (const a of shelfBlackAisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) {
+    if (mi < models.length) { s.slots[i].modelId = models[mi].id; mi++; }
+  }
+  if (mi < models.length) {
+    const la = shelfBlackAisles[shelfBlackAisles.length-1];
+    while (mi < models.length) {
+      const idx = la.shelves.length;
+      const slots = Array.from({length: SLOTS_PER_SHELF}, () => newSlot());
+      for (let i=0; i<SLOTS_PER_SHELF && mi < models.length; i++) { slots[i].modelId = models[mi].id; mi++; }
+      la.shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots });
+    }
+  }
+  // White shelf: same structure, empty (user fills as needed) — but pre-seed with same model layout for convenience
+  const shelfWhiteAisles = SHELF_AISLE_NAMES.map(n => ({ name: n, shelves: SHELF_NAMES.map(sn => ({ name: sn, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) }));
+  mi = 0;
+  for (const a of shelfWhiteAisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) {
+    if (mi < models.length) { s.slots[i].modelId = models[mi].id; mi++; }
+  }
+  if (mi < models.length) {
+    const la = shelfWhiteAisles[shelfWhiteAisles.length-1];
+    while (mi < models.length) {
+      const idx = la.shelves.length;
+      const slots = Array.from({length: SLOTS_PER_SHELF}, () => newSlot());
+      for (let i=0; i<SLOTS_PER_SHELF && mi < models.length; i++) { slots[i].modelId = models[mi].id; mi++; }
+      la.shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots });
+    }
+  }
+  const palletAisles = PALLET_AISLE_NAMES.map(n => ({
+    name: n,
+    pallets: Array.from({length: PALLETS_PER_AISLE}, (_, pi) => ({ name: 'P'+(pi+1), layers: Array.from({length: LAYERS_PER_PALLET}, () => newSlot()) }))
+  }));
+  if (palletAisles[0]) {
+    for (let p = 0; p < 3 && p < palletAisles[0].pallets.length; p++) {
+      const layout = p === 2 ? [20,21,22,23,24] : [p*10, p*10+1, p*10+2, p*10+3, p*10+4, p*10+5, p*10+6, p*10+7, p*10+8, p*10+9];
+      layout.forEach((mi, li) => {
+        if (mi < models.length) palletAisles[0].pallets[p].layers[li] = { modelId: models[mi].id, color: null, qty: 0 };
+      });
+    }
+  }
+  const today = new Date().toISOString().slice(0, 10);
+  return {
+    models,
+    shelfBlackTable: { aisles: shelfBlackAisles },
+    shelfWhiteTable: { aisles: shelfWhiteAisles },
+    palletTable: { aisles: palletAisles },
+    meta: {
+      shelfBlack: { filler: '', date: today, title: '黑色 MUG 和 IC 零散货架表' },
+      shelfWhite: { filler: '', date: today, title: '白色 BK/CH 零散货架表' },
+      pallet: { filler: '', date: today, title: '整箱货堆库存表' }
+    }
+  };
 }
 
 function getModel(id) { return state.models.find(m => m.id === id); }
 function isShelfTable(t) { return t === 'shelfBlack' || t === 'shelfWhite'; }
 function getActiveTable() {
-if (currentTable === 'shelfBlack') return state.shelfBlackTable;
-if (currentTable === 'shelfWhite') return state.shelfWhiteTable;
-return state.palletTable;
+  if (currentTable === 'shelfBlack') return state.shelfBlackTable;
+  if (currentTable === 'shelfWhite') return state.shelfWhiteTable;
+  return state.palletTable;
 }
 function getContainerKey() { return isShelfTable(currentTable) ? 'shelves' : 'pallets'; }
 function getSlotsKey() { return isShelfTable(currentTable) ? 'slots' : 'layers'; }
@@ -487,489 +497,739 @@ function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;'
 function render() { renderMetaBars(); renderListView(); renderGridView(); saveState(); }
 
 function renderMetaBars() {
-if (!state.meta) state.meta = { shelfBlack:{filler:'',date:'',title:'黑色 MUG 和 IC 零散货架表'}, shelfWhite:{filler:'',date:'',title:'白色 BK/CH 零散货架表'}, pallet:{filler:'',date:'',title:'整箱货堆库存表'} };
-const defaults = { shelfBlack: '黑色 MUG 和 IC 零散货架表', shelfWhite: '白色 BK/CH 零散货架表', pallet: '整箱货堆库存表' };
-['shelfBlack','shelfWhite','pallet'].forEach(key => {
-if (!state.meta[key]) state.meta[key] = { filler:'', date:'', title: defaults[key] };
-if (!state.meta[key].title) state.meta[key].title = defaults[key];
-const fillerInp = document.querySelector(`input[data-meta="filler"][data-table-meta="${key}"]`);
-const dateInp = document.querySelector(`input[data-meta="date"][data-table-meta="${key}"]`);
-const titleEl = document.querySelector(`.meta-title[data-meta-title="${key}"]`);
-if (fillerInp && document.activeElement !== fillerInp) fillerInp.value = state.meta[key].filler || '';
-if (dateInp && document.activeElement !== dateInp) dateInp.value = state.meta[key].date || '';
-if (titleEl && titleEl.contentEditable !== 'true') titleEl.textContent = state.meta[key].title || defaults[key];
-});
+  if (!state.meta) state.meta = { shelfBlack:{filler:'',date:'',title:'黑色 MUG 和 IC 零散货架表'}, shelfWhite:{filler:'',date:'',title:'白色 BK/CH 零散货架表'}, pallet:{filler:'',date:'',title:'整箱货堆库存表'} };
+  const defaults = { shelfBlack: '黑色 MUG 和 IC 零散货架表', shelfWhite: '白色 BK/CH 零散货架表', pallet: '整箱货堆库存表' };
+  ['shelfBlack','shelfWhite','pallet'].forEach(key => {
+    if (!state.meta[key]) state.meta[key] = { filler:'', date:'', title: defaults[key] };
+    if (!state.meta[key].title) state.meta[key].title = defaults[key];
+    const fillerInp = document.querySelector(`input[data-meta="filler"][data-table-meta="${key}"]`);
+    const dateInp = document.querySelector(`input[data-meta="date"][data-table-meta="${key}"]`);
+    const titleEl = document.querySelector(`.meta-title[data-meta-title="${key}"]`);
+    if (fillerInp && document.activeElement !== fillerInp) fillerInp.value = state.meta[key].filler || '';
+    if (dateInp && document.activeElement !== dateInp) dateInp.value = state.meta[key].date || '';
+    if (titleEl && titleEl.contentEditable !== 'true') titleEl.textContent = state.meta[key].title || defaults[key];
+  });
 }
 
 // One-time meta input bindings
 document.querySelectorAll('input[data-meta]').forEach(inp => {
-inp.addEventListener('input', () => {
-const key = inp.dataset.tableMeta;
-const field = inp.dataset.meta;
-if (!state.meta) state.meta = {};
-if (!state.meta[key]) state.meta[key] = { filler:'', date:'', title:'' };
-state.meta[key][field] = inp.value;
-saveState();
-});
+  inp.addEventListener('input', () => {
+    const key = inp.dataset.tableMeta;
+    const field = inp.dataset.meta;
+    if (!state.meta) state.meta = {};
+    if (!state.meta[key]) state.meta[key] = { filler:'', date:'', title:'' };
+    state.meta[key][field] = inp.value;
+    saveState();
+  });
 });
 
 // Meta title double-tap to edit
 document.querySelectorAll('.meta-title[data-meta-title]').forEach(el => {
-let lastTap = 0;
-el.addEventListener('dblclick', (e) => { e.preventDefault(); startEditMetaTitle(el); });
-el.addEventListener('touchend', (e) => {
-const now = Date.now();
-if (now - lastTap < 350) { e.preventDefault(); startEditMetaTitle(el); }
-lastTap = now;
-});
+  let lastTap = 0;
+  el.addEventListener('dblclick', (e) => { e.preventDefault(); startEditMetaTitle(el); });
+  el.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTap < 350) { e.preventDefault(); startEditMetaTitle(el); }
+    lastTap = now;
+  });
 });
 function startEditMetaTitle(el) {
-el.contentEditable = 'true';
-el.focus();
-const range = document.createRange(); range.selectNodeContents(el);
-const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
-const finish = () => {
-el.contentEditable = 'false';
-el.removeEventListener('blur', finish); el.removeEventListener('keydown', onKey);
-const txt = el.textContent.trim();
-const key = el.dataset.metaTitle;
-if (!state.meta[key]) state.meta[key] = { filler:'', date:'', title:'' };
-if (txt) state.meta[key].title = txt;
-render();
-};
-const onKey = (e) => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } if (e.key === 'Escape') { e.preventDefault(); render(); } };
-el.addEventListener('blur', finish); el.addEventListener('keydown', onKey);
+  el.contentEditable = 'true';
+  el.focus();
+  const range = document.createRange(); range.selectNodeContents(el);
+  const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  const finish = () => {
+    el.contentEditable = 'false';
+    el.removeEventListener('blur', finish); el.removeEventListener('keydown', onKey);
+    const txt = el.textContent.trim();
+    const key = el.dataset.metaTitle;
+    if (!state.meta[key]) state.meta[key] = { filler:'', date:'', title:'' };
+    if (txt) state.meta[key].title = txt;
+    render();
+  };
+  const onKey = (e) => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } if (e.key === 'Escape') { e.preventDefault(); render(); } };
+  el.addEventListener('blur', finish); el.addEventListener('keydown', onKey);
 }
 
 function renderListView() {
-const isShelf = isShelfTable(currentTable);
-const root = document.getElementById(currentTable + '-list');
-root.innerHTML = '';
-const t = getActiveTable();
-if (!t.aisles.length) { root.innerHTML = `<div style="text-align:center; padding:40px; color:var(--muted);">暂无数据,点右下 + 添加</div>`; return; }
-const ck = getContainerKey(), sk = getSlotsKey();
-let serial = 0;
-t.aisles.forEach((aisle, ai) => {
-const ablock = document.createElement('div');
-ablock.className = 'aisle-block';
-const containerLabel = isShelf ? '货架' : '托盘';
-ablock.innerHTML = `<div class="aisle-header">
-<span class="aisle-name editable" data-ai="${ai}">${isShelf ? '通道 · ' : '排 · '}${escapeHtml(aisle.name)}</span>
-<button class="add-child" data-ai="${ai}" title="新增${containerLabel}">+</button></div>`;
-aisle[ck].forEach((container, ci) => {
-const cblock = document.createElement('div');
-cblock.className = 'container-block' + (isShelf ? '' : ' pallet');
-const tools = isShelf ? '' : `<div class="container-tools"><button class="mini-btn" data-act="add-layer" data-ai="${ai}" data-ci="${ci}">+层</button><button class="mini-btn" data-act="del-pallet" data-ai="${ai}" data-ci="${ci}">删</button></div>`;
-cblock.innerHTML = `<div class="container-name">
-<span class="cont-name editable" data-ai="${ai}" data-ci="${ci}">${escapeHtml(container.name)}${isShelf ? ' 层' : ''}</span>
-${tools}</div>`;
-container[sk].forEach((slot, si) => {
-serial++;
-const cell = document.createElement('div');
-cell.className = 'slot' + (slot.modelId ? '' : ' empty');
-cell.dataset.ai = ai; cell.dataset.ci = ci; cell.dataset.si = si;
-const m = slot.modelId ? getModel(slot.modelId) : null;
-const modelHtml = slot.modelId
-? `<div class="model-cell has-model" draggable="true" data-mid="${slot.modelId}" data-ai="${ai}" data-ci="${ci}" data-si="${si}" data-table="${currentTable}">${escapeHtml(m ? m.name : '?')}</div>`
-: `<div class="model-cell empty-clickable" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${isShelf ? '空格 (点击添加)' : '空层 (拍照添加)'}</div>`;
-const colorHtml = slot.modelId
-? `<div class="color-cell" data-color="${slot.color||''}" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${slot.qty>0 ? slot.qty : '<span class="qty-zero">·</span>'}</div>`
-: `<div class="color-cell" style="visibility:hidden"></div>`;
-cell.innerHTML = `<div class="slot-num">${slot.modelId ? serial : '—'}</div>${modelHtml}${colorHtml}`;
-cblock.appendChild(cell);
-});
-ablock.appendChild(cblock);
-});
-root.appendChild(ablock);
-});
-attachListHandlers(root);
+  const isShelf = isShelfTable(currentTable);
+  const root = document.getElementById(currentTable + '-list');
+  root.innerHTML = '';
+  const t = getActiveTable();
+  if (!t.aisles.length) { root.innerHTML = `<div style="text-align:center; padding:40px; color:var(--muted);">暂无数据,点右下 + 添加</div>`; return; }
+  const ck = getContainerKey(), sk = getSlotsKey();
+  let serial = 0;
+  t.aisles.forEach((aisle, ai) => {
+    const ablock = document.createElement('div');
+    ablock.className = 'aisle-block';
+    const containerLabel = isShelf ? '货架' : '托盘';
+    ablock.innerHTML = `<div class="aisle-header">
+      <span class="aisle-name editable" data-ai="${ai}">${isShelf ? '通道 · ' : '排 · '}${escapeHtml(aisle.name)}</span>
+      <button class="add-child" data-ai="${ai}" title="新增${containerLabel}">+</button></div>`;
+    aisle[ck].forEach((container, ci) => {
+      const cblock = document.createElement('div');
+      cblock.className = 'container-block' + (isShelf ? '' : ' pallet');
+      const palletTools = isShelf ? '' : `<button class="mini-btn" data-act="del-pallet" data-ai="${ai}" data-ci="${ci}">删</button>`;
+      cblock.innerHTML = `<div class="container-name">
+        <span class="shelf-drag-handle" data-ai="${ai}" data-ci="${ci}" data-table="${currentTable}" title="按住拖动整层">⠿</span>
+        <span class="cont-name editable" data-ai="${ai}" data-ci="${ci}">${escapeHtml(container.name)}${isShelf ? ' 层' : ''}</span>
+        <div class="container-tools">
+          <button class="add-after-shelf" data-ai="${ai}" data-ci="${ci}" title="在此后插入新${isShelf ? '层' : '托盘'}">+</button>
+          ${palletTools}
+        </div></div>`;
+      container[sk].forEach((slot, si) => {
+        serial++;
+        const cell = document.createElement('div');
+        cell.className = 'slot' + (slot.modelId ? '' : ' empty');
+        cell.dataset.ai = ai; cell.dataset.ci = ci; cell.dataset.si = si;
+        const m = slot.modelId ? getModel(slot.modelId) : null;
+        const modelHtml = slot.modelId
+          ? `<div class="model-cell has-model" draggable="true" data-mid="${slot.modelId}" data-ai="${ai}" data-ci="${ci}" data-si="${si}" data-table="${currentTable}">${escapeHtml(m ? m.name : '?')}</div>`
+          : `<div class="model-cell empty-clickable" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${isShelf ? '空格 (点击添加)' : '空层 (拍照添加)'}</div>`;
+        const colorHtml = slot.modelId
+          ? `<div class="color-cell" data-color="${slot.color||''}" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${slot.qty>0 ? slot.qty : '<span class="qty-zero">·</span>'}</div>`
+          : `<div class="color-cell" style="visibility:hidden"></div>`;
+        cell.innerHTML = `<div class="slot-num">${slot.modelId ? serial : '—'}</div>${modelHtml}${colorHtml}`;
+        cblock.appendChild(cell);
+      });
+      ablock.appendChild(cblock);
+    });
+    root.appendChild(ablock);
+  });
+  attachListHandlers(root);
 }
 
 function renderGridView() {
-const isShelf = isShelfTable(currentTable);
-const root = document.getElementById(currentTable + '-grid');
-root.innerHTML = '';
-const t = getActiveTable();
-if (!t.aisles.length) return;
-const ck = getContainerKey(), sk = getSlotsKey();
-const slotSerial = {}; let n = 0;
-t.aisles.forEach((aisle, ai) => aisle[ck].forEach((c, ci) => c[sk].forEach((slot, si) => { n++; slotSerial[`${ai}|${ci}|${si}`] = n; })));
-const row = document.createElement('div');
-row.className = 'aisles-row';
-row.style.setProperty('--cols', t.aisles.length);
-t.aisles.forEach((aisle, ai) => {
-const acol = document.createElement('div');
-acol.className = 'grid-aisle';
-acol.innerHTML = `<div class="grid-aisle-name editable" data-ai="${ai}">${escapeHtml(aisle.name)}</div>`;
-const containers = document.createElement('div');
-containers.className = 'grid-pallets';
-containers.style.setProperty('--pcols', isShelf ? 1 : 2);
-aisle[ck].forEach((container, ci) => {
-const cont = document.createElement('div');
-cont.className = 'grid-container' + (isShelf ? '' : ' pallet');
-cont.innerHTML = `<div class="grid-container-name editable" data-ai="${ai}" data-ci="${ci}">${escapeHtml(container.name)}</div>`;
-container[sk].forEach((slot, si) => {
-const gs = document.createElement('div');
-gs.className = 'grid-slot' + (slot.modelId ? '' : ' empty');
-gs.dataset.ai = ai; gs.dataset.ci = ci; gs.dataset.si = si;
-const m = slot.modelId ? getModel(slot.modelId) : null;
-const num = slotSerial[`${ai}|${ci}|${si}`];
-const modelHtml = slot.modelId
-? `<div class="gmodel" draggable="true" data-mid="${slot.modelId}" data-ai="${ai}" data-ci="${ci}" data-si="${si}" data-table="${currentTable}">${escapeHtml(m ? m.name : '?')}</div>`
-: `<div class="gmodel">${isShelf ? '空' : '—'}</div>`;
-const colorHtml = slot.modelId
-? `<div class="gcolor" data-color="${slot.color||''}" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${slot.qty>0 ? slot.qty : ''}</div>`
-: `<div class="gcolor" style="visibility:hidden"></div>`;
-gs.innerHTML = `<div class="gnum">${slot.modelId ? num : ''}</div>${modelHtml}${colorHtml}`;
-cont.appendChild(gs);
-});
-containers.appendChild(cont);
-});
-acol.appendChild(containers);
-row.appendChild(acol);
-});
-root.appendChild(row);
-attachGridHandlers(root);
+  const isShelf = isShelfTable(currentTable);
+  const root = document.getElementById(currentTable + '-grid');
+  root.innerHTML = '';
+  const t = getActiveTable();
+  if (!t.aisles.length) return;
+  const ck = getContainerKey(), sk = getSlotsKey();
+  const slotSerial = {}; let n = 0;
+  t.aisles.forEach((aisle, ai) => aisle[ck].forEach((c, ci) => c[sk].forEach((slot, si) => { n++; slotSerial[`${ai}|${ci}|${si}`] = n; })));
+  const row = document.createElement('div');
+  row.className = 'aisles-row';
+  row.style.setProperty('--cols', t.aisles.length);
+  t.aisles.forEach((aisle, ai) => {
+    const acol = document.createElement('div');
+    acol.className = 'grid-aisle';
+    acol.innerHTML = `<div class="grid-aisle-name editable" data-ai="${ai}">${escapeHtml(aisle.name)}</div>`;
+    const containers = document.createElement('div');
+    containers.className = 'grid-pallets';
+    containers.style.setProperty('--pcols', isShelf ? 1 : 2);
+    aisle[ck].forEach((container, ci) => {
+      const cont = document.createElement('div');
+      cont.className = 'grid-container' + (isShelf ? '' : ' pallet');
+      cont.innerHTML = `<div class="grid-container-name editable" data-ai="${ai}" data-ci="${ci}">${escapeHtml(container.name)}</div>`;
+      container[sk].forEach((slot, si) => {
+        const gs = document.createElement('div');
+        gs.className = 'grid-slot' + (slot.modelId ? '' : ' empty');
+        gs.dataset.ai = ai; gs.dataset.ci = ci; gs.dataset.si = si;
+        const m = slot.modelId ? getModel(slot.modelId) : null;
+        const num = slotSerial[`${ai}|${ci}|${si}`];
+        const modelHtml = slot.modelId
+          ? `<div class="gmodel" draggable="true" data-mid="${slot.modelId}" data-ai="${ai}" data-ci="${ci}" data-si="${si}" data-table="${currentTable}">${escapeHtml(m ? m.name : '?')}</div>`
+          : `<div class="gmodel">${isShelf ? '空' : '—'}</div>`;
+        const colorHtml = slot.modelId
+          ? `<div class="gcolor" data-color="${slot.color||''}" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${slot.qty>0 ? slot.qty : ''}</div>`
+          : `<div class="gcolor" style="visibility:hidden"></div>`;
+        gs.innerHTML = `<div class="gnum">${slot.modelId ? num : ''}</div>${modelHtml}${colorHtml}`;
+        cont.appendChild(gs);
+      });
+      containers.appendChild(cont);
+    });
+    acol.appendChild(containers);
+    row.appendChild(acol);
+  });
+  root.appendChild(row);
+  attachGridHandlers(root);
 }
 
 function attachListHandlers(root) {
-root.querySelectorAll('.model-cell.has-model').forEach(el => { el.addEventListener('dragstart', onDragStart); el.addEventListener('dragend', onDragEnd); addTouchDrag(el); });
-root.querySelectorAll('.model-cell.empty-clickable').forEach(el => {
-el.addEventListener('click', () => { openModelPicker(+el.dataset.ai, +el.dataset.ci, +el.dataset.si, currentTable === 'pallet'); });
-});
-root.querySelectorAll('.slot').forEach(el => {
-el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('dragover'); });
-el.addEventListener('dragleave', () => el.classList.remove('dragover'));
-el.addEventListener('drop', onDropSlot);
-});
-root.querySelectorAll('.color-cell[data-ai]').forEach(el => attachColorCellHandlers(el));
-root.querySelectorAll('.editable').forEach(el => makeEditable(el));
-root.querySelectorAll('.add-child').forEach(el => { el.addEventListener('click', () => addContainerToAisle(+el.dataset.ai)); });
-root.querySelectorAll('.mini-btn').forEach(el => {
-el.addEventListener('click', (e) => {
-e.stopPropagation();
-const ai = +el.dataset.ai, ci = +el.dataset.ci, act = el.dataset.act;
-if (act === 'add-layer') {
-state.palletTable.aisles[ai].pallets[ci].layers.push(newSlot());
-toast('已加一层'); render();
-} else if (act === 'del-pallet') {
-if (confirm('删除整个托盘?(该托盘上所有整箱将清除)')) {
-state.palletTable.aisles[ai].pallets.splice(ci, 1);
-toast('已删除托盘'); render();
-}
-}
-});
-});
-}
-function attachGridHandlers(root) {
-root.querySelectorAll('.gmodel[draggable="true"]').forEach(el => { el.addEventListener('dragstart', onDragStart); el.addEventListener('dragend', onDragEnd); addTouchDrag(el); });
-root.querySelectorAll('.grid-slot').forEach(el => {
-el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('dragover'); });
-el.addEventListener('dragleave', () => el.classList.remove('dragover'));
-el.addEventListener('drop', onDropSlot);
-if (el.classList.contains('empty')) {
-el.addEventListener('click', () => openModelPicker(+el.dataset.ai, +el.dataset.ci, +el.dataset.si, currentTable === 'pallet'));
-}
-});
-root.querySelectorAll('.gcolor[data-ai]').forEach(el => attachColorCellHandlers(el));
-root.querySelectorAll('.editable').forEach(el => makeEditable(el));
+  root.querySelectorAll('.model-cell.has-model').forEach(el => {
+    el.addEventListener('dragstart', onDragStart);
+    el.addEventListener('dragend', onDragEnd);
+    addTouchDrag(el);
+    attachModelDoubleTap(el);
+  });
+  root.querySelectorAll('.model-cell.empty-clickable').forEach(el => {
+    el.addEventListener('click', () => { openModelPicker(+el.dataset.ai, +el.dataset.ci, +el.dataset.si, true); });
+  });
+  root.querySelectorAll('.slot').forEach(el => {
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('dragover'); });
+    el.addEventListener('dragleave', () => el.classList.remove('dragover'));
+    el.addEventListener('drop', onDropSlot);
+  });
+  root.querySelectorAll('.color-cell[data-ai]').forEach(el => attachColorCellHandlers(el));
+  root.querySelectorAll('.editable').forEach(el => makeEditable(el));
+  root.querySelectorAll('.add-child').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); addContainerToAisle(+el.dataset.ai); }); });
+  root.querySelectorAll('.add-after-shelf').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); addShelfAfter(+el.dataset.ai, +el.dataset.ci); }); });
+  root.querySelectorAll('.shelf-drag-handle').forEach(el => addShelfDrag(el));
+  // Desktop: container-block accepts shelf drops
+  root.querySelectorAll('.container-block').forEach(block => {
+    block.addEventListener('dragover', (e) => {
+      if (e.dataTransfer && Array.from(e.dataTransfer.types).includes('text/shelf')) {
+        e.preventDefault();
+        block.classList.add('shelf-drop-target');
+      }
+    });
+    block.addEventListener('dragleave', () => block.classList.remove('shelf-drop-target'));
+    block.addEventListener('drop', (e) => {
+      const data = e.dataTransfer?.getData('text/shelf');
+      if (!data) return;
+      e.preventDefault();
+      const { ai: srcAi, ci: srcCi } = JSON.parse(data);
+      const targetHandle = block.querySelector('.shelf-drag-handle');
+      if (targetHandle) moveShelf(srcAi, srcCi, +targetHandle.dataset.ai, +targetHandle.dataset.ci);
+      block.classList.remove('shelf-drop-target');
+    });
+  });
+  root.querySelectorAll('.mini-btn').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const ai = +el.dataset.ai, ci = +el.dataset.ci, act = el.dataset.act;
+      if (act === 'add-layer') {
+        state.palletTable.aisles[ai].pallets[ci].layers.push(newSlot());
+        toast('已加一层'); render();
+      } else if (act === 'del-pallet') {
+        if (confirm('删除整个托盘?(该托盘上所有整箱将清除)')) {
+          state.palletTable.aisles[ai].pallets.splice(ci, 1);
+          toast('已删除托盘'); render();
+        }
+      }
+    });
+  });
 }
 
+// Double-tap on a model cell: open picker (with camera), and replace current model on confirm
+function attachModelDoubleTap(el) {
+  let lastTapTime = 0;
+  el.addEventListener('click', (e) => {
+    const now = Date.now();
+    if (now - lastTapTime < 320) {
+      e.stopPropagation();
+      const ai = +el.dataset.ai, ci = +el.dataset.ci, si = +el.dataset.si;
+      const slot = getSlot(ai, ci, si);
+      const oldColor = slot.color, oldQty = slot.qty;
+      // Open picker with callback that replaces just the modelId, keeping color/qty
+      openModelPicker(ai, ci, si, true, (model) => {
+        const s = getSlot(ai, ci, si);
+        s.modelId = model.id;
+        // Keep existing color and qty when just replacing the model
+        s.color = oldColor; s.qty = oldQty;
+      });
+      // Pre-fill the search box with current name as a hint
+      setTimeout(() => {
+        const m = getModel(slot.modelId);
+        if (m) {
+          const inp = document.getElementById('model-search');
+          inp.value = '';
+          renderSuggestions('');
+        }
+      }, 50);
+      lastTapTime = 0;
+    } else {
+      lastTapTime = now;
+    }
+  });
+}
+function attachGridHandlers(root) {
+  root.querySelectorAll('.gmodel[draggable="true"]').forEach(el => {
+    el.addEventListener('dragstart', onDragStart);
+    el.addEventListener('dragend', onDragEnd);
+    addTouchDrag(el);
+    attachModelDoubleTap(el);
+  });
+  root.querySelectorAll('.grid-slot').forEach(el => {
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('dragover'); });
+    el.addEventListener('dragleave', () => el.classList.remove('dragover'));
+    el.addEventListener('drop', onDropSlot);
+    if (el.classList.contains('empty')) {
+      el.addEventListener('click', () => openModelPicker(+el.dataset.ai, +el.dataset.ci, +el.dataset.si, true));
+    }
+  });
+  root.querySelectorAll('.gcolor[data-ai]').forEach(el => attachColorCellHandlers(el));
+  root.querySelectorAll('.editable').forEach(el => makeEditable(el));
+}
+
+// Single tap = color, double tap = qty (touch-friendly)
 function attachColorCellHandlers(el) {
-let tapTimer = null, tapCount = 0;
-el.addEventListener('click', () => {
-tapCount++;
-if (tapCount === 1) {
-tapTimer = setTimeout(() => { openColorPicker(+el.dataset.ai, +el.dataset.ci, +el.dataset.si); tapCount = 0; }, 240);
-} else { clearTimeout(tapTimer); tapCount = 0; openQtyEditor(+el.dataset.ai, +el.dataset.ci, +el.dataset.si); }
-});
+  let lastTapTime = 0;
+  let pendingSingleTimer = null;
+
+  const handleTap = () => {
+    const now = Date.now();
+    const ai = +el.dataset.ai, ci = +el.dataset.ci, si = +el.dataset.si;
+    if (now - lastTapTime < 320) {
+      // Double tap detected
+      clearTimeout(pendingSingleTimer);
+      pendingSingleTimer = null;
+      lastTapTime = 0;
+      openQtyEditor(ai, ci, si);
+    } else {
+      lastTapTime = now;
+      // Schedule single-tap action; cancel if a second tap arrives
+      pendingSingleTimer = setTimeout(() => {
+        openColorPicker(ai, ci, si);
+        pendingSingleTimer = null;
+      }, 320);
+    }
+  };
+
+  el.addEventListener('click', (e) => { e.stopPropagation(); handleTap(); });
 }
 
 function makeEditable(el) {
-let lastTap = 0;
-el.addEventListener('dblclick', (e) => { e.preventDefault(); startEdit(el); });
-el.addEventListener('touchend', (e) => {
-const now = Date.now();
-if (now - lastTap < 350) { e.preventDefault(); startEdit(el); }
-lastTap = now;
-});
+  let lastTap = 0;
+  el.addEventListener('dblclick', (e) => { e.preventDefault(); startEdit(el); });
+  el.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTap < 350) { e.preventDefault(); startEdit(el); }
+    lastTap = now;
+  });
 }
 function startEdit(el) {
-el.contentEditable = 'true';
-el.focus();
-const range = document.createRange(); range.selectNodeContents(el);
-const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
-const finish = () => {
-el.contentEditable = 'false';
-el.removeEventListener('blur', finish); el.removeEventListener('keydown', onKey);
-let txt = el.textContent.trim().replace(/^通道 · /,'').replace(/^排 · /,'').replace(/ 层$/,'');
-if (!txt) { render(); return; }
-const ai = el.dataset.ai !== undefined ? +el.dataset.ai : null;
-const ci = el.dataset.ci !== undefined ? +el.dataset.ci : null;
-const t = getActiveTable(); const ck = getContainerKey();
-if (el.classList.contains('aisle-name') || el.classList.contains('grid-aisle-name')) t.aisles[ai].name = txt;
-else if (el.classList.contains('cont-name') || el.classList.contains('grid-container-name')) t.aisles[ai][ck][ci].name = txt;
-render();
-};
-const onKey = (e) => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } if (e.key === 'Escape') { e.preventDefault(); render(); } };
-el.addEventListener('blur', finish); el.addEventListener('keydown', onKey);
+  el.contentEditable = 'true';
+  el.focus();
+  const range = document.createRange(); range.selectNodeContents(el);
+  const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  const finish = () => {
+    el.contentEditable = 'false';
+    el.removeEventListener('blur', finish); el.removeEventListener('keydown', onKey);
+    let txt = el.textContent.trim().replace(/^通道 · /,'').replace(/^排 · /,'').replace(/ 层$/,'');
+    if (!txt) { render(); return; }
+    const ai = el.dataset.ai !== undefined ? +el.dataset.ai : null;
+    const ci = el.dataset.ci !== undefined ? +el.dataset.ci : null;
+    const t = getActiveTable(); const ck = getContainerKey();
+    if (el.classList.contains('aisle-name') || el.classList.contains('grid-aisle-name')) t.aisles[ai].name = txt;
+    else if (el.classList.contains('cont-name') || el.classList.contains('grid-container-name')) t.aisles[ai][ck][ci].name = txt;
+    render();
+  };
+  const onKey = (e) => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } if (e.key === 'Escape') { e.preventDefault(); render(); } };
+  el.addEventListener('blur', finish); el.addEventListener('keydown', onKey);
 }
 
 let dragMid = null, dragSrc = null, dragSrcTable = null;
 function onDragStart(e) {
-dragMid = this.dataset.mid; dragSrcTable = this.dataset.table;
-dragSrc = { ai: +this.dataset.ai, ci: +this.dataset.ci, si: +this.dataset.si };
-this.classList.add('dragging');
-if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragMid); }
-if (currentTable === 'pallet') showDeleteZone();
+  dragMid = this.dataset.mid; dragSrcTable = this.dataset.table;
+  dragSrc = { ai: +this.dataset.ai, ci: +this.dataset.ci, si: +this.dataset.si };
+  this.classList.add('dragging');
+  if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragMid); }
+  if (currentTable === 'pallet') showDeleteZone();
 }
 function onDragEnd() { this.classList.remove('dragging'); document.querySelectorAll('.dragover').forEach(el => el.classList.remove('dragover')); hideDeleteZone(); }
 function onDropSlot(e) {
-e.preventDefault(); this.classList.remove('dragover');
-if (!dragMid || !dragSrc || dragSrcTable !== currentTable) { dragMid = null; dragSrc = null; return; }
-performMove(dragSrc, { ai: +this.dataset.ai, ci: +this.dataset.ci, si: +this.dataset.si });
-dragMid = null; dragSrc = null;
+  e.preventDefault(); this.classList.remove('dragover');
+  if (!dragMid || !dragSrc || dragSrcTable !== currentTable) { dragMid = null; dragSrc = null; return; }
+  performMove(dragSrc, { ai: +this.dataset.ai, ci: +this.dataset.ci, si: +this.dataset.si });
+  dragMid = null; dragSrc = null;
 }
 function performMove(src, tgt) {
-if (src.ai === tgt.ai && src.ci === tgt.ci && src.si === tgt.si) return;
-const sSlot = getSlot(src.ai, src.ci, src.si), tSlot = getSlot(tgt.ai, tgt.ci, tgt.si);
-const tmp = { modelId: tSlot.modelId, color: tSlot.color, qty: tSlot.qty };
-tSlot.modelId = sSlot.modelId; tSlot.color = sSlot.color; tSlot.qty = sSlot.qty;
-sSlot.modelId = tmp.modelId; sSlot.color = tmp.color; sSlot.qty = tmp.qty;
-render();
+  if (src.ai === tgt.ai && src.ci === tgt.ci && src.si === tgt.si) return;
+  const sSlot = getSlot(src.ai, src.ci, src.si), tSlot = getSlot(tgt.ai, tgt.ci, tgt.si);
+  const tmp = { modelId: tSlot.modelId, color: tSlot.color, qty: tSlot.qty };
+  tSlot.modelId = sSlot.modelId; tSlot.color = sSlot.color; tSlot.qty = sSlot.qty;
+  sSlot.modelId = tmp.modelId; sSlot.color = tmp.color; sSlot.qty = tmp.qty;
+  render();
 }
 function showDeleteZone() { document.getElementById('delete-zone').classList.add('show'); }
 function hideDeleteZone() { const z = document.getElementById('delete-zone'); z.classList.remove('show'); z.classList.remove('active'); }
 
 function addTouchDrag(el) {
-let ghost = null, startX = 0, startY = 0, longPressTimer = null, dragging = false;
-el.addEventListener('touchstart', (e) => {
-const t = e.touches[0]; startX = t.clientX; startY = t.clientY;
-longPressTimer = setTimeout(() => {
-dragging = true;
-dragMid = el.dataset.mid; dragSrcTable = el.dataset.table;
-dragSrc = { ai: +el.dataset.ai, ci: +el.dataset.ci, si: +el.dataset.si };
-ghost = el.cloneNode(true);
-Object.assign(ghost.style, {
-position: 'fixed', zIndex: '300', pointerEvents: 'none', background: 'var(--paper)',
-padding: '6px 10px', border: '2px solid var(--ink)', borderRadius: '8px',
-boxShadow: '0 6px 20px rgba(0,0,0,0.3)', left: (t.clientX-50)+'px', top: (t.clientY-18)+'px',
-opacity: '0.95', maxWidth: '180px', fontSize: '13px'
-});
-document.body.appendChild(ghost);
-el.classList.add('dragging');
-if (currentTable === 'pallet') showDeleteZone();
-if (navigator.vibrate) navigator.vibrate(30);
-}, 350);
-}, { passive: true });
-el.addEventListener('touchmove', (e) => {
-const t = e.touches[0];
-if (!dragging && Math.hypot(t.clientX-startX, t.clientY-startY) > 10) clearTimeout(longPressTimer);
-if (dragging && ghost) {
-e.preventDefault();
-ghost.style.left = (t.clientX-50)+'px'; ghost.style.top = (t.clientY-18)+'px';
-ghost.style.display = 'none';
-const under = document.elementFromPoint(t.clientX, t.clientY);
-ghost.style.display = '';
-document.querySelectorAll('.dragover').forEach(x => x.classList.remove('dragover'));
-const slot = under?.closest('.slot, .grid-slot');
-if (slot) slot.classList.add('dragover');
-const dz = document.getElementById('delete-zone');
-if (currentTable === 'pallet') {
-const dzRect = dz.getBoundingClientRect();
-if (t.clientY > dzRect.top) dz.classList.add('active'); else dz.classList.remove('active');
-}
-}
-}, { passive: false });
-el.addEventListener('touchend', (e) => {
-clearTimeout(longPressTimer);
-if (dragging) {
-const t = e.changedTouches[0];
-ghost.style.display = 'none';
-const under = document.elementFromPoint(t.clientX, t.clientY);
-ghost.remove(); ghost = null;
-el.classList.remove('dragging');
-const dz = document.getElementById('delete-zone'); const dzRect = dz.getBoundingClientRect();
-if (currentTable === 'pallet' && t.clientY > dzRect.top) {
-const s = getSlot(dragSrc.ai, dragSrc.ci, dragSrc.si);
-s.modelId = null; s.color = null; s.qty = 0;
-toast('🗑️ 整箱已搬走'); render();
-} else {
-const slot = under?.closest('.slot, .grid-slot');
-if (slot && dragMid) performMove(dragSrc, { ai: +slot.dataset.ai, ci: +slot.dataset.ci, si: +slot.dataset.si });
-}
-document.querySelectorAll('.dragover').forEach(x => x.classList.remove('dragover'));
-hideDeleteZone();
-dragging = false; dragMid = null; dragSrc = null;
-}
-});
-el.addEventListener('touchcancel', () => { clearTimeout(longPressTimer); if (ghost) { ghost.remove(); ghost = null; } dragging = false; el.classList.remove('dragging'); hideDeleteZone(); });
+  let ghost = null, startX = 0, startY = 0, longPressTimer = null, dragging = false;
+  el.addEventListener('touchstart', (e) => {
+    const t = e.touches[0]; startX = t.clientX; startY = t.clientY;
+    longPressTimer = setTimeout(() => {
+      dragging = true;
+      dragMid = el.dataset.mid; dragSrcTable = el.dataset.table;
+      dragSrc = { ai: +el.dataset.ai, ci: +el.dataset.ci, si: +el.dataset.si };
+      ghost = el.cloneNode(true);
+      Object.assign(ghost.style, {
+        position: 'fixed', zIndex: '300', pointerEvents: 'none', background: 'var(--paper)',
+        padding: '6px 10px', border: '2px solid var(--ink)', borderRadius: '8px',
+        boxShadow: '0 6px 20px rgba(0,0,0,0.3)', left: (t.clientX-50)+'px', top: (t.clientY-18)+'px',
+        opacity: '0.95', maxWidth: '180px', fontSize: '13px'
+      });
+      document.body.appendChild(ghost);
+      el.classList.add('dragging');
+      if (currentTable === 'pallet') showDeleteZone();
+      if (navigator.vibrate) navigator.vibrate(30);
+    }, 350);
+  }, { passive: true });
+  el.addEventListener('touchmove', (e) => {
+    const t = e.touches[0];
+    if (!dragging && Math.hypot(t.clientX-startX, t.clientY-startY) > 10) clearTimeout(longPressTimer);
+    if (dragging && ghost) {
+      e.preventDefault();
+      ghost.style.left = (t.clientX-50)+'px'; ghost.style.top = (t.clientY-18)+'px';
+      ghost.style.display = 'none';
+      const under = document.elementFromPoint(t.clientX, t.clientY);
+      ghost.style.display = '';
+      document.querySelectorAll('.dragover').forEach(x => x.classList.remove('dragover'));
+      const slot = under?.closest('.slot, .grid-slot');
+      if (slot) slot.classList.add('dragover');
+      const dz = document.getElementById('delete-zone');
+      if (currentTable === 'pallet') {
+        const dzRect = dz.getBoundingClientRect();
+        if (t.clientY > dzRect.top) dz.classList.add('active'); else dz.classList.remove('active');
+      }
+    }
+  }, { passive: false });
+  el.addEventListener('touchend', (e) => {
+    clearTimeout(longPressTimer);
+    if (dragging) {
+      const t = e.changedTouches[0];
+      ghost.style.display = 'none';
+      const under = document.elementFromPoint(t.clientX, t.clientY);
+      ghost.remove(); ghost = null;
+      el.classList.remove('dragging');
+      const dz = document.getElementById('delete-zone'); const dzRect = dz.getBoundingClientRect();
+      if (currentTable === 'pallet' && t.clientY > dzRect.top) {
+        const s = getSlot(dragSrc.ai, dragSrc.ci, dragSrc.si);
+        s.modelId = null; s.color = null; s.qty = 0;
+        toast('🗑️ 整箱已搬走'); render();
+      } else {
+        const slot = under?.closest('.slot, .grid-slot');
+        if (slot && dragMid) performMove(dragSrc, { ai: +slot.dataset.ai, ci: +slot.dataset.ci, si: +slot.dataset.si });
+      }
+      document.querySelectorAll('.dragover').forEach(x => x.classList.remove('dragover'));
+      hideDeleteZone();
+      dragging = false; dragMid = null; dragSrc = null;
+    }
+  });
+  el.addEventListener('touchcancel', () => { clearTimeout(longPressTimer); if (ghost) { ghost.remove(); ghost = null; } dragging = false; el.classList.remove('dragging'); hideDeleteZone(); });
 }
 
 let pendingSlot = null;
 function openColorPicker(ai, ci, si) { pendingSlot = { ai, ci, si }; showSheet('color-sheet'); }
 document.querySelectorAll('#color-sheet .color-opt').forEach(el => {
-el.addEventListener('click', () => {
-const c = el.dataset.color;
-const s = getSlot(pendingSlot.ai, pendingSlot.ci, pendingSlot.si);
-s.color = (c === 'none' ? null : c);
-hideSheets(); render();
-});
+  el.addEventListener('click', () => {
+    const c = el.dataset.color;
+    const s = getSlot(pendingSlot.ai, pendingSlot.ci, pendingSlot.si);
+    s.color = (c === 'none' ? null : c);
+    hideSheets(); render();
+  });
 });
 
 function openQtyEditor(ai, ci, si) {
-pendingSlot = { ai, ci, si };
-const s = getSlot(ai, ci, si);
-const m = s.modelId ? getModel(s.modelId) : null;
-document.getElementById('qty-title').textContent = m ? `${m.name} · 数量` : '数量';
-const inp = document.getElementById('qty-input'); inp.value = s.qty || 0;
-showSheet('qty-sheet');
-setTimeout(() => { inp.focus(); inp.select(); }, 100);
+  pendingSlot = { ai, ci, si };
+  const s = getSlot(ai, ci, si);
+  const m = s.modelId ? getModel(s.modelId) : null;
+  document.getElementById('qty-title').textContent = m ? `${m.name} · 数量` : '数量';
+  const inp = document.getElementById('qty-input'); inp.value = s.qty || 0;
+  showSheet('qty-sheet');
+  setTimeout(() => { inp.focus(); inp.select(); }, 100);
 }
 document.getElementById('qty-minus').addEventListener('click', () => { const inp = document.getElementById('qty-input'); inp.value = Math.max(0, (parseInt(inp.value)||0)-1); });
 document.getElementById('qty-plus').addEventListener('click', () => { const inp = document.getElementById('qty-input'); inp.value = (parseInt(inp.value)||0)+1; });
 document.getElementById('qty-confirm').addEventListener('click', () => {
-const v = Math.max(0, parseInt(document.getElementById('qty-input').value) || 0);
-const s = getSlot(pendingSlot.ai, pendingSlot.ci, pendingSlot.si); s.qty = v;
-hideSheets(); render();
+  const v = Math.max(0, parseInt(document.getElementById('qty-input').value) || 0);
+  const s = getSlot(pendingSlot.ai, pendingSlot.ci, pendingSlot.si); s.qty = v;
+  hideSheets(); render();
 });
 document.getElementById('qty-input').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/[^\d]/g, ''); });
 
-let pendingModelTarget = null, cameraStream = null, selectedSuggestionId = null;
-function openModelPicker(ai, ci, si, withCamera) {
-pendingModelTarget = { ai, ci, si };
-selectedSuggestionId = null;
-const camStartBtn = document.getElementById('camera-start');
-const camRetakeBtn = document.getElementById('camera-retake');
-const video = document.getElementById('camera-video');
-const canvas = document.getElementById('camera-canvas');
-video.style.display = 'none'; canvas.style.display = 'none';
-camStartBtn.style.display = withCamera ? '' : 'none';
-camStartBtn.textContent = '📷 拍照识别';
-camStartBtn.onclick = startCamera;
-camRetakeBtn.style.display = 'none';
-document.getElementById('camera-title').textContent = withCamera ? '添加整箱型号' : '选择型号';
-document.getElementById('model-search').value = '';
-renderSuggestions('');
-showSheet('camera-sheet');
+let pendingModelTarget = null, cameraStream = null, selectedSuggestionId = null, modelPickerCallback = null;
+function openModelPicker(ai, ci, si, withCamera, callback) {
+  pendingModelTarget = (ai === null) ? null : { ai, ci, si };
+  modelPickerCallback = callback || null;
+  selectedSuggestionId = null;
+  const camStartBtn = document.getElementById('camera-start');
+  const camRetakeBtn = document.getElementById('camera-retake');
+  const video = document.getElementById('camera-video');
+  const canvas = document.getElementById('camera-canvas');
+  video.style.display = 'none'; canvas.style.display = 'none';
+  camStartBtn.style.display = withCamera ? '' : 'none';
+  camStartBtn.textContent = '📷 拍照识别';
+  camStartBtn.dataset.mode = 'start';
+  camRetakeBtn.style.display = 'none';
+  document.getElementById('camera-title').textContent = withCamera ? '添加 / 修改型号' : '选择型号';
+  document.getElementById('model-search').value = '';
+  renderSuggestions('');
+  showSheet('camera-sheet');
 }
-async function startCamera() {
-const video = document.getElementById('camera-video');
-if (cameraStream) stopCamera();
-try {
-cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-video.srcObject = cameraStream;
-video.style.display = '';
-document.getElementById('camera-canvas').style.display = 'none';
-const btn = document.getElementById('camera-start');
-btn.textContent = '📸 拍下';
-btn.onclick = capturePhoto;
-} catch(e) { toast('无法打开摄像头: ' + (e.message || e.name)); }
-}
-function capturePhoto() {
-const video = document.getElementById('camera-video');
-const canvas = document.getElementById('camera-canvas');
-canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-canvas.getContext('2d').drawImage(video, 0, 0);
-canvas.style.display = ''; video.style.display = 'none';
-stopCamera();
-document.getElementById('camera-retake').style.display = '';
-document.getElementById('camera-start').style.display = 'none';
-toast('请在搜索框输入关键词,会智能匹配现有型号');
-setTimeout(() => document.getElementById('model-search').focus(), 200);
-}
-document.getElementById('camera-retake').addEventListener('click', () => {
-document.getElementById('camera-canvas').style.display = 'none';
-document.getElementById('camera-retake').style.display = 'none';
-const btn = document.getElementById('camera-start');
-btn.style.display = ''; btn.textContent = '📷 拍照识别'; btn.onclick = startCamera;
+
+// Single delegated handler for camera-start button (handles both "start" and "capture" modes)
+document.getElementById('camera-start').addEventListener('click', async () => {
+  const btn = document.getElementById('camera-start');
+  const mode = btn.dataset.mode || 'start';
+  if (mode === 'start') {
+    await startCameraNow();
+  } else if (mode === 'capture') {
+    capturePhotoNow();
+  }
 });
+
+async function startCameraNow() {
+  const video = document.getElementById('camera-video');
+  if (cameraStream) stopCamera();
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
+      audio: false
+    });
+    video.srcObject = cameraStream;
+    video.style.display = '';
+    document.getElementById('camera-canvas').style.display = 'none';
+    const btn = document.getElementById('camera-start');
+    btn.textContent = '📸 拍下';
+    btn.dataset.mode = 'capture';
+    // Tap-to-focus on iOS Safari
+    video.addEventListener('click', tryFocus);
+  } catch(e) { toast('无法打开摄像头: ' + (e.message || e.name)); }
+}
+
+function tryFocus() {
+  if (!cameraStream) return;
+  const track = cameraStream.getVideoTracks()[0];
+  if (!track) return;
+  const caps = track.getCapabilities ? track.getCapabilities() : {};
+  try {
+    const constraints = {};
+    if (caps.focusMode && caps.focusMode.includes('continuous')) {
+      constraints.focusMode = 'continuous';
+    }
+    if (Object.keys(constraints).length) track.applyConstraints({ advanced: [constraints] });
+  } catch(e) {}
+}
+
+function capturePhotoNow() {
+  const video = document.getElementById('camera-video');
+  const canvas = document.getElementById('camera-canvas');
+  if (!video.videoWidth) { toast('摄像头未就绪,请稍等'); return; }
+  canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  canvas.style.display = ''; video.style.display = 'none';
+  stopCamera();
+  document.getElementById('camera-retake').style.display = '';
+  const btn = document.getElementById('camera-start');
+  btn.style.display = 'none';
+  btn.dataset.mode = 'start';
+  toast('请在搜索框输入关键词,会智能匹配现有型号');
+  setTimeout(() => document.getElementById('model-search').focus(), 200);
+}
+
+document.getElementById('camera-retake').addEventListener('click', () => {
+  document.getElementById('camera-canvas').style.display = 'none';
+  document.getElementById('camera-retake').style.display = 'none';
+  const btn = document.getElementById('camera-start');
+  btn.style.display = ''; btn.textContent = '📷 拍照识别'; btn.dataset.mode = 'start';
+});
+
 function stopCamera() { if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; } }
 
 function fuzzyMatch(query, name) {
-if (!query) return 1;
-const q = query.toLowerCase().replace(/\s+/g,'');
-const n = name.toLowerCase().replace(/\s+/g,'');
-if (n.includes(q)) return 100;
-let qi = 0, score = 0;
-for (let i = 0; i < n.length && qi < q.length; i++) { if (n[i] === q[qi]) { score++; qi++; } }
-return qi === q.length ? (score/n.length)*80 : (score/q.length)*30;
+  if (!query) return 1;
+  const q = query.toLowerCase().replace(/\s+/g,'');
+  const n = name.toLowerCase().replace(/\s+/g,'');
+  if (n.includes(q)) return 100;
+  let qi = 0, score = 0;
+  for (let i = 0; i < n.length && qi < q.length; i++) { if (n[i] === q[qi]) { score++; qi++; } }
+  return qi === q.length ? (score/n.length)*80 : (score/q.length)*30;
 }
 function renderSuggestions(query) {
-const root = document.getElementById('model-suggestions');
-const scored = state.models.map(m => ({ m, s: fuzzyMatch(query, m.name) }))
-.filter(x => x.s > (query ? 10 : 0)).sort((a,b) => b.s-a.s).slice(0, 30);
-if (!scored.length) {
-root.innerHTML = `<div class="suggestion" style="color:var(--muted); font-style:italic; cursor:default;">没有匹配 — 点"确定"会用搜索框文字新建型号</div>`;
-return;
-}
-root.innerHTML = scored.map(x => `<div class="suggestion${x.m.id===selectedSuggestionId?' selected':''}" data-mid="${x.m.id}">${escapeHtml(x.m.name)}<span class="match-score">${query ? Math.round(x.s) : ''}</span></div>`).join('');
-root.querySelectorAll('.suggestion[data-mid]').forEach(el => {
-el.addEventListener('click', () => {
-const m = getModel(el.dataset.mid);
-document.getElementById('model-search').value = m.name;
-selectedSuggestionId = m.id;
-root.querySelectorAll('.suggestion').forEach(x => x.classList.remove('selected'));
-el.classList.add('selected');
-});
-});
+  const root = document.getElementById('model-suggestions');
+  const scored = state.models.map(m => ({ m, s: fuzzyMatch(query, m.name) }))
+    .filter(x => x.s > (query ? 10 : 0)).sort((a,b) => b.s-a.s).slice(0, 30);
+  if (!scored.length) {
+    root.innerHTML = `<div class="suggestion" style="color:var(--muted); font-style:italic; cursor:default;">没有匹配 — 点"确定"会用搜索框文字新建型号</div>`;
+    return;
+  }
+  root.innerHTML = scored.map(x => `<div class="suggestion${x.m.id===selectedSuggestionId?' selected':''}" data-mid="${x.m.id}">${escapeHtml(x.m.name)}<span class="match-score">${query ? Math.round(x.s) : ''}</span></div>`).join('');
+  root.querySelectorAll('.suggestion[data-mid]').forEach(el => {
+    el.addEventListener('click', () => {
+      const m = getModel(el.dataset.mid);
+      document.getElementById('model-search').value = m.name;
+      selectedSuggestionId = m.id;
+      root.querySelectorAll('.suggestion').forEach(x => x.classList.remove('selected'));
+      el.classList.add('selected');
+    });
+  });
 }
 document.getElementById('model-search').addEventListener('input', (e) => { selectedSuggestionId = null; renderSuggestions(e.target.value); });
 document.getElementById('model-confirm').addEventListener('click', () => {
-const txt = document.getElementById('model-search').value.trim();
-if (!txt) { toast('请输入或选择型号'); return; }
-let model = state.models.find(m => m.name === txt);
-if (!model) {
-model = { id: 'm_'+Date.now()+'_'+Math.random().toString(36).slice(2,6), name: txt };
-state.models.push(model);
-toast('已新建型号: ' + txt);
-}
-const s = getSlot(pendingModelTarget.ai, pendingModelTarget.ci, pendingModelTarget.si);
-s.modelId = model.id; s.color = null; s.qty = 0;
-stopCamera(); hideSheets(); render();
+  const txt = document.getElementById('model-search').value.trim();
+  if (!txt) { toast('请输入或选择型号'); return; }
+  let model = state.models.find(m => m.name === txt);
+  if (!model) {
+    model = { id: 'm_'+Date.now()+'_'+Math.random().toString(36).slice(2,6), name: txt };
+    state.models.push(model);
+    toast('已新建型号: ' + txt);
+  }
+  if (modelPickerCallback) {
+    // Callback mode (used by shelf table to replace existing model)
+    modelPickerCallback(model);
+    modelPickerCallback = null;
+  } else if (pendingModelTarget) {
+    // Standard mode: place in target slot
+    const s = getSlot(pendingModelTarget.ai, pendingModelTarget.ci, pendingModelTarget.si);
+    s.modelId = model.id; s.color = null; s.qty = 0;
+  }
+  stopCamera(); hideSheets(); render();
 });
 
 document.getElementById('add-aisle').addEventListener('click', () => {
-const t = getActiveTable();
-const newName = String.fromCharCode(65 + t.aisles.length);
-if (isShelfTable(currentTable)) {
-t.aisles.push({ name: newName, shelves: SHELF_NAMES.map(n => ({ name: n, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) });
-} else {
-t.aisles.push({ name: newName, pallets: Array.from({length: PALLETS_PER_AISLE}, (_, pi) => ({ name: 'P'+(pi+1), layers: Array.from({length: LAYERS_PER_PALLET}, () => newSlot()) })) });
-}
-toast('新增 ' + (isShelfTable(currentTable) ? '通道 ' : '排 ') + newName);
-render();
+  const t = getActiveTable();
+  const newName = String.fromCharCode(65 + t.aisles.length);
+  if (isShelfTable(currentTable)) {
+    t.aisles.push({ name: newName, shelves: SHELF_NAMES.map(n => ({ name: n, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) });
+  } else {
+    t.aisles.push({ name: newName, pallets: Array.from({length: PALLETS_PER_AISLE}, (_, pi) => ({ name: 'P'+(pi+1), layers: Array.from({length: LAYERS_PER_PALLET}, () => newSlot()) })) });
+  }
+  toast('新增 ' + (isShelfTable(currentTable) ? '通道 ' : '排 ') + newName);
+  render();
 });
 function addContainerToAisle(ai) {
-const t = getActiveTable();
-if (isShelfTable(currentTable)) {
-const idx = t.aisles[ai].shelves.length;
-t.aisles[ai].shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) });
-toast('已加货架');
-} else {
-const idx = t.aisles[ai].pallets.length;
-t.aisles[ai].pallets.push({ name: 'P'+(idx+1), layers: Array.from({length: LAYERS_PER_PALLET}, () => newSlot()) });
-toast('已加托盘');
+  const t = getActiveTable();
+  if (isShelfTable(currentTable)) {
+    const idx = t.aisles[ai].shelves.length;
+    t.aisles[ai].shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) });
+    toast('已加货架');
+  } else {
+    const idx = t.aisles[ai].pallets.length;
+    t.aisles[ai].pallets.push({ name: 'P'+(idx+1), layers: Array.from({length: LAYERS_PER_PALLET}, () => newSlot()) });
+    toast('已加托盘');
+  }
+  render();
 }
-render();
+
+// Insert a new shelf/pallet immediately AFTER the given index
+function addShelfAfter(ai, ci) {
+  const t = getActiveTable();
+  if (isShelfTable(currentTable)) {
+    const list = t.aisles[ai].shelves;
+    const newIdx = list.length;
+    const newName = SHELF_NAMES[newIdx] || ('第' + (newIdx + 1) + '层');
+    const newShelf = { name: newName, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) };
+    list.splice(ci + 1, 0, newShelf);
+    toast('已在该层后插入新层');
+  } else {
+    const list = t.aisles[ai].pallets;
+    const newIdx = list.length;
+    const newPallet = { name: 'P' + (newIdx + 1), layers: Array.from({length: LAYERS_PER_PALLET}, () => newSlot()) };
+    list.splice(ci + 1, 0, newPallet);
+    toast('已在此后插入新托盘');
+  }
+  render();
+}
+
+// Touch-drag for entire shelf/layer (the ⠿ handle)
+function addShelfDrag(handle) {
+  let ghost = null, longPressTimer = null, dragging = false, startX = 0, startY = 0;
+
+  handle.addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    startX = t.clientX; startY = t.clientY;
+    longPressTimer = setTimeout(() => {
+      dragging = true;
+      const block = handle.closest('.container-block');
+      block.classList.add('shelf-dragging');
+      const rect = block.getBoundingClientRect();
+      ghost = block.cloneNode(true);
+      Object.assign(ghost.style, {
+        position: 'fixed', zIndex: '300', pointerEvents: 'none',
+        background: 'var(--paper)', border: '2px solid var(--ink)',
+        borderRadius: '8px', boxShadow: '0 6px 20px rgba(0,0,0,0.3)',
+        left: rect.left + 'px', top: (t.clientY - 20) + 'px',
+        width: rect.width + 'px', opacity: '0.92', maxHeight: '200px', overflow: 'hidden'
+      });
+      document.body.appendChild(ghost);
+      if (navigator.vibrate) navigator.vibrate(40);
+    }, 380);
+  }, { passive: true });
+
+  handle.addEventListener('touchmove', (e) => {
+    const t = e.touches[0];
+    if (!dragging && Math.hypot(t.clientX - startX, t.clientY - startY) > 10) clearTimeout(longPressTimer);
+    if (dragging && ghost) {
+      e.preventDefault();
+      ghost.style.top = (t.clientY - 20) + 'px';
+      ghost.style.display = 'none';
+      const under = document.elementFromPoint(t.clientX, t.clientY);
+      ghost.style.display = '';
+      document.querySelectorAll('.shelf-drop-target').forEach(x => x.classList.remove('shelf-drop-target'));
+      const target = under?.closest('.container-block');
+      if (target && !target.classList.contains('shelf-dragging')) target.classList.add('shelf-drop-target');
+    }
+  }, { passive: false });
+
+  handle.addEventListener('touchend', (e) => {
+    clearTimeout(longPressTimer);
+    if (dragging) {
+      const t = e.changedTouches[0];
+      ghost.style.display = 'none';
+      const under = document.elementFromPoint(t.clientX, t.clientY);
+      ghost.remove(); ghost = null;
+      const block = handle.closest('.container-block');
+      block.classList.remove('shelf-dragging');
+      document.querySelectorAll('.shelf-drop-target').forEach(x => x.classList.remove('shelf-drop-target'));
+      const target = under?.closest('.container-block');
+      if (target && !target.isSameNode(block)) {
+        // Find target ai/ci by walking the dom: get the handle inside target
+        const targetHandle = target.querySelector('.shelf-drag-handle');
+        if (targetHandle) {
+          moveShelf(+handle.dataset.ai, +handle.dataset.ci, +targetHandle.dataset.ai, +targetHandle.dataset.ci);
+        }
+      }
+      dragging = false;
+    }
+  });
+
+  handle.addEventListener('touchcancel', () => {
+    clearTimeout(longPressTimer);
+    if (ghost) { ghost.remove(); ghost = null; }
+    dragging = false;
+    const block = handle.closest('.container-block');
+    if (block) block.classList.remove('shelf-dragging');
+  });
+
+  // Desktop drag fallback (HTML5 drag)
+  handle.setAttribute('draggable', 'true');
+  handle.addEventListener('dragstart', (e) => {
+    if (e.dataTransfer) {
+      e.dataTransfer.setData('text/shelf', JSON.stringify({ ai: +handle.dataset.ai, ci: +handle.dataset.ci }));
+      e.dataTransfer.effectAllowed = 'move';
+    }
+    handle.closest('.container-block').classList.add('shelf-dragging');
+  });
+  handle.addEventListener('dragend', () => {
+    handle.closest('.container-block').classList.remove('shelf-dragging');
+    document.querySelectorAll('.shelf-drop-target').forEach(x => x.classList.remove('shelf-drop-target'));
+  });
+}
+
+function moveShelf(srcAi, srcCi, tgtAi, tgtCi) {
+  const t = getActiveTable();
+  const ck = getContainerKey();
+  const srcList = t.aisles[srcAi][ck];
+  const item = srcList.splice(srcCi, 1)[0];
+  // If moving within same aisle and target index is after source, adjust
+  let insertCi = tgtCi;
+  if (srcAi === tgtAi && tgtCi > srcCi) insertCi = tgtCi - 1;
+  // Insert at target position
+  t.aisles[tgtAi][ck].splice(insertCi + 1, 0, item);
+  // (slot ids and contents move with item; serial numbers will recompute on render)
+  toast('已移动整层');
+  render();
 }
 
 document.querySelectorAll('.table-tab').forEach(b => {
-b.addEventListener('click', () => {
-currentTable = b.dataset.table;
-document.querySelectorAll('.table-tab').forEach(x => x.classList.toggle('active', x.dataset.table === currentTable));
-document.querySelectorAll('.table-pane').forEach(x => x.classList.toggle('active', x.dataset.tablePane === currentTable));
-render();
-});
+  b.addEventListener('click', () => {
+    currentTable = b.dataset.table;
+    document.querySelectorAll('.table-tab').forEach(x => x.classList.toggle('active', x.dataset.table === currentTable));
+    document.querySelectorAll('.table-pane').forEach(x => x.classList.toggle('active', x.dataset.tablePane === currentTable));
+    render();
+  });
 });
 document.querySelectorAll('.tool[data-view]').forEach(b => {
-b.addEventListener('click', () => {
-document.querySelectorAll('.tool[data-view]').forEach(x => x.classList.remove('active'));
-b.classList.add('active');
-const v = b.dataset.view;
-document.querySelectorAll('.list-view').forEach(x => x.classList.toggle('hidden', v !== 'list'));
-document.querySelectorAll('.grid-view').forEach(x => x.classList.toggle('active', v === 'grid'));
-});
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.tool[data-view]').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    const v = b.dataset.view;
+    document.querySelectorAll('.list-view').forEach(x => x.classList.toggle('hidden', v !== 'list'));
+    document.querySelectorAll('.grid-view').forEach(x => x.classList.toggle('active', v === 'grid'));
+  });
 });
 
 function showSheet(id) { document.getElementById(id).classList.add('show'); }
@@ -979,139 +1239,139 @@ document.querySelectorAll('.sheet-backdrop').forEach(s => s.addEventListener('cl
 
 document.getElementById('upload-btn').addEventListener('click', () => showSheet('upload-sheet'));
 document.querySelectorAll('#upload-sheet .action-row').forEach(b => {
-b.addEventListener('click', () => {
-const mode = b.dataset.act === 'upload-replace' ? 'replace' : 'append';
-hideSheets();
-setTimeout(() => {
-const txt = prompt('请输入或粘贴型号清单 (每行一个,会自动去除前面的序号):', mode === 'replace' ? INITIAL_MODELS.slice(0, 5).join('\n') : '');
-if (!txt) return;
-const lines = txt.split('\n').map(l => l.trim().replace(/^[\d①-⑳]+[.、\s]*/, '')).filter(Boolean);
-if (!lines.length) return;
-if (mode === 'replace') {
-state.models = lines.map((n,i) => ({ id: 'm_'+i+'_'+Date.now(), name: n }));
-// Rebuild both shelf tables with same layout
-for (const tableKey of ['shelfBlackTable', 'shelfWhiteTable']) {
-state[tableKey].aisles = SHELF_AISLE_NAMES.map(n => ({ name: n, shelves: SHELF_NAMES.map(sn => ({ name: sn, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) }));
-let mi = 0;
-for (const a of state[tableKey].aisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) {
-if (mi < state.models.length) { s.slots[i].modelId = state.models[mi].id; mi++; }
-}
-if (mi < state.models.length) {
-const la = state[tableKey].aisles[state[tableKey].aisles.length-1];
-while (mi < state.models.length) {
-const idx = la.shelves.length;
-const slots = Array.from({length: SLOTS_PER_SHELF}, () => newSlot());
-for (let i=0;i<SLOTS_PER_SHELF && mi < state.models.length; i++) { slots[i].modelId = state.models[mi].id; mi++; }
-la.shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots });
-}
-}
-}
-state.palletTable.aisles = PALLET_AISLE_NAMES.map(n => ({ name: n, pallets: Array.from({length: PALLETS_PER_AISLE}, (_, pi) => ({ name: 'P'+(pi+1), layers: Array.from({length: LAYERS_PER_PALLET}, () => newSlot()) })) }));
-} else {
-const newModels = lines.map((n,i) => ({ id: 'm_'+Date.now()+'_'+i, name: n }));
-state.models.push(...newModels);
-// Append to both shelf tables
-for (const tableKey of ['shelfBlackTable', 'shelfWhiteTable']) {
-let mi = 0;
-outer: for (const a of state[tableKey].aisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) if (!s.slots[i].modelId) { s.slots[i].modelId = newModels[mi].id; mi++; if (mi >= newModels.length) break outer; }
-if (mi < newModels.length) {
-const la = state[tableKey].aisles[state[tableKey].aisles.length-1];
-while (mi < newModels.length) {
-const idx = la.shelves.length;
-const slots = Array.from({length: SLOTS_PER_SHELF}, () => newSlot());
-for (let i=0;i<SLOTS_PER_SHELF && mi < newModels.length; i++) { slots[i].modelId = newModels[mi].id; mi++; }
-la.shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots });
-}
-}
-}
-}
-render();
-toast(`已${mode === 'replace' ? '替换' : '追加'} ${lines.length} 个型号`);
-}, 100);
-});
+  b.addEventListener('click', () => {
+    const mode = b.dataset.act === 'upload-replace' ? 'replace' : 'append';
+    hideSheets();
+    setTimeout(() => {
+      const txt = prompt('请输入或粘贴型号清单 (每行一个,会自动去除前面的序号):', mode === 'replace' ? INITIAL_MODELS.slice(0, 5).join('\n') : '');
+      if (!txt) return;
+      const lines = txt.split('\n').map(l => l.trim().replace(/^[\d①-⑳]+[.、\s]*/, '')).filter(Boolean);
+      if (!lines.length) return;
+      if (mode === 'replace') {
+        state.models = lines.map((n,i) => ({ id: 'm_'+i+'_'+Date.now(), name: n }));
+        // Rebuild both shelf tables with same layout
+        for (const tableKey of ['shelfBlackTable', 'shelfWhiteTable']) {
+          state[tableKey].aisles = SHELF_AISLE_NAMES.map(n => ({ name: n, shelves: SHELF_NAMES.map(sn => ({ name: sn, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) }));
+          let mi = 0;
+          for (const a of state[tableKey].aisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) {
+            if (mi < state.models.length) { s.slots[i].modelId = state.models[mi].id; mi++; }
+          }
+          if (mi < state.models.length) {
+            const la = state[tableKey].aisles[state[tableKey].aisles.length-1];
+            while (mi < state.models.length) {
+              const idx = la.shelves.length;
+              const slots = Array.from({length: SLOTS_PER_SHELF}, () => newSlot());
+              for (let i=0;i<SLOTS_PER_SHELF && mi < state.models.length; i++) { slots[i].modelId = state.models[mi].id; mi++; }
+              la.shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots });
+            }
+          }
+        }
+        state.palletTable.aisles = PALLET_AISLE_NAMES.map(n => ({ name: n, pallets: Array.from({length: PALLETS_PER_AISLE}, (_, pi) => ({ name: 'P'+(pi+1), layers: Array.from({length: LAYERS_PER_PALLET}, () => newSlot()) })) }));
+      } else {
+        const newModels = lines.map((n,i) => ({ id: 'm_'+Date.now()+'_'+i, name: n }));
+        state.models.push(...newModels);
+        // Append to both shelf tables
+        for (const tableKey of ['shelfBlackTable', 'shelfWhiteTable']) {
+          let mi = 0;
+          outer: for (const a of state[tableKey].aisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) if (!s.slots[i].modelId) { s.slots[i].modelId = newModels[mi].id; mi++; if (mi >= newModels.length) break outer; }
+          if (mi < newModels.length) {
+            const la = state[tableKey].aisles[state[tableKey].aisles.length-1];
+            while (mi < newModels.length) {
+              const idx = la.shelves.length;
+              const slots = Array.from({length: SLOTS_PER_SHELF}, () => newSlot());
+              for (let i=0;i<SLOTS_PER_SHELF && mi < newModels.length; i++) { slots[i].modelId = newModels[mi].id; mi++; }
+              la.shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots });
+            }
+          }
+        }
+      }
+      render();
+      toast(`已${mode === 'replace' ? '替换' : '追加'} ${lines.length} 个型号`);
+    }, 100);
+  });
 });
 
 document.getElementById('save-btn').addEventListener('click', () => showSheet('save-sheet'));
 document.querySelectorAll('#save-sheet .action-row').forEach(b => {
-b.addEventListener('click', () => {
-const act = b.dataset.act; hideSheets();
-if (act === 'download-json') downloadJSON();
-else if (act === 'download-csv') downloadCSV();
-else if (act === 'share') shareData();
-else if (act === 'load-json') loadJSON();
-});
+  b.addEventListener('click', () => {
+    const act = b.dataset.act; hideSheets();
+    if (act === 'download-json') downloadJSON();
+    else if (act === 'download-csv') downloadCSV();
+    else if (act === 'share') shareData();
+    else if (act === 'load-json') loadJSON();
+  });
 });
 function downloadJSON() {
-const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-triggerDownload(blob, `inventory-${dateStamp()}.json`); toast('已下载 JSON');
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  triggerDownload(blob, `inventory-${dateStamp()}.json`); toast('已下载 JSON');
 }
 function downloadCSV() {
-const rows = [['#','表','填表人','日期','通道','货架/托盘','位置','型号','颜色','数量']];
-let n = 0;
-const tables = [
-[(state.meta?.shelfBlack?.title) || '黑色MUG零散货架', state.shelfBlackTable, 'shelves', 'slots', state.meta?.shelfBlack || {}],
-[(state.meta?.shelfWhite?.title) || '白色BK/CH零散货架', state.shelfWhiteTable, 'shelves', 'slots', state.meta?.shelfWhite || {}],
-[(state.meta?.pallet?.title) || '整箱货堆', state.palletTable, 'pallets', 'layers', state.meta?.pallet || {}]
-];
-for (const [tableName, t, ck, sk, meta] of tables) {
-for (const a of t.aisles) for (const c of a[ck]) c[sk].forEach((slot, i) => {
-n++; const m = slot.modelId ? getModel(slot.modelId) : null;
-rows.push([n, tableName, meta.filler || '', meta.date || '', a.name, c.name, i+1, m?.name || '', slot.color || '', slot.qty || 0]);
-});
-}
-const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
-const blob = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8' });
-triggerDownload(blob, `inventory-${dateStamp()}.csv`); toast('已下载 CSV');
+  const rows = [['#','表','填表人','日期','通道','货架/托盘','位置','型号','颜色','数量']];
+  let n = 0;
+  const tables = [
+    [(state.meta?.shelfBlack?.title) || '黑色MUG零散货架', state.shelfBlackTable, 'shelves', 'slots', state.meta?.shelfBlack || {}],
+    [(state.meta?.shelfWhite?.title) || '白色BK/CH零散货架', state.shelfWhiteTable, 'shelves', 'slots', state.meta?.shelfWhite || {}],
+    [(state.meta?.pallet?.title) || '整箱货堆', state.palletTable, 'pallets', 'layers', state.meta?.pallet || {}]
+  ];
+  for (const [tableName, t, ck, sk, meta] of tables) {
+    for (const a of t.aisles) for (const c of a[ck]) c[sk].forEach((slot, i) => {
+      n++; const m = slot.modelId ? getModel(slot.modelId) : null;
+      rows.push([n, tableName, meta.filler || '', meta.date || '', a.name, c.name, i+1, m?.name || '', slot.color || '', slot.qty || 0]);
+    });
+  }
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8' });
+  triggerDownload(blob, `inventory-${dateStamp()}.csv`); toast('已下载 CSV');
 }
 async function shareData() {
-const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-const file = new File([blob], `inventory-${dateStamp()}.json`, { type: 'application/json' });
-if (navigator.canShare && navigator.canShare({ files: [file] })) {
-try { await navigator.share({ files: [file], title: '库存数据' }); } catch(e) {}
-} else if (navigator.share) {
-try { await navigator.share({ title: '库存', text: JSON.stringify(state).slice(0, 1000) + '...' }); } catch(e) {}
-} else { downloadJSON(); toast('当前不支持分享,已下载'); }
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const file = new File([blob], `inventory-${dateStamp()}.json`, { type: 'application/json' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: '库存数据' }); } catch(e) {}
+  } else if (navigator.share) {
+    try { await navigator.share({ title: '库存', text: JSON.stringify(state).slice(0, 1000) + '...' }); } catch(e) {}
+  } else { downloadJSON(); toast('当前不支持分享,已下载'); }
 }
 function loadJSON() {
-const inp = document.createElement('input');
-inp.type = 'file'; inp.accept = '.json,application/json';
-inp.onchange = (e) => {
-const f = e.target.files[0]; if (!f) return;
-const r = new FileReader();
-r.onload = () => { try { const data = JSON.parse(r.result); if (data.models && data.shelfBlackTable && data.shelfWhiteTable && data.palletTable) { if (!data.meta) data.meta = { shelfBlack:{}, shelfWhite:{}, pallet:{} }; state = data; render(); toast('已导入'); } else toast('文件格式错误 (需要 v3 格式)'); } catch(e) { toast('解析失败'); } };
-r.readAsText(f);
-};
-inp.click();
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json,application/json';
+  inp.onchange = (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { try { const data = JSON.parse(r.result); if (data.models && data.shelfBlackTable && data.shelfWhiteTable && data.palletTable) { if (!data.meta) data.meta = { shelfBlack:{}, shelfWhite:{}, pallet:{} }; state = data; render(); toast('已导入'); } else toast('文件格式错误 (需要 v3 格式)'); } catch(e) { toast('解析失败'); } };
+    r.readAsText(f);
+  };
+  inp.click();
 }
 function triggerDownload(blob, name) {
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a'); a.href = url; a.download = name; a.click();
-setTimeout(() => URL.revokeObjectURL(url), 1000);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 function dateStamp() {
-const d = new Date();
-return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}-${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`;
+  const d = new Date();
+  return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}-${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`;
 }
 
 document.getElementById('legend-btn').addEventListener('click', () => showSheet('legend-sheet'));
 document.getElementById('reset-btn').addEventListener('click', () => {
-if (confirm('确定要重置为初始数据吗?当前所有改动会丢失。')) { state = buildInitial(); render(); toast('已重置'); }
+  if (confirm('确定要重置为初始数据吗?当前所有改动会丢失。')) { state = buildInitial(); render(); toast('已重置'); }
 });
 
 let toastTimer = null;
 function toast(msg) {
-const el = document.getElementById('toast');
-el.textContent = msg; el.classList.add('show');
-clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
 }
 
 loadState(); render();
 
 let lastTouchEnd = 0;
 document.addEventListener('touchend', (e) => {
-const now = Date.now();
-if (now - lastTouchEnd < 300) e.preventDefault();
-lastTouchEnd = now;
+  const now = Date.now();
+  if (now - lastTouchEnd < 300) e.preventDefault();
+  lastTouchEnd = now;
 }, { passive: false });
 </script>
 
