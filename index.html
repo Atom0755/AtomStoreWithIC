@@ -1249,36 +1249,62 @@ function renderSuggestions(query) {
   });
 }
 document.getElementById('model-search').addEventListener('input', (e) => { selectedSuggestionId = null; renderSuggestions(e.target.value); });
-document.getElementById('model-confirm').addEventListener('click', () => {
-  const txt = document.getElementById('model-search').value.trim();
+function commitModelChoice() {
+  const inp = document.getElementById('model-search');
+  // Robust value extraction: handle textarea newlines and weird whitespace
+  let txt = (inp.value || '').replace(/\s+/g, ' ').trim();
   if (!txt) {
-    // Focus the input and show a clear visual cue
-    const inp = document.getElementById('model-search');
     inp.style.borderColor = 'var(--red)';
     inp.style.background = '#ffe5e5';
     setTimeout(() => { inp.style.borderColor = ''; inp.style.background = ''; }, 1500);
     inp.focus();
-    toast('⚠️ 请先在搜索框输入或选择型号名');
+    toast('⚠️ 请先输入或选择型号名');
     return;
   }
   let model = state.models.find(m => m.name === txt);
   if (!model) {
-    model = { id: 'm_'+Date.now()+'_'+Math.random().toString(36).slice(2,6), name: txt };
+    model = { id: 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), name: txt };
     state.models.push(model);
     toast('✅ 已新建型号: ' + txt);
   } else {
-    toast('✅ 已选择型号: ' + model.name);
+    toast('✅ 已选择: ' + model.name);
   }
+  // Apply choice
   if (modelPickerCallback) {
-    modelPickerCallback(model);
+    try { modelPickerCallback(model); } catch(e) { console.error(e); }
     modelPickerCallback = null;
   } else if (pendingModelTarget) {
     const s = getSlot(pendingModelTarget.ai, pendingModelTarget.ci, pendingModelTarget.si);
     s.modelId = model.id;
-    if (!modelPickerCallback) { s.color = null; s.qty = 0; }
+    s.color = null; s.qty = 0;
+  } else {
+    toast('⚠️ 没有目标位置');
+    return;
   }
-  stopCamera(); hideSheets(); render();
+  pendingModelTarget = null;
+  stopCamera();
+  hideSheets();
+  render();
+}
+
+// Bind both click and touchend to handle iOS quirks
+const _modelConfirmBtn = document.getElementById('model-confirm');
+_modelConfirmBtn.addEventListener('click', (e) => { e.preventDefault(); commitModelChoice(); });
+_modelConfirmBtn.addEventListener('touchend', (e) => {
+  // Prevent ghost click and ensure handler runs even if click is suppressed
+  e.preventDefault();
+  e.stopPropagation();
+  commitModelChoice();
+}, { passive: false });
+// Also handle Enter key in textarea to commit (Cmd/Ctrl+Enter or Enter alone if user clicks done)
+document.getElementById('model-search').addEventListener('keydown', (e) => {
+  // Ctrl/Cmd+Enter commits
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    commitModelChoice();
+  }
 });
+window.commitModelChoice = commitModelChoice;
 
 document.getElementById('add-aisle').addEventListener('click', () => {
   const t = getActiveTable();
@@ -1588,6 +1614,9 @@ loadState(); render();
 
 let lastTouchEnd = 0;
 document.addEventListener('touchend', (e) => {
+  // Don't interfere with buttons, links, inputs, or interactive elements
+  const tgt = e.target;
+  if (tgt && tgt.closest('button, a, input, textarea, .color-cell, .gcolor, .model-cell, .gmodel, .editable, [contenteditable], .suggestion, .color-opt, .action-row, .tool, .table-tab')) return;
   const now = Date.now();
   if (now - lastTouchEnd < 300) e.preventDefault();
   lastTouchEnd = now;
