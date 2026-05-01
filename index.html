@@ -133,7 +133,7 @@ font-size: 12px;
 .container-block.shelf-dragging { opacity: 0.4; }
 .container-block.shelf-drop-target { box-shadow: 0 -3px 0 var(–ink) inset, 0 3px 0 var(–ink) inset; }
 
-.slot { display: grid; grid-template-columns: 30px 1fr 56px; gap: 6px; align-items: center; padding: 7px 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); min-height: 46px; background: var(–paper); }
+.slot { display: grid; grid-template-columns: 28px 1fr 56px 50px; gap: 5px; align-items: center; padding: 7px 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); min-height: 50px; background: var(–paper); }
 .slot:last-child { border-bottom: 0; }
 .slot.dragover { background: #fff8d6; }
 .slot.empty .model-cell { color: var(–muted); font-style: italic; }
@@ -142,6 +142,28 @@ font-size: 12px;
 .model-cell.dragging { opacity: 0.4; }
 .model-cell.empty-clickable { color: var(–muted); font-style: italic; cursor: pointer; }
 .model-cell.empty-clickable::before { content: ’＋ ’; }
+
+.unit-cell {
+height: 38px;
+border: 2px dashed rgba(0,0,0,0.25);
+border-radius: 8px;
+background: var(–paper);
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 12px;
+font-weight: 600;
+color: var(–muted);
+overflow: hidden;
+text-align: center;
+padding: 0 4px;
+line-height: 1.1;
+flex-shrink: 0;
+box-sizing: border-box;
+}
+.unit-cell:active { transform: scale(0.92); }
+.unit-cell.has-unit { border-style: solid; color: var(–ink); background: var(–bg); }
 
 .color-cell { width: 50px; height: 38px; border: 2px solid var(–ink); border-radius: 8px; background: var(–paper); cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: ‘JetBrains Mono’, monospace; font-size: 14px; font-weight: 700; color: var(–ink); flex-shrink: 0; box-sizing: border-box; }
 .color-cell:active { transform: scale(0.92); }
@@ -189,11 +211,26 @@ font-size: 12px;
 .sheet h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; color: var(–muted); }
 
 .color-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
-.color-opt { aspect-ratio: 1; border-radius: 12px; border: 2px solid var(–line); cursor: pointer; display: grid; place-items: center; font-size: 11px; font-weight: 600; color: rgba(0,0,0,0.7); }
+.color-opt {
+height: 80px;
+border-radius: 12px;
+border: 2px solid var(–line);
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 13px;
+font-weight: 700;
+color: rgba(0,0,0,0.85);
+text-align: center;
+line-height: 1.2;
+transition: transform .12s;
+}
+.color-opt:active { transform: scale(0.92); }
 .color-opt[data-color=“red”] { background: var(–red); border-color: var(–red); color: white; }
-.color-opt[data-color=“yellow”] { background: var(–yellow); }
+.color-opt[data-color=“yellow”] { background: var(–yellow); border-color: #c79900; color: #1a1a1a; }
 .color-opt[data-color=“green”] { background: var(–green); border-color: var(–green); color: white; }
-.color-opt[data-color=“none”] { background: var(–paper); }
+.color-opt[data-color=“none”] { background: var(–paper); color: var(–muted); }
 .sheet-cancel, .sheet-confirm { width: 100%; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid var(–line); }
 .sheet-cancel { background: var(–bg); }
 .sheet-confirm { background: var(–ink); color: var(–paper); margin-bottom: 8px; }
@@ -203,6 +240,21 @@ font-size: 12px;
 .qty-input-wrap input:focus { outline: none; }
 .qty-btn { width: 44px; height: 44px; border-radius: 8px; border: 1px solid var(–line); background: var(–paper); font-size: 20px; font-weight: 700; cursor: pointer; }
 .qty-btn:active { background: var(–ink); color: var(–paper); }
+
+.unit-quick {
+height: 50px;
+border: 2px solid var(–line);
+border-radius: 10px;
+background: var(–paper);
+font-size: 16px;
+font-weight: 700;
+cursor: pointer;
+color: var(–ink);
+transition: transform .12s;
+font-family: inherit;
+}
+.unit-quick:active { transform: scale(0.92); background: var(–ink); color: var(–paper); }
+.unit-quick[data-unit=””] { background: var(–bg); color: var(–muted); border-style: dashed; }
 
 .actions-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
 .action-row { padding: 14px; border: 1px solid var(–line); border-radius: 10px; background: var(–bg); font-size: 14px; font-weight: 500; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; }
@@ -346,6 +398,31 @@ color: var(–ink);
   </div>
 </div>
 
+<!-- Unit picker -->
+
+<div class="sheet-backdrop modal-style" id="unit-sheet">
+  <div class="sheet">
+    <div class="sheet-body">
+      <h3 id="unit-title">单位</h3>
+      <div style="display:grid; grid-template-columns: repeat(4,1fr); gap:8px; margin-bottom:12px;">
+        <button class="unit-quick" data-unit="套">套</button>
+        <button class="unit-quick" data-unit="个">个</button>
+        <button class="unit-quick" data-unit="对">对</button>
+        <button class="unit-quick" data-unit="件">件</button>
+        <button class="unit-quick" data-unit="箱">箱</button>
+        <button class="unit-quick" data-unit="包">包</button>
+        <button class="unit-quick" data-unit="片">片</button>
+        <button class="unit-quick" data-unit="">清除</button>
+      </div>
+      <input type="text" id="unit-input" placeholder="或自定义单位..." autocomplete="off" style="width:100%; padding:12px; border:2px solid var(--ink); border-radius:10px; font-size:16px; font-weight:600; background:#fff8d6;">
+    </div>
+    <div class="sheet-footer">
+      <button class="sheet-confirm" id="unit-confirm">确定</button>
+      <button class="sheet-cancel" data-close>取消</button>
+    </div>
+  </div>
+</div>
+
 <div class="sheet-backdrop" id="save-sheet">
   <div class="sheet">
     <div class="sheet-body">
@@ -463,7 +540,7 @@ const LAYERS_PER_PALLET = 10;
 let state = null;
 let currentTable = 'shelfBlack';
 
-function newSlot() { return { modelId: null, color: null, qty: 0 }; }
+function newSlot() { return { modelId: null, color: null, qty: 0, unit: null }; }
 function loadState() {
   try {
     const raw = localStorage.getItem('inventoryV3');
@@ -653,9 +730,12 @@ function renderListView() {
           ? `<div class="model-cell has-model" draggable="true" data-mid="${slot.modelId}" data-ai="${ai}" data-ci="${ci}" data-si="${si}" data-table="${currentTable}">${escapeHtml(m ? m.name : '?')}</div>`
           : `<div class="model-cell empty-clickable" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${isShelf ? '空格 (点击添加)' : '空层 (拍照添加)'}</div>`;
         const colorHtml = slot.modelId
-          ? `<div class="color-cell" data-color="${slot.color||''}" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${slot.qty>0 ? slot.qty : '<span class="qty-zero">·</span>'}</div>`
+          ? `<div class="color-cell" data-color="${slot.color||''}" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${slot.qty>0 ? slot.qty : ''}</div>`
           : `<div class="color-cell" style="visibility:hidden"></div>`;
-        cell.innerHTML = `<div class="slot-num">${slot.modelId ? serial : '—'}</div>${modelHtml}${colorHtml}`;
+        const unitHtml = slot.modelId
+          ? `<div class="unit-cell ${slot.unit ? 'has-unit' : ''}" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${slot.unit ? escapeHtml(slot.unit) : '单位'}</div>`
+          : `<div class="unit-cell" style="visibility:hidden"></div>`;
+        cell.innerHTML = `<div class="slot-num">${slot.modelId ? serial : '—'}</div>${modelHtml}${colorHtml}${unitHtml}`;
         cblock.appendChild(cell);
       });
       ablock.appendChild(cblock);
@@ -728,6 +808,7 @@ function attachListHandlers(root) {
     el.addEventListener('drop', onDropSlot);
   });
   root.querySelectorAll('.color-cell[data-ai]').forEach(el => attachColorCellHandlers(el));
+  root.querySelectorAll('.unit-cell[data-ai]').forEach(el => attachUnitCellHandlers(el));
   root.querySelectorAll('.editable').forEach(el => makeEditable(el));
   root.querySelectorAll('.add-child').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); addContainerToAisle(+el.dataset.ai); }); });
   root.querySelectorAll('.add-after-shelf').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); addShelfAfter(+el.dataset.ai, +el.dataset.ci); }); });
@@ -776,34 +857,52 @@ function attachListHandlers(root) {
 // Double-tap on a model cell: open picker (with camera), and replace current model on confirm
 function attachModelDoubleTap(el) {
   let lastTapTime = 0;
+  let lastTapX = 0, lastTapY = 0;
+
+  const handleDoubleTap = () => {
+    const ai = +el.dataset.ai, ci = +el.dataset.ci, si = +el.dataset.si;
+    const slot = getSlot(ai, ci, si);
+    const oldColor = slot.color, oldQty = slot.qty;
+    openModelPicker(ai, ci, si, true, (model) => {
+      const s = getSlot(ai, ci, si);
+      s.modelId = model.id;
+      s.color = oldColor; s.qty = oldQty;
+    });
+  };
+
+  // click handler (mouse + tap fallback)
   el.addEventListener('click', (e) => {
     const now = Date.now();
-    if (now - lastTapTime < 320) {
+    if (now - lastTapTime < 380) {
+      e.preventDefault();
       e.stopPropagation();
-      const ai = +el.dataset.ai, ci = +el.dataset.ci, si = +el.dataset.si;
-      const slot = getSlot(ai, ci, si);
-      const oldColor = slot.color, oldQty = slot.qty;
-      // Open picker with callback that replaces just the modelId, keeping color/qty
-      openModelPicker(ai, ci, si, true, (model) => {
-        const s = getSlot(ai, ci, si);
-        s.modelId = model.id;
-        // Keep existing color and qty when just replacing the model
-        s.color = oldColor; s.qty = oldQty;
-      });
-      // Pre-fill the search box with current name as a hint
-      setTimeout(() => {
-        const m = getModel(slot.modelId);
-        if (m) {
-          const inp = document.getElementById('model-search');
-          inp.value = '';
-          renderSuggestions('');
-        }
-      }, 50);
       lastTapTime = 0;
+      handleDoubleTap();
     } else {
       lastTapTime = now;
     }
   });
+
+  // touchend handler (catches iOS taps that might not fire click in time)
+  el.addEventListener('touchend', (e) => {
+    if (e.changedTouches && e.changedTouches.length) {
+      const t = e.changedTouches[0];
+      const now = Date.now();
+      const dx = Math.abs(t.clientX - lastTapX);
+      const dy = Math.abs(t.clientY - lastTapY);
+      // Detect double tap with proximity check
+      if (now - lastTapTime < 380 && dx < 30 && dy < 30) {
+        e.preventDefault();
+        e.stopPropagation();
+        lastTapTime = 0;
+        handleDoubleTap();
+        return;
+      }
+      lastTapTime = now;
+      lastTapX = t.clientX;
+      lastTapY = t.clientY;
+    }
+  }, { passive: false });
 }
 function attachGridHandlers(root) {
   root.querySelectorAll('.gmodel[draggable="true"]').forEach(el => {
@@ -824,31 +923,61 @@ function attachGridHandlers(root) {
   root.querySelectorAll('.editable').forEach(el => makeEditable(el));
 }
 
-// Single tap = color, double tap = qty (touch-friendly)
+// Unit cell click → open unit editor
+function attachUnitCellHandlers(el) {
+  el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openUnitEditor(+el.dataset.ai, +el.dataset.ci, +el.dataset.si);
+  });
+}
+
+// Single tap = color, double tap = qty (touch-friendly, robust)
 function attachColorCellHandlers(el) {
   let lastTapTime = 0;
+  let lastTapX = 0, lastTapY = 0;
   let pendingSingleTimer = null;
 
-  const handleTap = () => {
+  const ai = () => +el.dataset.ai, ci = () => +el.dataset.ci, si = () => +el.dataset.si;
+
+  const onSingle = () => openColorPicker(ai(), ci(), si());
+  const onDouble = () => openQtyEditor(ai(), ci(), si());
+
+  el.addEventListener('click', (e) => {
+    e.stopPropagation();
     const now = Date.now();
-    const ai = +el.dataset.ai, ci = +el.dataset.ci, si = +el.dataset.si;
-    if (now - lastTapTime < 320) {
-      // Double tap detected
-      clearTimeout(pendingSingleTimer);
-      pendingSingleTimer = null;
+    if (now - lastTapTime < 380) {
+      // Double tap
+      if (pendingSingleTimer) { clearTimeout(pendingSingleTimer); pendingSingleTimer = null; }
       lastTapTime = 0;
-      openQtyEditor(ai, ci, si);
+      onDouble();
     } else {
       lastTapTime = now;
-      // Schedule single-tap action; cancel if a second tap arrives
       pendingSingleTimer = setTimeout(() => {
-        openColorPicker(ai, ci, si);
+        onSingle();
         pendingSingleTimer = null;
-      }, 320);
+      }, 380);
     }
-  };
+  });
 
-  el.addEventListener('click', (e) => { e.stopPropagation(); handleTap(); });
+  el.addEventListener('touchend', (e) => {
+    if (e.changedTouches && e.changedTouches.length) {
+      const t = e.changedTouches[0];
+      const now = Date.now();
+      const dx = Math.abs(t.clientX - lastTapX);
+      const dy = Math.abs(t.clientY - lastTapY);
+      if (now - lastTapTime < 380 && dx < 30 && dy < 30) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (pendingSingleTimer) { clearTimeout(pendingSingleTimer); pendingSingleTimer = null; }
+        lastTapTime = 0;
+        onDouble();
+        return;
+      }
+      lastTapTime = now;
+      lastTapX = t.clientX;
+      lastTapY = t.clientY;
+    }
+  }, { passive: false });
 }
 
 function makeEditable(el) {
@@ -1000,6 +1129,30 @@ document.getElementById('qty-confirm').addEventListener('click', () => {
   hideSheets(); render();
 });
 document.getElementById('qty-input').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/[^\d]/g, ''); });
+
+// Unit editor
+function openUnitEditor(ai, ci, si) {
+  pendingSlot = { ai, ci, si };
+  const s = getSlot(ai, ci, si);
+  const m = s.modelId ? getModel(s.modelId) : null;
+  document.getElementById('unit-title').textContent = m ? `${m.name} · 单位` : '单位';
+  document.getElementById('unit-input').value = s.unit || '';
+  showSheet('unit-sheet');
+}
+document.querySelectorAll('#unit-sheet .unit-quick').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const u = btn.dataset.unit;
+    const s = getSlot(pendingSlot.ai, pendingSlot.ci, pendingSlot.si);
+    s.unit = u || null;
+    hideSheets(); render();
+  });
+});
+document.getElementById('unit-confirm').addEventListener('click', () => {
+  const u = document.getElementById('unit-input').value.trim();
+  const s = getSlot(pendingSlot.ai, pendingSlot.ci, pendingSlot.si);
+  s.unit = u || null;
+  hideSheets(); render();
+});
 
 let pendingModelTarget = null, cameraStream = null, selectedSuggestionId = null, modelPickerCallback = null;
 function openModelPicker(ai, ci, si, withCamera, callback) {
@@ -1551,17 +1704,17 @@ function downloadJSON() {
   triggerDownload(blob, `inventory-${dateStamp()}.json`); toast('已下载 JSON');
 }
 function downloadCSV() {
-  const rows = [['#','表','填表人','日期','通道','货架/托盘','位置','型号','颜色','数量']];
+  const rows = [['#','表','填表人','日期','通道','货架/托盘','位置','型号','颜色','数量','单位']];
   let n = 0;
   const tables = [
-    [(state.meta?.shelfBlack?.title) || '黑色MUG零散货架', state.shelfBlackTable, 'shelves', 'slots', state.meta?.shelfBlack || {}],
+    [(state.meta?.shelfBlack?.title) || '黑色MUG+IC零散货架', state.shelfBlackTable, 'shelves', 'slots', state.meta?.shelfBlack || {}],
     [(state.meta?.shelfWhite?.title) || '白色BK/CH零散货架', state.shelfWhiteTable, 'shelves', 'slots', state.meta?.shelfWhite || {}],
     [(state.meta?.pallet?.title) || '整箱货堆', state.palletTable, 'pallets', 'layers', state.meta?.pallet || {}]
   ];
   for (const [tableName, t, ck, sk, meta] of tables) {
     for (const a of t.aisles) for (const c of a[ck]) c[sk].forEach((slot, i) => {
       n++; const m = slot.modelId ? getModel(slot.modelId) : null;
-      rows.push([n, tableName, meta.filler || '', meta.date || '', a.name, c.name, i+1, m?.name || '', slot.color || '', slot.qty || 0]);
+      rows.push([n, tableName, meta.filler || '', meta.date || '', a.name, c.name, i+1, m?.name || '', slot.color || '', slot.qty || 0, slot.unit || '']);
     });
   }
   const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
@@ -1616,7 +1769,7 @@ let lastTouchEnd = 0;
 document.addEventListener('touchend', (e) => {
   // Don't interfere with buttons, links, inputs, or interactive elements
   const tgt = e.target;
-  if (tgt && tgt.closest('button, a, input, textarea, .color-cell, .gcolor, .model-cell, .gmodel, .editable, [contenteditable], .suggestion, .color-opt, .action-row, .tool, .table-tab')) return;
+  if (tgt && tgt.closest('button, a, input, textarea, .color-cell, .gcolor, .unit-cell, .model-cell, .gmodel, .editable, [contenteditable], .suggestion, .color-opt, .action-row, .tool, .table-tab, .unit-quick')) return;
   const now = Date.now();
   if (now - lastTouchEnd < 300) e.preventDefault();
   lastTouchEnd = now;
