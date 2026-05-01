@@ -22,98 +22,109 @@
   html, body { height: 100%; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
   body { font-family: 'Bricolage Grotesque', system-ui, sans-serif; background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.4; overflow: hidden; padding-top: var(--safe-top); }
   .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
-
-header { flex-shrink: 0; padding: 12px 16px 8px; background: var(–paper); border-bottom: 1px solid var(–line); display: flex; align-items: center; gap: 8px; }
-header h1 { font-size: 16px; font-weight: 700; flex: 1; min-width: 0; }
-.icon-btn { width: 36px; height: 36px; border: 1px solid var(–line); background: var(–paper); border-radius: 10px; display: grid; place-items: center; cursor: pointer; font-size: 16px; flex-shrink: 0; }
-.icon-btn:active { transform: scale(0.94); background: var(–ink); color: var(–paper); }
-
-.table-tabs { flex-shrink: 0; display: flex; background: var(–paper); border-bottom: 1px solid var(–line); }
-.table-tab {
-flex: 1; padding: 10px 6px; font-size: 12px; font-weight: 500;
-background: transparent; border: 0; cursor: pointer;
-color: var(–muted); border-bottom: 3px solid transparent;
-transition: all .18s;
-}
-.table-tab.active {
-color: var(–red);
-border-bottom-color: var(–red);
-background: var(–bg);
-font-weight: 800;
-font-size: 16px;
-letter-spacing: -0.01em;
-}
-.table-tab small { display: block; font-size: 9px; font-weight: 500; margin-top: 2px; opacity: 0.7; font-family: ‘JetBrains Mono’, monospace; letter-spacing: 0.05em; }
-.table-tab.active small { opacity: 0.85; font-size: 10px; font-weight: 700; }
-
-.toolbar { flex-shrink: 0; padding: 8px 12px; background: var(–paper); border-bottom: 1px solid var(–line); display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-.toolbar::-webkit-scrollbar { display: none; }
-.tool { flex-shrink: 0; padding: 7px 12px; border: 1px solid var(–line); border-radius: 999px; background: var(–paper); font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; }
-.tool.active { background: var(–ink); color: var(–paper); }
-.tool:active { transform: scale(0.96); }
-
-main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.table-pane { display: none; }
-.table-pane.active { display: block; }
-
-.meta-bar {
-background: var(–paper);
-border-bottom: 1px solid var(–line);
-padding: 10px 14px;
-}
-.meta-title {
-font-size: 16px;
-font-weight: 800;
-color: var(–red);
-margin-bottom: 8px;
-letter-spacing: -0.01em;
-cursor: pointer;
-display: inline-block;
-padding: 2px 6px;
-margin-left: -6px;
-border-radius: 4px;
-transition: background .15s;
-}
-.meta-title:active { background: rgba(0,0,0,0.06); }
-.meta-fields {
-display: flex;
-gap: 8px;
-flex-wrap: wrap;
-}
-.meta-fields label {
-flex: 1;
-min-width: 130px;
-display: flex;
-align-items: center;
-gap: 6px;
-font-size: 11px;
-font-weight: 600;
-color: var(–muted);
-text-transform: uppercase;
-letter-spacing: 0.05em;
-}
-.meta-fields input {
-flex: 1;
-min-width: 0;
-padding: 6px 8px;
-border: 1px solid var(–line);
-border-radius: 6px;
-background: var(–bg);
-font-size: 13px;
-font-weight: 500;
-color: var(–ink);
-font-family: inherit;
--webkit-user-select: text;
-user-select: text;
-}
-.meta-fields input:focus {
-outline: none;
-background: #fff8d6;
-}
-.meta-fields input[type=“date”] {
-font-family: ‘JetBrains Mono’, monospace;
-font-size: 12px;
-}
+  header { flex-shrink: 0; padding: 12px 16px 8px; background: var(--paper); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; }
+  header h1 { font-size: 16px; font-weight: 700; flex: 1; min-width: 0; }
+  .icon-btn { width: 36px; height: 36px; border: 1px solid var(--line); background: var(--paper); border-radius: 10px; display: grid; place-items: center; cursor: pointer; font-size: 16px; flex-shrink: 0; }
+  .icon-btn:active { transform: scale(0.94); background: var(--ink); color: var(--paper); }
+  .table-tabs { flex-shrink: 0; display: flex; background: var(--paper); border-bottom: 1px solid var(--line); }
+  .table-tab {
+    flex: 1; padding: 10px 6px; font-size: 12px; font-weight: 500;
+    background: transparent; border: 0; cursor: pointer;
+    color: var(--muted); border-bottom: 3px solid transparent;
+    transition: all .18s;
+  }
+  .table-tab.active {
+    color: var(--red);
+    border-bottom-color: var(--red);
+    background: var(--bg);
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+  }
+  .table-tab small { display: block; font-size: 9px; font-weight: 500; margin-top: 2px; opacity: 0.7; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; }
+  .table-tab.active small { opacity: 0.85; font-size: 10px; font-weight: 700; }
+  .toolbar { flex-shrink: 0; padding: 8px 12px; background: var(--paper); border-bottom: 1px solid var(--line); display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .toolbar::-webkit-scrollbar { display: none; }
+  .tool { flex-shrink: 0; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+  .tool.active { background: var(--ink); color: var(--paper); }
+  .tool:active { transform: scale(0.96); }
+  main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .table-pane { display: none; }
+  .table-pane.active { display: block; }
+  .meta-bar {
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    padding: 10px 14px;
+  }
+  .meta-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--red);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    display: inline-block;
+    padding: 2px 6px;
+    margin-left: -6px;
+    border-radius: 4px;
+    transition: background .15s;
+  }
+  .meta-title:active { background: rgba(0,0,0,0.06); }
+  .meta-fields {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .meta-fields label {
+    flex: 1;
+    min-width: 130px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .meta-fields input {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    font-family: inherit;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+  .meta-fields input:focus {
+    outline: none;
+    background: #fff8d6;
+  }
+  .meta-fields input[type="date"] {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .meta-save-btn {
+    flex-shrink: 0;
+    background: var(--red);
+    color: white;
+    border: 0;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(214,51,64,0.35);
+    font-family: inherit;
+    letter-spacing: 0.02em;
+  }
+  .meta-save-btn:active { transform: scale(0.94); background: #b8232f; }
 
 .list-view { padding: 10px 14px 100px; }
 .aisle-block { margin-bottom: 20px; }
@@ -132,7 +143,6 @@ font-size: 12px;
 .container-name .add-after-shelf:active { transform: scale(0.92); }
 .container-block.shelf-dragging { opacity: 0.4; }
 .container-block.shelf-drop-target { box-shadow: 0 -3px 0 var(–ink) inset, 0 3px 0 var(–ink) inset; }
-
 .slot { display: grid; grid-template-columns: 28px 1fr 56px 50px; gap: 5px; align-items: center; padding: 7px 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); min-height: 50px; background: var(–paper); }
 .slot:last-child { border-bottom: 0; }
 .slot.dragover { background: #fff8d6; }
@@ -142,7 +152,6 @@ font-size: 12px;
 .model-cell.dragging { opacity: 0.4; }
 .model-cell.empty-clickable { color: var(–muted); font-style: italic; cursor: pointer; }
 .model-cell.empty-clickable::before { content: ’＋ ’; }
-
 .unit-cell {
 height: 38px;
 border: 2px dashed rgba(0,0,0,0.25);
@@ -165,17 +174,43 @@ box-sizing: border-box;
 .unit-cell:active { transform: scale(0.92); }
 .unit-cell.has-unit { border-style: solid; color: var(–ink); background: var(–bg); }
 
-.color-cell { width: 50px; height: 38px; border: 2px solid var(–ink); border-radius: 8px; background: var(–paper); cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: ‘JetBrains Mono’, monospace; font-size: 14px; font-weight: 700; color: var(–ink); flex-shrink: 0; box-sizing: border-box; }
-.color-cell:active { transform: scale(0.92); }
-.color-cell[data-color=“red”] { background: var(–red); border-color: var(–red); color: white; }
-.color-cell[data-color=“yellow”] { background: var(–yellow); border-color: #c79900; }
-.color-cell[data-color=“green”] { background: var(–green); border-color: var(–green); color: white; }
-.color-cell .qty-zero { display: none; }
+/* COLOR CELL — improved visibility for empty state */
+.color-cell {
+width: 50px;
+height: 38px;
+border: 2.5px dashed rgba(0,0,0,0.55);  /* Empty: dashed border, very visible */
+border-radius: 50%;
+background: var(–paper);
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 14px;
+font-weight: 700;
+color: rgba(0,0,0,0.4);
+flex-shrink: 0;
+box-sizing: border-box;
+transition: all .15s;
+position: relative;
+}
+.color-cell:active { transform: scale(0.88); }
+.color-cell:not([data-color=””]):not([data-color=“null”]) {
+border-style: solid;
+}
+.color-cell[data-color=””]::before, .color-cell[data-color=“null”]::before {
+content: ‘○’;
+font-size: 20px;
+color: rgba(0,0,0,0.45);
+line-height: 1;
+}
+.color-cell[data-color=“red”] { background: var(–red); border-color: #a02028; color: white; }
+.color-cell[data-color=“yellow”] { background: var(–yellow); border-color: #c79900; color: #1a1a1a; }
+.color-cell[data-color=“green”] { background: var(–green); border-color: #2f7028; color: white; }
 
 .grid-view { padding: 10px; padding-bottom: 100px; display: none; }
 .grid-view.active { display: block; }
 .list-view.hidden { display: none; }
-
 .aisles-row { display: grid; grid-template-columns: repeat(var(–cols, 3), minmax(0, 1fr)); gap: 6px; }
 .grid-aisle { background: var(–aisle-bg); border: 1px solid var(–line); border-radius: 10px; padding: 5px; }
 .grid-aisle-name { font-weight: 700; font-size: 11px; text-align: center; padding: 3px 0 6px; }
@@ -188,28 +223,24 @@ box-sizing: border-box;
 .grid-slot.dragover { background: #fff8d6; }
 .grid-slot .gnum { font-family: ‘JetBrains Mono’, monospace; font-size: 7px; color: var(–muted); flex-shrink: 0; width: 14px; text-align: right; }
 .grid-slot .gmodel { flex: 1; word-break: break-word; cursor: grab; font-weight: 500; min-width: 0; }
-.grid-slot .gcolor { width: 22px; height: 14px; border: 1px solid var(–line); border-radius: 3px; flex-shrink: 0; cursor: pointer; font-family: ‘JetBrains Mono’, monospace; font-size: 7px; font-weight: 700; display: flex; align-items: center; justify-content: center; color: var(–ink); }
+.grid-slot .gcolor { width: 22px; height: 14px; border: 1.5px dashed rgba(0,0,0,0.4); border-radius: 3px; flex-shrink: 0; cursor: pointer; font-family: ‘JetBrains Mono’, monospace; font-size: 7px; font-weight: 700; display: flex; align-items: center; justify-content: center; color: var(–ink); }
+.grid-slot .gcolor:not([data-color=””]):not([data-color=“null”]) { border-style: solid; }
 .grid-slot .gcolor[data-color=“red”] { background: var(–red); border-color: var(–red); color: white; }
-.grid-slot .gcolor[data-color=“yellow”] { background: var(–yellow); }
+.grid-slot .gcolor[data-color=“yellow”] { background: var(–yellow); border-color: #c79900; }
 .grid-slot .gcolor[data-color=“green”] { background: var(–green); border-color: var(–green); color: white; }
 .grid-slot.empty .gmodel { color: var(–muted); font-style: italic; }
-
 .fab { position: fixed; right: 14px; bottom: calc(14px + var(–safe-bottom)); width: 52px; height: 52px; border-radius: 50%; background: var(–ink); color: var(–paper); border: 0; font-size: 24px; font-weight: 300; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25); z-index: 50; }
 .fab:active { transform: scale(0.9); }
-
 .sheet-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: flex-end; justify-content: center; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
 .sheet-backdrop.show { display: flex; }
 .sheet { width: 100%; max-width: 480px; background: var(–paper); border-radius: 18px 18px 0 0; padding: 0; border: 1px solid var(–line); border-bottom: 0; animation: slideUp .25s cubic-bezier(.2,.9,.3,1); max-height: 88vh; display: flex; flex-direction: column; }
 .sheet-body { padding: 18px 18px 8px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
 .sheet-footer { padding: 10px 18px calc(14px + var(–safe-bottom)); border-top: 1px solid rgba(0,0,0,0.08); background: var(–paper); position: sticky; bottom: 0; }
-
-/* Centered modal variant for camera/picker - higher visibility */
 .sheet-backdrop.modal-style { align-items: center; }
 .sheet-backdrop.modal-style .sheet { border-radius: 16px; max-height: 92vh; max-width: 460px; width: calc(100% - 24px); border-bottom: 1px solid var(–line); animation: fadeIn .2s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } }
 @keyframes slideUp { from { transform: translateY(100%); } }
 .sheet h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; color: var(–muted); }
-
 .color-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
 .color-opt {
 height: 80px;
@@ -234,13 +265,11 @@ transition: transform .12s;
 .sheet-cancel, .sheet-confirm { width: 100%; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid var(–line); }
 .sheet-cancel { background: var(–bg); }
 .sheet-confirm { background: var(–ink); color: var(–paper); margin-bottom: 8px; }
-
 .qty-input-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; background: var(–bg); border: 1px solid var(–line); border-radius: 10px; padding: 4px; }
 .qty-input-wrap input { flex: 1; border: 0; background: transparent; font-size: 24px; font-weight: 700; text-align: center; font-family: ‘JetBrains Mono’, monospace; padding: 12px; -webkit-user-select: text; user-select: text; }
 .qty-input-wrap input:focus { outline: none; }
 .qty-btn { width: 44px; height: 44px; border-radius: 8px; border: 1px solid var(–line); background: var(–paper); font-size: 20px; font-weight: 700; cursor: pointer; }
 .qty-btn:active { background: var(–ink); color: var(–paper); }
-
 .unit-quick {
 height: 50px;
 border: 2px solid var(–line);
@@ -255,11 +284,51 @@ font-family: inherit;
 }
 .unit-quick:active { transform: scale(0.92); background: var(–ink); color: var(–paper); }
 .unit-quick[data-unit=””] { background: var(–bg); color: var(–muted); border-style: dashed; }
-
 .actions-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
 .action-row { padding: 14px; border: 1px solid var(–line); border-radius: 10px; background: var(–bg); font-size: 14px; font-weight: 500; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; }
-.action-row .ico { font-size: 18px; }
+.action-row .ico { font-size: 20px; }
 .action-row:active { background: var(–ink); color: var(–paper); }
+
+/* Input method options for model picker */
+.input-methods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+.input-method-btn {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 4px;
+padding: 12px 4px;
+border: 2px solid var(–line);
+border-radius: 10px;
+background: var(–bg);
+cursor: pointer;
+font-size: 11px;
+font-weight: 700;
+color: var(–ink);
+text-align: center;
+line-height: 1.2;
+font-family: inherit;
+transition: transform .12s;
+}
+.input-method-btn:active { transform: scale(0.92); background: var(–ink); color: var(–paper); }
+.input-method-btn .imico { font-size: 22px; line-height: 1; }
+.input-method-btn.active { background: var(–ink); color: var(–paper); border-color: var(–ink); }
+
+/* Handwriting canvas */
+.handwrite-wrap { display: none; margin-bottom: 10px; }
+.handwrite-wrap.show { display: block; }
+.handwrite-canvas {
+width: 100%;
+height: 180px;
+background: #fff8d6;
+border: 2px solid var(–ink);
+border-radius: 10px;
+touch-action: none;
+display: block;
+}
+.handwrite-tools { display: flex; gap: 8px; margin-top: 8px; }
+.handwrite-tools button { flex: 1; padding: 10px; border: 1px solid var(–line); border-radius: 8px; background: var(–bg); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.handwrite-tools button:active { background: var(–ink); color: var(–paper); }
 
 .model-search-input {
 width: 100%;
@@ -286,16 +355,35 @@ color: var(–ink);
 .suggestion.selected { background: var(–ink); color: var(–paper); }
 .suggestion .match-score { float: right; font-size: 10px; color: var(–muted); font-family: ‘JetBrains Mono’, monospace; }
 .suggestion.selected .match-score { color: rgba(255,255,255,0.6); }
+
+.camera-wrap { display: none; margin-bottom: 10px; }
+.camera-wrap.show { display: block; }
 .camera-preview { width: 100%; aspect-ratio: 4/3; background: #000; border-radius: 10px; margin-bottom: 10px; object-fit: cover; }
 .camera-controls { display: flex; gap: 8px; margin-bottom: 12px; }
 .camera-controls button { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(–line); background: var(–bg); font-size: 13px; font-weight: 600; cursor: pointer; }
 .camera-controls button.primary { background: var(–ink); color: var(–paper); }
 
-[contenteditable=“true”] { outline: 2px solid var(–ink); outline-offset: 2px; background: #fff8d6; border-radius: 4px; -webkit-user-select: text; user-select: text; }
+.voice-wrap { display: none; margin-bottom: 10px; padding: 16px; background: #fff8d6; border: 2px solid var(–ink); border-radius: 10px; text-align: center; }
+.voice-wrap.show { display: block; }
+.voice-mic-btn {
+width: 80px;
+height: 80px;
+border-radius: 50%;
+border: 0;
+background: var(–red);
+color: white;
+font-size: 36px;
+cursor: pointer;
+box-shadow: 0 4px 14px rgba(214,51,64,0.4);
+margin: 8px 0;
+}
+.voice-mic-btn.recording { background: #2f7028; animation: pulse 1.2s infinite; }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+.voice-status { font-size: 13px; font-weight: 600; color: var(–ink); margin-top: 6px; }
 
+[contenteditable=“true”] { outline: 2px solid var(–ink); outline-offset: 2px; background: #fff8d6; border-radius: 4px; -webkit-user-select: text; user-select: text; }
 .toast { position: fixed; bottom: calc(80px + var(–safe-bottom)); left: 50%; transform: translateX(-50%); background: var(–ink); color: var(–paper); padding: 10px 18px; border-radius: 999px; font-size: 13px; font-weight: 500; z-index: 200; opacity: 0; transition: opacity .25s; pointer-events: none; max-width: 80vw; text-align: center; }
 .toast.show { opacity: 1; }
-
 .delete-zone { position: fixed; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to top, rgba(214,51,64,0.95), rgba(214,51,64,0)); display: none; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; z-index: 90; pointer-events: none; padding-bottom: var(–safe-bottom); }
 .delete-zone.show { display: flex; }
 .delete-zone.active { background: linear-gradient(to top, rgba(214,51,64,1), rgba(214,51,64,0.4)); }
@@ -330,6 +418,7 @@ color: var(–ink);
         <div class="meta-fields">
           <label>填表人 <input type="text" data-meta="filler" data-table-meta="shelfBlack" placeholder="姓名"></label>
           <label>日期 <input type="date" data-meta="date" data-table-meta="shelfBlack"></label>
+          <button class="meta-save-btn" data-meta-save>💾 Save 保存</button>
         </div>
       </div>
       <div class="list-view" id="shelfBlack-list"></div>
@@ -341,6 +430,7 @@ color: var(–ink);
         <div class="meta-fields">
           <label>填表人 <input type="text" data-meta="filler" data-table-meta="shelfWhite" placeholder="姓名"></label>
           <label>日期 <input type="date" data-meta="date" data-table-meta="shelfWhite"></label>
+          <button class="meta-save-btn" data-meta-save>💾 Save 保存</button>
         </div>
       </div>
       <div class="list-view" id="shelfWhite-list"></div>
@@ -352,15 +442,14 @@ color: var(–ink);
         <div class="meta-fields">
           <label>填表人 <input type="text" data-meta="filler" data-table-meta="pallet" placeholder="姓名"></label>
           <label>日期 <input type="date" data-meta="date" data-table-meta="pallet"></label>
+          <button class="meta-save-btn" data-meta-save>💾 Save 保存</button>
         </div>
       </div>
       <div class="list-view" id="pallet-list"></div>
       <div class="grid-view" id="pallet-grid"></div>
     </div>
   </main>
-
-<button class="fab" id="add-aisle">+</button>
-
+  <button class="fab" id="add-aisle">+</button>
   <div class="delete-zone" id="delete-zone">🗑️ 拖到这里删除整箱(已搬走)</div>
 </div>
 
@@ -398,8 +487,6 @@ color: var(–ink);
   </div>
 </div>
 
-<!-- Unit picker -->
-
 <div class="sheet-backdrop modal-style" id="unit-sheet">
   <div class="sheet">
     <div class="sheet-body">
@@ -423,19 +510,26 @@ color: var(–ink);
   </div>
 </div>
 
+<!-- SAVE / EXPORT sheet — with WeChat / Drive / Email -->
+
 <div class="sheet-backdrop" id="save-sheet">
   <div class="sheet">
     <div class="sheet-body">
-      <h3>保存 / 导出</h3>
+      <h3>保存与分享</h3>
       <div class="actions-list">
-        <button class="action-row" data-act="download-json"><span class="ico">📁</span>下载到本地 (JSON)</button>
+        <button class="action-row" data-act="share-wechat"><span class="ico">💬</span>分享到微信 / Messages</button>
+        <button class="action-row" data-act="share-drive"><span class="ico">☁️</span>保存到 Google Drive / iCloud</button>
+        <button class="action-row" data-act="share-email"><span class="ico">📧</span>发送到邮箱</button>
         <button class="action-row" data-act="download-csv"><span class="ico">📊</span>导出 CSV 表格</button>
-        <button class="action-row" data-act="share"><span class="ico">📤</span>分享 (微信/Drive...)</button>
+        <button class="action-row" data-act="download-json"><span class="ico">📁</span>下载 JSON 备份</button>
         <button class="action-row" data-act="load-json"><span class="ico">📂</span>从本地导入 JSON</button>
+      </div>
+      <div style="font-size:11px; color:var(--muted); padding: 8px 4px; line-height:1.6;">
+        💡 数据已自动保存到本浏览器,以上选项是导出 / 备份到其他地方。
       </div>
     </div>
     <div class="sheet-footer">
-      <button class="sheet-cancel" data-close>取消</button>
+      <button class="sheet-cancel" data-close>关闭</button>
     </div>
   </div>
 </div>
@@ -472,16 +566,21 @@ color: var(–ink);
           <div style="width:36px; height:24px; background:var(--green); border-radius:4px;"></div>
           <div><strong>绿色</strong> · 充足</div>
         </div>
+        <div style="display:flex; align-items:center; gap:10px; padding:8px; background:var(--bg); border-radius:8px;">
+          <div style="width:36px; height:24px; border:2.5px dashed rgba(0,0,0,0.55); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; color:rgba(0,0,0,0.45);">○</div>
+          <div><strong>空圆框</strong> · 未标注 (单击选颜色)</div>
+        </div>
         <div style="font-size:12px; color:var(--muted); padding:10px; background:var(--bg); border-radius:8px; line-height:1.7;">
-          · <b>单击</b>颜色格 → 改颜色<br>
-          · <b>双击</b>颜色格 → 输入数量(整数)<br>
-          · <b>双击</b>型号 → 拍照识别 / 修改型号<br>
+          · <b>单击</b>○颜色圆框 → 选红/黄/绿<br>
+          · <b>双击</b>○颜色圆框 → 输入数量(整数)<br>
+          · <b>双击</b>型号 → 4 种输入: 拍照/打字/手写/语音<br>
+          · <b>单击</b>单位框 → 选单位(套/个/对...)<br>
           · <b>双击</b>表标题 / 通道名 / 货架层名 → 修改<br>
           · <b>长按拖动</b>型号 → 移到其他位置<br>
           · <b>长按层名</b>(整行) → 整层拖到别处(序号自动重排)<br>
           · 货架行右边 <b>+</b> → 在该层后插入新一层<br>
           · 整箱表上 <b>拖到底部</b> → 删除(整箱搬走)<br>
-          · 整箱表 <b>空层点击</b> → 拍照识别新增
+          · 顶部 <b>💾</b> 或表内 <b>Save 保存</b> → 导出/分享到微信/Drive/邮箱
         </div>
       </div>
     </div>
@@ -491,25 +590,61 @@ color: var(–ink);
   </div>
 </div>
 
+<!-- MODEL PICKER with 4 input methods: camera, type, handwrite, voice -->
+
 <div class="sheet-backdrop modal-style" id="camera-sheet">
   <div class="sheet">
     <div class="sheet-body">
-      <h3 id="camera-title">添加整箱型号</h3>
-      <video id="camera-video" class="camera-preview" autoplay playsinline muted style="display:none;"></video>
-      <canvas id="camera-canvas" class="camera-preview" style="display:none;"></canvas>
-      <div class="camera-controls">
-        <button id="camera-start">📷 拍照识别</button>
-        <button id="camera-retake" style="display:none;">↻ 重拍</button>
-      </div>
-      <div id="ocr-status" style="display:none; padding: 8px 12px; background: #fff8d6; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; margin-bottom: 10px;"></div>
-      <div style="font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600;">识别结果 (可手动修改):</div>
-      <textarea class="model-search-input" id="model-search" placeholder="拍照后会自动填入识别文字,可在此手动修改..." autocomplete="off" rows="2" spellcheck="false"></textarea>
-      <div class="model-suggestions" id="model-suggestions"></div>
+      <h3 id="camera-title">添加 / 修改型号</h3>
+
+```
+  <!-- Input method selector -->
+  <div class="input-methods">
+    <button class="input-method-btn active" data-method="type"><span class="imico">⌨️</span><span>打字</span></button>
+    <button class="input-method-btn" data-method="camera"><span class="imico">📷</span><span>拍照</span></button>
+    <button class="input-method-btn" data-method="handwrite"><span class="imico">✍️</span><span>手写</span></button>
+    <button class="input-method-btn" data-method="voice"><span class="imico">🎤</span><span>语音</span></button>
+  </div>
+
+  <!-- Camera -->
+  <div class="camera-wrap" id="camera-wrap">
+    <video id="camera-video" class="camera-preview" autoplay playsinline muted style="display:none;"></video>
+    <canvas id="camera-canvas" class="camera-preview" style="display:none;"></canvas>
+    <div class="camera-controls">
+      <button id="camera-start">📷 开启摄像头</button>
+      <button id="camera-retake" style="display:none;">↻ 重拍</button>
     </div>
-    <div class="sheet-footer">
-      <button class="sheet-confirm" id="model-confirm">确定</button>
-      <button class="sheet-cancel" data-close>取消</button>
+    <div id="ocr-status" style="display:none; padding: 8px 12px; background: #fff8d6; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; margin-bottom: 10px;"></div>
+  </div>
+
+  <!-- Handwriting -->
+  <div class="handwrite-wrap" id="handwrite-wrap">
+    <div style="font-size:11px; color:var(--muted); margin-bottom:6px; font-weight:600;">在下方区域用手指或笔写字,然后手动输入对应文字 ↓</div>
+    <canvas class="handwrite-canvas" id="handwrite-canvas"></canvas>
+    <div class="handwrite-tools">
+      <button id="hw-clear">🗑️ 清空</button>
+      <button id="hw-undo">↶ 撤销</button>
     </div>
+  </div>
+
+  <!-- Voice -->
+  <div class="voice-wrap" id="voice-wrap">
+    <div style="font-size:13px; color:var(--muted); margin-bottom:6px;">点击麦克风按钮说出型号</div>
+    <button class="voice-mic-btn" id="voice-mic">🎤</button>
+    <div class="voice-status" id="voice-status">点击开始录音</div>
+  </div>
+
+  <!-- Always-visible text field (works for all methods) -->
+  <div style="font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600;">型号名 (可手动修改):</div>
+  <textarea class="model-search-input" id="model-search" placeholder="输入型号名,或选下方建议..." autocomplete="off" rows="2" spellcheck="false"></textarea>
+  <div class="model-suggestions" id="model-suggestions"></div>
+</div>
+<div class="sheet-footer">
+  <button class="sheet-confirm" id="model-confirm">确定</button>
+  <button class="sheet-cancel" data-close>取消</button>
+</div>
+```
+
   </div>
 </div>
 
@@ -545,7 +680,6 @@ function loadState() {
   try {
     const raw = localStorage.getItem('inventoryV3');
     if (raw) { state = JSON.parse(raw); if (state.models && state.shelfBlackTable && state.shelfWhiteTable && state.palletTable) return; }
-    // try migrating from V2
     const oldRaw = localStorage.getItem('inventoryV2');
     if (oldRaw) {
       const old = JSON.parse(oldRaw);
@@ -569,7 +703,6 @@ function buildEmptyShelfTable() {
 }
 function buildInitial() {
   const models = INITIAL_MODELS.map((n,i) => ({ id: 'm_'+i+'_'+Date.now(), name: n }));
-  // Black shelf: filled with all models
   const shelfBlackAisles = SHELF_AISLE_NAMES.map(n => ({ name: n, shelves: SHELF_NAMES.map(sn => ({ name: sn, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) }));
   let mi = 0;
   for (const a of shelfBlackAisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) {
@@ -584,7 +717,6 @@ function buildInitial() {
       la.shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots });
     }
   }
-  // White shelf: same structure, empty (user fills as needed) — but pre-seed with same model layout for convenience
   const shelfWhiteAisles = SHELF_AISLE_NAMES.map(n => ({ name: n, shelves: SHELF_NAMES.map(sn => ({ name: sn, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) }));
   mi = 0;
   for (const a of shelfWhiteAisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) {
@@ -654,7 +786,6 @@ function renderMetaBars() {
   });
 }
 
-// One-time meta input bindings
 document.querySelectorAll('input[data-meta]').forEach(inp => {
   inp.addEventListener('input', () => {
     const key = inp.dataset.tableMeta;
@@ -666,7 +797,16 @@ document.querySelectorAll('input[data-meta]').forEach(inp => {
   });
 });
 
-// Meta title double-tap to edit
+// SAVE buttons inside each meta-bar — open save sheet
+document.querySelectorAll('[data-meta-save]').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    saveState();
+    showSheet('save-sheet');
+  });
+});
+
 document.querySelectorAll('.meta-title[data-meta-title]').forEach(el => {
   let lastTap = 0;
   el.addEventListener('dblclick', (e) => { e.preventDefault(); startEditMetaTitle(el); });
@@ -713,9 +853,10 @@ function renderListView() {
       const cblock = document.createElement('div');
       cblock.className = 'container-block' + (isShelf ? '' : ' pallet');
       const palletTools = isShelf ? '' : `<button class="mini-btn" data-act="del-pallet" data-ai="${ai}" data-ci="${ci}">删</button>`;
+      // FIX (二): No more forced ' 层' suffix — name is fully user-controlled
       cblock.innerHTML = `<div class="container-name">
         <span class="shelf-drag-handle" data-ai="${ai}" data-ci="${ci}" data-table="${currentTable}" title="按住拖动整层">⠿</span>
-        <span class="cont-name editable" data-ai="${ai}" data-ci="${ci}">${escapeHtml(container.name)}${isShelf ? ' 层' : ''}</span>
+        <span class="cont-name editable" data-ai="${ai}" data-ci="${ci}">${escapeHtml(container.name)}</span>
         <div class="container-tools">
           <button class="add-after-shelf" data-ai="${ai}" data-ci="${ci}" title="在此后插入新${isShelf ? '层' : '托盘'}">+</button>
           ${palletTools}
@@ -729,6 +870,7 @@ function renderListView() {
         const modelHtml = slot.modelId
           ? `<div class="model-cell has-model" draggable="true" data-mid="${slot.modelId}" data-ai="${ai}" data-ci="${ci}" data-si="${si}" data-table="${currentTable}">${escapeHtml(m ? m.name : '?')}</div>`
           : `<div class="model-cell empty-clickable" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${isShelf ? '空格 (点击添加)' : '空层 (拍照添加)'}</div>`;
+        // FIX (一): Always render color cell — empty state shows dashed circle with ○ symbol
         const colorHtml = slot.modelId
           ? `<div class="color-cell" data-color="${slot.color||''}" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${slot.qty>0 ? slot.qty : ''}</div>`
           : `<div class="color-cell" style="visibility:hidden"></div>`;
@@ -813,12 +955,10 @@ function attachListHandlers(root) {
   root.querySelectorAll('.add-child').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); addContainerToAisle(+el.dataset.ai); }); });
   root.querySelectorAll('.add-after-shelf').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); addShelfAfter(+el.dataset.ai, +el.dataset.ci); }); });
   root.querySelectorAll('.shelf-drag-handle').forEach(el => addShelfDrag(el));
-  // Also make the whole container-name row act as a drag handle (long-press)
   root.querySelectorAll('.container-name').forEach(row => {
     const handle = row.querySelector('.shelf-drag-handle');
     if (handle) addShelfDrag(row, handle);
   });
-  // Desktop: container-block accepts shelf drops
   root.querySelectorAll('.container-block').forEach(block => {
     block.addEventListener('dragover', (e) => {
       if (e.dataTransfer && Array.from(e.dataTransfer.types).includes('text/shelf')) {
@@ -854,53 +994,37 @@ function attachListHandlers(root) {
   });
 }
 
-// Double-tap on a model cell: open picker (with camera), and replace current model on confirm
 function attachModelDoubleTap(el) {
   let lastTapTime = 0;
   let lastTapX = 0, lastTapY = 0;
-
   const handleDoubleTap = () => {
     const ai = +el.dataset.ai, ci = +el.dataset.ci, si = +el.dataset.si;
     const slot = getSlot(ai, ci, si);
-    const oldColor = slot.color, oldQty = slot.qty;
+    const oldColor = slot.color, oldQty = slot.qty, oldUnit = slot.unit;
     openModelPicker(ai, ci, si, true, (model) => {
       const s = getSlot(ai, ci, si);
       s.modelId = model.id;
-      s.color = oldColor; s.qty = oldQty;
+      s.color = oldColor; s.qty = oldQty; s.unit = oldUnit;
     });
   };
-
-  // click handler (mouse + tap fallback)
   el.addEventListener('click', (e) => {
     const now = Date.now();
     if (now - lastTapTime < 380) {
-      e.preventDefault();
-      e.stopPropagation();
-      lastTapTime = 0;
-      handleDoubleTap();
-    } else {
-      lastTapTime = now;
-    }
+      e.preventDefault(); e.stopPropagation();
+      lastTapTime = 0; handleDoubleTap();
+    } else { lastTapTime = now; }
   });
-
-  // touchend handler (catches iOS taps that might not fire click in time)
   el.addEventListener('touchend', (e) => {
     if (e.changedTouches && e.changedTouches.length) {
       const t = e.changedTouches[0];
       const now = Date.now();
       const dx = Math.abs(t.clientX - lastTapX);
       const dy = Math.abs(t.clientY - lastTapY);
-      // Detect double tap with proximity check
       if (now - lastTapTime < 380 && dx < 30 && dy < 30) {
-        e.preventDefault();
-        e.stopPropagation();
-        lastTapTime = 0;
-        handleDoubleTap();
-        return;
+        e.preventDefault(); e.stopPropagation();
+        lastTapTime = 0; handleDoubleTap(); return;
       }
-      lastTapTime = now;
-      lastTapX = t.clientX;
-      lastTapY = t.clientY;
+      lastTapTime = now; lastTapX = t.clientX; lastTapY = t.clientY;
     }
   }, { passive: false });
 }
@@ -923,7 +1047,6 @@ function attachGridHandlers(root) {
   root.querySelectorAll('.editable').forEach(el => makeEditable(el));
 }
 
-// Unit cell click → open unit editor
 function attachUnitCellHandlers(el) {
   el.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -931,34 +1054,24 @@ function attachUnitCellHandlers(el) {
   });
 }
 
-// Single tap = color, double tap = qty (touch-friendly, robust)
 function attachColorCellHandlers(el) {
   let lastTapTime = 0;
   let lastTapX = 0, lastTapY = 0;
   let pendingSingleTimer = null;
-
   const ai = () => +el.dataset.ai, ci = () => +el.dataset.ci, si = () => +el.dataset.si;
-
   const onSingle = () => openColorPicker(ai(), ci(), si());
   const onDouble = () => openQtyEditor(ai(), ci(), si());
-
   el.addEventListener('click', (e) => {
     e.stopPropagation();
     const now = Date.now();
     if (now - lastTapTime < 380) {
-      // Double tap
       if (pendingSingleTimer) { clearTimeout(pendingSingleTimer); pendingSingleTimer = null; }
-      lastTapTime = 0;
-      onDouble();
+      lastTapTime = 0; onDouble();
     } else {
       lastTapTime = now;
-      pendingSingleTimer = setTimeout(() => {
-        onSingle();
-        pendingSingleTimer = null;
-      }, 380);
+      pendingSingleTimer = setTimeout(() => { onSingle(); pendingSingleTimer = null; }, 380);
     }
   });
-
   el.addEventListener('touchend', (e) => {
     if (e.changedTouches && e.changedTouches.length) {
       const t = e.changedTouches[0];
@@ -966,16 +1079,11 @@ function attachColorCellHandlers(el) {
       const dx = Math.abs(t.clientX - lastTapX);
       const dy = Math.abs(t.clientY - lastTapY);
       if (now - lastTapTime < 380 && dx < 30 && dy < 30) {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         if (pendingSingleTimer) { clearTimeout(pendingSingleTimer); pendingSingleTimer = null; }
-        lastTapTime = 0;
-        onDouble();
-        return;
+        lastTapTime = 0; onDouble(); return;
       }
-      lastTapTime = now;
-      lastTapX = t.clientX;
-      lastTapY = t.clientY;
+      lastTapTime = now; lastTapX = t.clientX; lastTapY = t.clientY;
     }
   }, { passive: false });
 }
@@ -997,7 +1105,8 @@ function startEdit(el) {
   const finish = () => {
     el.contentEditable = 'false';
     el.removeEventListener('blur', finish); el.removeEventListener('keydown', onKey);
-    let txt = el.textContent.trim().replace(/^通道 · /,'').replace(/^排 · /,'').replace(/ 层$/,'');
+    // FIX (二): No longer strip ' 层' suffix — user fully owns the name
+    let txt = el.textContent.trim().replace(/^通道 · /,'').replace(/^排 · /,'');
     if (!txt) { render(); return; }
     const ai = el.dataset.ai !== undefined ? +el.dataset.ai : null;
     const ci = el.dataset.ci !== undefined ? +el.dataset.ci : null;
@@ -1028,9 +1137,9 @@ function onDropSlot(e) {
 function performMove(src, tgt) {
   if (src.ai === tgt.ai && src.ci === tgt.ci && src.si === tgt.si) return;
   const sSlot = getSlot(src.ai, src.ci, src.si), tSlot = getSlot(tgt.ai, tgt.ci, tgt.si);
-  const tmp = { modelId: tSlot.modelId, color: tSlot.color, qty: tSlot.qty };
-  tSlot.modelId = sSlot.modelId; tSlot.color = sSlot.color; tSlot.qty = sSlot.qty;
-  sSlot.modelId = tmp.modelId; sSlot.color = tmp.color; sSlot.qty = tmp.qty;
+  const tmp = { modelId: tSlot.modelId, color: tSlot.color, qty: tSlot.qty, unit: tSlot.unit };
+  tSlot.modelId = sSlot.modelId; tSlot.color = sSlot.color; tSlot.qty = sSlot.qty; tSlot.unit = sSlot.unit;
+  sSlot.modelId = tmp.modelId; sSlot.color = tmp.color; sSlot.qty = tmp.qty; sSlot.unit = tmp.unit;
   render();
 }
 function showDeleteZone() { document.getElementById('delete-zone').classList.add('show'); }
@@ -1087,7 +1196,7 @@ function addTouchDrag(el) {
       const dz = document.getElementById('delete-zone'); const dzRect = dz.getBoundingClientRect();
       if (currentTable === 'pallet' && t.clientY > dzRect.top) {
         const s = getSlot(dragSrc.ai, dragSrc.ci, dragSrc.si);
-        s.modelId = null; s.color = null; s.qty = 0;
+        s.modelId = null; s.color = null; s.qty = 0; s.unit = null;
         toast('🗑️ 整箱已搬走'); render();
       } else {
         const slot = under?.closest('.slot, .grid-slot');
@@ -1130,7 +1239,6 @@ document.getElementById('qty-confirm').addEventListener('click', () => {
 });
 document.getElementById('qty-input').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/[^\d]/g, ''); });
 
-// Unit editor
 function openUnitEditor(ai, ci, si) {
   pendingSlot = { ai, ci, si };
   const s = getSlot(ai, ci, si);
@@ -1154,27 +1262,46 @@ document.getElementById('unit-confirm').addEventListener('click', () => {
   hideSheets(); render();
 });
 
+// ===== MODEL PICKER with 4 input methods =====
 let pendingModelTarget = null, cameraStream = null, selectedSuggestionId = null, modelPickerCallback = null;
+let voiceRecognition = null, voiceActive = false;
+
 function openModelPicker(ai, ci, si, withCamera, callback) {
   pendingModelTarget = (ai === null) ? null : { ai, ci, si };
   modelPickerCallback = callback || null;
   selectedSuggestionId = null;
-  const camStartBtn = document.getElementById('camera-start');
-  const camRetakeBtn = document.getElementById('camera-retake');
-  const video = document.getElementById('camera-video');
-  const canvas = document.getElementById('camera-canvas');
-  video.style.display = 'none'; canvas.style.display = 'none';
-  camStartBtn.style.display = withCamera ? '' : 'none';
-  camStartBtn.textContent = '📷 拍照识别';
-  camStartBtn.dataset.mode = 'start';
-  camRetakeBtn.style.display = 'none';
-  document.getElementById('camera-title').textContent = withCamera ? '添加 / 修改型号' : '选择型号';
+  // Default to "type" method
+  switchInputMethod('type');
+  document.getElementById('camera-title').textContent = '添加 / 修改型号';
   document.getElementById('model-search').value = '';
   renderSuggestions('');
   showSheet('camera-sheet');
+  // Auto-focus the text field
+  setTimeout(() => {
+    const inp = document.getElementById('model-search');
+    if (inp) inp.focus();
+  }, 200);
 }
 
-// Single delegated handler for camera-start button (handles both "start" and "capture" modes)
+function switchInputMethod(method) {
+  document.querySelectorAll('.input-method-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.method === method);
+  });
+  document.getElementById('camera-wrap').classList.toggle('show', method === 'camera');
+  document.getElementById('handwrite-wrap').classList.toggle('show', method === 'handwrite');
+  document.getElementById('voice-wrap').classList.toggle('show', method === 'voice');
+
+  // Stop other methods when switching
+  if (method !== 'camera') stopCamera();
+  if (method !== 'voice') stopVoice();
+  if (method === 'handwrite') initHandwrite();
+}
+
+document.querySelectorAll('.input-method-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchInputMethod(btn.dataset.method));
+});
+
+// CAMERA
 document.getElementById('camera-start').addEventListener('click', async () => {
   const btn = document.getElementById('camera-start');
   const mode = btn.dataset.mode || 'start';
@@ -1199,7 +1326,6 @@ async function startCameraNow() {
     const btn = document.getElementById('camera-start');
     btn.textContent = '📸 拍下';
     btn.dataset.mode = 'capture';
-    // Tap-to-focus on iOS Safari
     video.addEventListener('click', tryFocus);
   } catch(e) { toast('无法打开摄像头: ' + (e.message || e.name)); }
 }
@@ -1230,8 +1356,6 @@ function capturePhotoNow() {
   const btn = document.getElementById('camera-start');
   btn.style.display = 'none';
   btn.dataset.mode = 'start';
-
-  // Run OCR on the captured photo
   runOcrOnCanvas(canvas);
 }
 
@@ -1241,20 +1365,14 @@ async function runOcrOnCanvas(canvas) {
   toast('🔍 正在识别照片中的文字...');
   const ocrStatus = document.getElementById('ocr-status');
   if (ocrStatus) { ocrStatus.style.display = ''; ocrStatus.textContent = '⏳ 处理图片中...'; }
-
   try {
     if (typeof Tesseract === 'undefined') {
       toast('OCR 库未加载,请联网');
       if (ocrStatus) ocrStatus.style.display = 'none';
       return;
     }
-
-    // Preprocess: convert to grayscale + boost contrast for better OCR
     const processed = preprocessForOcr(canvas);
-
     if (ocrStatus) ocrStatus.textContent = '⏳ 识别中文字 0%...';
-
-    // Use English + Simplified Chinese for car labels (车型 + Tacoma etc)
     const result = await Tesseract.recognize(processed, 'eng+chi_sim', {
       logger: m => {
         if (m.status === 'recognizing text' && ocrStatus) {
@@ -1264,7 +1382,6 @@ async function runOcrOnCanvas(canvas) {
         }
       }
     });
-
     let text = (result.data.text || '').trim();
     if (ocrStatus) ocrStatus.style.display = 'none';
     if (!text) {
@@ -1272,12 +1389,9 @@ async function runOcrOnCanvas(canvas) {
       searchInput.focus();
       return;
     }
-
-    // Extract best candidate (prefer year-range patterns, ignore "车型" header)
     const candidate = extractBestCandidate(text);
     searchInput.value = candidate;
     renderSuggestions(searchInput.value);
-
     setTimeout(() => {
       const topSuggestion = document.querySelector('#model-suggestions .suggestion[data-mid]');
       if (topSuggestion) {
@@ -1299,10 +1413,8 @@ async function runOcrOnCanvas(canvas) {
   }
 }
 
-// Image preprocessing: grayscale + threshold for better OCR accuracy
 function preprocessForOcr(srcCanvas) {
   const w = srcCanvas.width, h = srcCanvas.height;
-  // Scale up if too small (target ~ 1500px wide for best OCR)
   const targetW = Math.max(w, 1500);
   const scale = targetW / w;
   const out = document.createElement('canvas');
@@ -1312,23 +1424,18 @@ function preprocessForOcr(srcCanvas) {
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(srcCanvas, 0, 0, out.width, out.height);
-
   const imgData = ctx.getImageData(0, 0, out.width, out.height);
   const d = imgData.data;
-  // Grayscale + contrast stretch
   let min = 255, max = 0;
-  // First pass: find histogram range
   for (let i = 0; i < d.length; i += 4) {
     const gray = (d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114) | 0;
     if (gray < min) min = gray;
     if (gray > max) max = gray;
   }
   const range = Math.max(1, max - min);
-  // Second pass: apply contrast and grayscale
   for (let i = 0; i < d.length; i += 4) {
     let gray = (d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114) | 0;
     gray = Math.max(0, Math.min(255, ((gray - min) / range) * 255));
-    // Slight binarization for crisp text
     if (gray > 180) gray = 255;
     else if (gray < 80) gray = 0;
     d[i] = d[i+1] = d[i+2] = gray;
@@ -1338,14 +1445,10 @@ function preprocessForOcr(srcCanvas) {
 }
 
 function extractBestCandidate(text) {
-  // Split by lines (preserve structure since label is often 2 lines)
   const lines = text.split(/\n+/).map(s => s.trim()).filter(Boolean);
-  // Filter out obvious headers like 车型, 型号, etc
   const filtered = lines.filter(l => !/^(车型|型号|品牌|名称)$/.test(l));
-  // Find lines containing year range
   const yearLines = filtered.filter(l => /\b(19|20)\d{2}\s*[-~–—]\s*(19|20)\d{2}\b/.test(l));
   if (yearLines.length) {
-    // Combine year line with next line if it looks like a continuation
     const idx = filtered.indexOf(yearLines[0]);
     if (idx >= 0 && idx + 1 < filtered.length) {
       const next = filtered[idx + 1];
@@ -1355,12 +1458,9 @@ function extractBestCandidate(text) {
     }
     return yearLines[0];
   }
-  // Single year + word
   const singleYear = filtered.find(l => /\b(19|20)\d{2}\b/.test(l) && /[A-Za-z]{3,}/.test(l));
   if (singleYear) return singleYear;
-  // Otherwise: join filtered lines and clean
   const joined = filtered.join(' ').replace(/\s+/g, ' ').trim();
-  // Remove obviously garbage characters (random single chars)
   return joined.replace(/\s+[a-zA-Z0-9]\s+/g, ' ').replace(/\s+/g, ' ').trim() || text;
 }
 
@@ -1368,10 +1468,144 @@ document.getElementById('camera-retake').addEventListener('click', () => {
   document.getElementById('camera-canvas').style.display = 'none';
   document.getElementById('camera-retake').style.display = 'none';
   const btn = document.getElementById('camera-start');
-  btn.style.display = ''; btn.textContent = '📷 拍照识别'; btn.dataset.mode = 'start';
+  btn.style.display = ''; btn.textContent = '📷 开启摄像头'; btn.dataset.mode = 'start';
 });
 
-function stopCamera() { if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; } }
+function stopCamera() {
+  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+  const btn = document.getElementById('camera-start');
+  if (btn) { btn.textContent = '📷 开启摄像头'; btn.dataset.mode = 'start'; btn.style.display = ''; }
+  const video = document.getElementById('camera-video');
+  if (video) video.style.display = 'none';
+  const canvas = document.getElementById('camera-canvas');
+  if (canvas) canvas.style.display = 'none';
+  const retakeBtn = document.getElementById('camera-retake');
+  if (retakeBtn) retakeBtn.style.display = 'none';
+}
+
+// HANDWRITING — simple drawing canvas (user types the recognized text after writing)
+let hwCtx = null, hwDrawing = false, hwLastX = 0, hwLastY = 0, hwInited = false;
+let hwStrokes = []; // for undo
+function initHandwrite() {
+  if (hwInited) return;
+  hwInited = true;
+  const canvas = document.getElementById('handwrite-canvas');
+  // Set actual pixel size for crispness
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = 180 * dpr;
+  hwCtx = canvas.getContext('2d');
+  hwCtx.scale(dpr, dpr);
+  hwCtx.lineWidth = 3;
+  hwCtx.lineCap = 'round';
+  hwCtx.lineJoin = 'round';
+  hwCtx.strokeStyle = '#1a1a1a';
+
+  const getPos = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+  };
+  const startStroke = (e) => {
+    e.preventDefault();
+    hwDrawing = true;
+    const p = getPos(e);
+    hwLastX = p.x; hwLastY = p.y;
+    // Save snapshot for undo
+    try { hwStrokes.push(hwCtx.getImageData(0, 0, canvas.width, canvas.height)); } catch(e) {}
+    if (hwStrokes.length > 20) hwStrokes.shift();
+  };
+  const moveStroke = (e) => {
+    if (!hwDrawing) return;
+    e.preventDefault();
+    const p = getPos(e);
+    hwCtx.beginPath();
+    hwCtx.moveTo(hwLastX, hwLastY);
+    hwCtx.lineTo(p.x, p.y);
+    hwCtx.stroke();
+    hwLastX = p.x; hwLastY = p.y;
+  };
+  const endStroke = (e) => { hwDrawing = false; };
+
+  canvas.addEventListener('touchstart', startStroke, { passive: false });
+  canvas.addEventListener('touchmove', moveStroke, { passive: false });
+  canvas.addEventListener('touchend', endStroke);
+  canvas.addEventListener('mousedown', startStroke);
+  canvas.addEventListener('mousemove', moveStroke);
+  canvas.addEventListener('mouseup', endStroke);
+  canvas.addEventListener('mouseleave', endStroke);
+}
+function clearHandwrite() {
+  if (!hwCtx) return;
+  const canvas = document.getElementById('handwrite-canvas');
+  hwCtx.clearRect(0, 0, canvas.width, canvas.height);
+  hwStrokes = [];
+}
+function undoHandwrite() {
+  if (!hwCtx || !hwStrokes.length) return;
+  const last = hwStrokes.pop();
+  hwCtx.putImageData(last, 0, 0);
+}
+document.getElementById('hw-clear').addEventListener('click', clearHandwrite);
+document.getElementById('hw-undo').addEventListener('click', undoHandwrite);
+
+// VOICE — Web Speech API
+function startVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    document.getElementById('voice-status').textContent = '⚠️ 此设备不支持语音识别,请用打字';
+    toast('设备不支持语音识别');
+    return;
+  }
+  if (voiceActive) { stopVoice(); return; }
+  voiceRecognition = new SR();
+  voiceRecognition.lang = 'zh-CN'; // Chinese first
+  voiceRecognition.continuous = false;
+  voiceRecognition.interimResults = true;
+  const status = document.getElementById('voice-status');
+  const micBtn = document.getElementById('voice-mic');
+  const searchInput = document.getElementById('model-search');
+
+  voiceRecognition.onstart = () => {
+    voiceActive = true;
+    micBtn.classList.add('recording');
+    status.textContent = '🔴 正在录音... 说出型号';
+  };
+  voiceRecognition.onresult = (e) => {
+    let interim = '', finalText = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalText += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    if (interim) status.textContent = '识别中: ' + interim;
+    if (finalText) {
+      searchInput.value = finalText.trim();
+      status.textContent = '✅ 已识别: ' + finalText.trim();
+      renderSuggestions(searchInput.value);
+    }
+  };
+  voiceRecognition.onerror = (e) => {
+    status.textContent = '⚠️ 错误: ' + e.error + ' (请尝试打字输入)';
+    voiceActive = false;
+    micBtn.classList.remove('recording');
+  };
+  voiceRecognition.onend = () => {
+    voiceActive = false;
+    micBtn.classList.remove('recording');
+    if (status.textContent.startsWith('🔴')) status.textContent = '已停止 — 点击麦克风重新录音';
+  };
+  try { voiceRecognition.start(); } catch(e) { status.textContent = '启动失败: ' + e.message; }
+}
+function stopVoice() {
+  if (voiceRecognition && voiceActive) {
+    try { voiceRecognition.stop(); } catch(e) {}
+  }
+  voiceActive = false;
+  const micBtn = document.getElementById('voice-mic');
+  if (micBtn) micBtn.classList.remove('recording');
+}
+document.getElementById('voice-mic').addEventListener('click', startVoice);
 
 function fuzzyMatch(query, name) {
   if (!query) return 1;
@@ -1402,9 +1636,9 @@ function renderSuggestions(query) {
   });
 }
 document.getElementById('model-search').addEventListener('input', (e) => { selectedSuggestionId = null; renderSuggestions(e.target.value); });
+
 function commitModelChoice() {
   const inp = document.getElementById('model-search');
-  // Robust value extraction: handle textarea newlines and weird whitespace
   let txt = (inp.value || '').replace(/\s+/g, ' ').trim();
   if (!txt) {
     inp.style.borderColor = 'var(--red)';
@@ -1422,36 +1656,31 @@ function commitModelChoice() {
   } else {
     toast('✅ 已选择: ' + model.name);
   }
-  // Apply choice
   if (modelPickerCallback) {
     try { modelPickerCallback(model); } catch(e) { console.error(e); }
     modelPickerCallback = null;
   } else if (pendingModelTarget) {
     const s = getSlot(pendingModelTarget.ai, pendingModelTarget.ci, pendingModelTarget.si);
     s.modelId = model.id;
-    s.color = null; s.qty = 0;
+    s.color = null; s.qty = 0; s.unit = null;
   } else {
     toast('⚠️ 没有目标位置');
     return;
   }
   pendingModelTarget = null;
   stopCamera();
+  stopVoice();
   hideSheets();
   render();
 }
 
-// Bind both click and touchend to handle iOS quirks
 const _modelConfirmBtn = document.getElementById('model-confirm');
 _modelConfirmBtn.addEventListener('click', (e) => { e.preventDefault(); commitModelChoice(); });
 _modelConfirmBtn.addEventListener('touchend', (e) => {
-  // Prevent ghost click and ensure handler runs even if click is suppressed
-  e.preventDefault();
-  e.stopPropagation();
+  e.preventDefault(); e.stopPropagation();
   commitModelChoice();
 }, { passive: false });
-// Also handle Enter key in textarea to commit (Cmd/Ctrl+Enter or Enter alone if user clicks done)
 document.getElementById('model-search').addEventListener('keydown', (e) => {
-  // Ctrl/Cmd+Enter commits
   if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
     e.preventDefault();
     commitModelChoice();
@@ -1484,7 +1713,6 @@ function addContainerToAisle(ai) {
   render();
 }
 
-// Insert a new shelf/pallet immediately AFTER the given index
 function addShelfAfter(ai, ci) {
   const t = getActiveTable();
   if (isShelfTable(currentTable)) {
@@ -1504,14 +1732,10 @@ function addShelfAfter(ai, ci) {
   render();
 }
 
-// Touch-drag for entire shelf/layer. `dragArea` is the element that receives touch events;
-// `handleEl` provides ai/ci data attributes (defaults to dragArea itself).
 function addShelfDrag(dragArea, handleEl) {
   const handle = handleEl || dragArea;
   let ghost = null, longPressTimer = null, dragging = false, startX = 0, startY = 0;
-
   dragArea.addEventListener('touchstart', (e) => {
-    // Don't start drag if user is touching an interactive child (button, editable, etc.)
     const tgt = e.target;
     if (tgt.closest('.add-after-shelf, .mini-btn') ||
         tgt.contentEditable === 'true' ||
@@ -1535,7 +1759,6 @@ function addShelfDrag(dragArea, handleEl) {
       if (navigator.vibrate) navigator.vibrate(40);
     }, 420);
   }, { passive: true });
-
   dragArea.addEventListener('touchmove', (e) => {
     const t = e.touches[0];
     if (!dragging && Math.hypot(t.clientX - startX, t.clientY - startY) > 10) clearTimeout(longPressTimer);
@@ -1550,7 +1773,6 @@ function addShelfDrag(dragArea, handleEl) {
       if (target && !target.classList.contains('shelf-dragging')) target.classList.add('shelf-drop-target');
     }
   }, { passive: false });
-
   dragArea.addEventListener('touchend', (e) => {
     clearTimeout(longPressTimer);
     if (dragging) {
@@ -1571,7 +1793,6 @@ function addShelfDrag(dragArea, handleEl) {
       dragging = false;
     }
   });
-
   dragArea.addEventListener('touchcancel', () => {
     clearTimeout(longPressTimer);
     if (ghost) { ghost.remove(); ghost = null; }
@@ -1579,8 +1800,6 @@ function addShelfDrag(dragArea, handleEl) {
     const block = dragArea.closest('.container-block');
     if (block) block.classList.remove('shelf-dragging');
   });
-
-  // Desktop: only the handle is draggable (avoids accidental drags)
   if (handle === dragArea && handle.classList.contains('shelf-drag-handle')) {
     handle.setAttribute('draggable', 'true');
     handle.addEventListener('dragstart', (e) => {
@@ -1602,12 +1821,9 @@ function moveShelf(srcAi, srcCi, tgtAi, tgtCi) {
   const ck = getContainerKey();
   const srcList = t.aisles[srcAi][ck];
   const item = srcList.splice(srcCi, 1)[0];
-  // If moving within same aisle and target index is after source, adjust
   let insertCi = tgtCi;
   if (srcAi === tgtAi && tgtCi > srcCi) insertCi = tgtCi - 1;
-  // Insert at target position
   t.aisles[tgtAi][ck].splice(insertCi + 1, 0, item);
-  // (slot ids and contents move with item; serial numbers will recompute on render)
   toast('已移动整层');
   render();
 }
@@ -1631,7 +1847,11 @@ document.querySelectorAll('.tool[data-view]').forEach(b => {
 });
 
 function showSheet(id) { document.getElementById(id).classList.add('show'); }
-function hideSheets() { document.querySelectorAll('.sheet-backdrop').forEach(s => s.classList.remove('show')); stopCamera(); }
+function hideSheets() {
+  document.querySelectorAll('.sheet-backdrop').forEach(s => s.classList.remove('show'));
+  stopCamera();
+  stopVoice();
+}
 document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', hideSheets));
 document.querySelectorAll('.sheet-backdrop').forEach(s => s.addEventListener('click', e => { if (e.target === s) hideSheets(); }));
 
@@ -1647,7 +1867,6 @@ document.querySelectorAll('#upload-sheet .action-row').forEach(b => {
       if (!lines.length) return;
       if (mode === 'replace') {
         state.models = lines.map((n,i) => ({ id: 'm_'+i+'_'+Date.now(), name: n }));
-        // Rebuild both shelf tables with same layout
         for (const tableKey of ['shelfBlackTable', 'shelfWhiteTable']) {
           state[tableKey].aisles = SHELF_AISLE_NAMES.map(n => ({ name: n, shelves: SHELF_NAMES.map(sn => ({ name: sn, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) }));
           let mi = 0;
@@ -1668,7 +1887,6 @@ document.querySelectorAll('#upload-sheet .action-row').forEach(b => {
       } else {
         const newModels = lines.map((n,i) => ({ id: 'm_'+Date.now()+'_'+i, name: n }));
         state.models.push(...newModels);
-        // Append to both shelf tables
         for (const tableKey of ['shelfBlackTable', 'shelfWhiteTable']) {
           let mi = 0;
           outer: for (const a of state[tableKey].aisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) if (!s.slots[i].modelId) { s.slots[i].modelId = newModels[mi].id; mi++; if (mi >= newModels.length) break outer; }
@@ -1689,16 +1907,45 @@ document.querySelectorAll('#upload-sheet .action-row').forEach(b => {
   });
 });
 
-document.getElementById('save-btn').addEventListener('click', () => showSheet('save-sheet'));
+document.getElementById('save-btn').addEventListener('click', () => { saveState(); showSheet('save-sheet'); });
 document.querySelectorAll('#save-sheet .action-row').forEach(b => {
   b.addEventListener('click', () => {
     const act = b.dataset.act; hideSheets();
     if (act === 'download-json') downloadJSON();
     else if (act === 'download-csv') downloadCSV();
-    else if (act === 'share') shareData();
+    else if (act === 'share-wechat') shareToWeChat();
+    else if (act === 'share-drive') shareToDrive();
+    else if (act === 'share-email') shareToEmail();
     else if (act === 'load-json') loadJSON();
   });
 });
+
+function buildExportSummaryText() {
+  const tables = [
+    [(state.meta?.shelfBlack?.title) || '黑色MUG+IC', state.shelfBlackTable, 'shelves', 'slots', state.meta?.shelfBlack || {}],
+    [(state.meta?.shelfWhite?.title) || '白色BK/CH', state.shelfWhiteTable, 'shelves', 'slots', state.meta?.shelfWhite || {}],
+    [(state.meta?.pallet?.title) || '整箱货堆', state.palletTable, 'pallets', 'layers', state.meta?.pallet || {}]
+  ];
+  let lines = [`📦 库存标注汇总 — ${dateStamp()}`];
+  for (const [tableName, t, ck, sk, meta] of tables) {
+    lines.push('');
+    lines.push(`【${tableName}】`);
+    if (meta.filler) lines.push(`填表人: ${meta.filler}`);
+    if (meta.date) lines.push(`日期: ${meta.date}`);
+    let cnt = { red: 0, yellow: 0, green: 0, total: 0, untagged: 0 };
+    for (const a of t.aisles) for (const c of a[ck]) for (const slot of c[sk]) {
+      if (!slot.modelId) continue;
+      cnt.total++;
+      if (slot.color === 'red') cnt.red++;
+      else if (slot.color === 'yellow') cnt.yellow++;
+      else if (slot.color === 'green') cnt.green++;
+      else cnt.untagged++;
+    }
+    lines.push(`总计 ${cnt.total} 个型号 — 🔴无货 ${cnt.red} · 🟡少量 ${cnt.yellow} · 🟢充足 ${cnt.green} · ⚪未标 ${cnt.untagged}`);
+  }
+  return lines.join('\n');
+}
+
 function downloadJSON() {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
   triggerDownload(blob, `inventory-${dateStamp()}.json`); toast('已下载 JSON');
@@ -1721,15 +1968,112 @@ function downloadCSV() {
   const blob = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8' });
   triggerDownload(blob, `inventory-${dateStamp()}.csv`); toast('已下载 CSV');
 }
-async function shareData() {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-  const file = new File([blob], `inventory-${dateStamp()}.json`, { type: 'application/json' });
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try { await navigator.share({ files: [file], title: '库存数据' }); } catch(e) {}
-  } else if (navigator.share) {
-    try { await navigator.share({ title: '库存', text: JSON.stringify(state).slice(0, 1000) + '...' }); } catch(e) {}
-  } else { downloadJSON(); toast('当前不支持分享,已下载'); }
+
+// SHARE TO WECHAT — uses Web Share API (system share sheet, includes WeChat if installed)
+async function shareToWeChat() {
+  const summary = buildExportSummaryText();
+  const csvBlob = makeCsvBlob();
+  const csvFile = new File([csvBlob], `inventory-${dateStamp()}.csv`, { type: 'text/csv' });
+  if (navigator.canShare && navigator.canShare({ files: [csvFile] })) {
+    try {
+      await navigator.share({
+        files: [csvFile],
+        title: '库存数据',
+        text: summary
+      });
+      toast('✅ 请在分享菜单中选择微信');
+      return;
+    } catch(e) {
+      if (e.name !== 'AbortError') toast('分享失败: ' + e.message);
+      return;
+    }
+  }
+  // Fallback: text-only share
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: '库存汇总', text: summary });
+      toast('✅ 请选择微信');
+      return;
+    } catch(e) { if (e.name !== 'AbortError') toast('分享失败'); return; }
+  }
+  // Ultimate fallback: copy to clipboard
+  copyToClipboard(summary);
+  toast('已复制汇总,可粘贴到微信');
 }
+
+// SHARE TO DRIVE / iCloud — file share, user picks Drive/iCloud from system sheet
+async function shareToDrive() {
+  const csvBlob = makeCsvBlob();
+  const jsonBlob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const csvFile = new File([csvBlob], `inventory-${dateStamp()}.csv`, { type: 'text/csv' });
+  const jsonFile = new File([jsonBlob], `inventory-${dateStamp()}.json`, { type: 'application/json' });
+  if (navigator.canShare && navigator.canShare({ files: [csvFile, jsonFile] })) {
+    try {
+      await navigator.share({ files: [csvFile, jsonFile], title: '库存备份' });
+      toast('✅ 请选择 Google Drive 或 iCloud');
+      return;
+    } catch(e) {
+      if (e.name !== 'AbortError') {
+        // Try with single file
+        try {
+          await navigator.share({ files: [csvFile], title: '库存数据' });
+          toast('✅ 请选择存储位置');
+          return;
+        } catch(e2) {}
+      }
+      return;
+    }
+  }
+  // Fallback: download both files
+  triggerDownload(csvBlob, `inventory-${dateStamp()}.csv`);
+  setTimeout(() => triggerDownload(jsonBlob, `inventory-${dateStamp()}.json`), 500);
+  toast('已下载 CSV+JSON,可手动上传到 Drive');
+}
+
+// SHARE TO EMAIL — opens mail client with pre-filled subject + body
+function shareToEmail() {
+  const summary = buildExportSummaryText();
+  const subject = `库存标注汇总 - ${dateStamp()}`;
+  // mailto with body (CSV file can't be attached via mailto, so include text summary)
+  const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(summary + '\n\n（详细 CSV 请通过分享按钮发送)')}`;
+  // Also download the CSV so user can manually attach
+  const csvBlob = makeCsvBlob();
+  triggerDownload(csvBlob, `inventory-${dateStamp()}.csv`);
+  setTimeout(() => {
+    window.location.href = mailtoUrl;
+    toast('已下载 CSV — 邮件已预填,可手动附加 CSV');
+  }, 300);
+}
+
+function makeCsvBlob() {
+  const rows = [['#','表','填表人','日期','通道','货架/托盘','位置','型号','颜色','数量','单位']];
+  let n = 0;
+  const tables = [
+    [(state.meta?.shelfBlack?.title) || '黑色MUG+IC', state.shelfBlackTable, 'shelves', 'slots', state.meta?.shelfBlack || {}],
+    [(state.meta?.shelfWhite?.title) || '白色BK/CH', state.shelfWhiteTable, 'shelves', 'slots', state.meta?.shelfWhite || {}],
+    [(state.meta?.pallet?.title) || '整箱货堆', state.palletTable, 'pallets', 'layers', state.meta?.pallet || {}]
+  ];
+  for (const [tableName, t, ck, sk, meta] of tables) {
+    for (const a of t.aisles) for (const c of a[ck]) c[sk].forEach((slot, i) => {
+      n++; const m = slot.modelId ? getModel(slot.modelId) : null;
+      rows.push([n, tableName, meta.filler || '', meta.date || '', a.name, c.name, i+1, m?.name || '', slot.color || '', slot.qty || 0, slot.unit || '']);
+    });
+  }
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  return new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8' });
+}
+
+function copyToClipboard(text) {
+  if (navigator.clipboard) navigator.clipboard.writeText(text);
+  else {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    ta.remove();
+  }
+}
+
 function loadJSON() {
   const inp = document.createElement('input');
   inp.type = 'file'; inp.accept = '.json,application/json';
@@ -1760,16 +2104,15 @@ let toastTimer = null;
 function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg; el.classList.add('show');
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
 }
 
 loadState(); render();
 
 let lastTouchEnd = 0;
 document.addEventListener('touchend', (e) => {
-  // Don't interfere with buttons, links, inputs, or interactive elements
   const tgt = e.target;
-  if (tgt && tgt.closest('button, a, input, textarea, .color-cell, .gcolor, .unit-cell, .model-cell, .gmodel, .editable, [contenteditable], .suggestion, .color-opt, .action-row, .tool, .table-tab, .unit-quick')) return;
+  if (tgt && tgt.closest('button, a, input, textarea, .color-cell, .gcolor, .unit-cell, .model-cell, .gmodel, .editable, [contenteditable], .suggestion, .color-opt, .action-row, .tool, .table-tab, .unit-quick, .input-method-btn, .voice-mic-btn, canvas, .meta-save-btn')) return;
   const now = Date.now();
   if (now - lastTouchEnd < 300) e.preventDefault();
   lastTouchEnd = now;
