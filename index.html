@@ -10,6 +10,7 @@
 <title>MUG 库存标注</title>
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231a1a1a'/%3E%3Ctext x='90' y='118' font-family='system-ui' font-size='80' font-weight='700' fill='%23faf8f3' text-anchor='middle'%3E库%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
   *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -405,6 +406,7 @@ font-size: 12px;
         <button id="camera-start">📷 拍照识别</button>
         <button id="camera-retake" style="display:none;">↻ 重拍</button>
       </div>
+      <div id="ocr-status" style="display:none; padding: 8px 12px; background: #fff8d6; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; margin-bottom: 10px;"></div>
       <input type="text" class="model-search-input" id="model-search" placeholder="或手动输入型号关键词搜索/新建..." autocomplete="off">
       <div class="model-suggestions" id="model-suggestions"></div>
     </div>
@@ -1056,8 +1058,80 @@ function capturePhotoNow() {
   const btn = document.getElementById('camera-start');
   btn.style.display = 'none';
   btn.dataset.mode = 'start';
-  toast('请在搜索框输入关键词,会智能匹配现有型号');
-  setTimeout(() => document.getElementById('model-search').focus(), 200);
+
+  // Run OCR on the captured photo
+  runOcrOnCanvas(canvas);
+}
+
+async function runOcrOnCanvas(canvas) {
+  const searchInput = document.getElementById('model-search');
+  searchInput.value = '';
+  // Show OCR loading state
+  toast('🔍 正在识别照片中的文字...');
+  const ocrStatus = document.getElementById('ocr-status');
+  if (ocrStatus) { ocrStatus.style.display = ''; ocrStatus.textContent = '⏳ 识别中,请稍候 (5-15秒)...'; }
+
+  try {
+    if (typeof Tesseract === 'undefined') {
+      toast('OCR 库未加载,请联网');
+      if (ocrStatus) ocrStatus.style.display = 'none';
+      return;
+    }
+    // Recognize English (most car model text is English/numbers)
+    const result = await Tesseract.recognize(canvas, 'eng', {
+      logger: m => {
+        if (m.status === 'recognizing text' && ocrStatus) {
+          ocrStatus.textContent = `⏳ 识别中 ${Math.round(m.progress * 100)}%`;
+        }
+      }
+    });
+    let text = (result.data.text || '').trim();
+    // Clean up: remove excessive whitespace
+    text = text.replace(/\s+/g, ' ').replace(/[^\w\s\-/+().年代]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (ocrStatus) ocrStatus.style.display = 'none';
+    if (!text) {
+      toast('未识别到文字,请手动输入或重拍');
+      searchInput.focus();
+      return;
+    }
+    // Try to find a likely car model substring
+    const candidate = extractBestCandidate(text);
+    searchInput.value = candidate || text;
+    renderSuggestions(searchInput.value);
+    // Auto-select top suggestion if very high match
+    setTimeout(() => {
+      const topSuggestion = document.querySelector('#model-suggestions .suggestion[data-mid]');
+      if (topSuggestion) {
+        const score = parseInt(topSuggestion.querySelector('.match-score')?.textContent || '0');
+        if (score >= 60) {
+          topSuggestion.click(); // Select it
+          toast('✅ 已识别并自动匹配,点确定填入');
+        } else {
+          toast('已识别文字,请检查或选择匹配型号');
+        }
+      } else {
+        toast('已识别:' + searchInput.value.slice(0, 30));
+      }
+    }, 200);
+  } catch (e) {
+    if (ocrStatus) ocrStatus.style.display = 'none';
+    toast('识别失败: ' + (e.message || '未知错误') + ' — 请手动输入');
+    searchInput.focus();
+  }
+}
+
+// Pull out the most likely model string from messy OCR output
+function extractBestCandidate(text) {
+  // Split by line / period / comma
+  const parts = text.split(/[\n.,;]+/).map(s => s.trim()).filter(Boolean);
+  // Prefer parts containing a year range pattern (e.g. "2016-2023")
+  const yearPart = parts.find(p => /\b(19|20)\d{2}\s*[-~–]\s*(19|20)\d{2}\b/.test(p));
+  if (yearPart) return yearPart;
+  // Or a single year + word
+  const singleYear = parts.find(p => /\b(19|20)\d{2}\b/.test(p) && /[A-Za-z]{3,}/.test(p));
+  if (singleYear) return singleYear;
+  // Else longest part with letters
+  return parts.filter(p => /[A-Za-z]{3,}/.test(p)).sort((a, b) => b.length - a.length)[0] || text;
 }
 
 document.getElementById('camera-retake').addEventListener('click', () => {
@@ -1100,21 +1174,31 @@ function renderSuggestions(query) {
 document.getElementById('model-search').addEventListener('input', (e) => { selectedSuggestionId = null; renderSuggestions(e.target.value); });
 document.getElementById('model-confirm').addEventListener('click', () => {
   const txt = document.getElementById('model-search').value.trim();
-  if (!txt) { toast('请输入或选择型号'); return; }
+  if (!txt) {
+    // Focus the input and show a clear visual cue
+    const inp = document.getElementById('model-search');
+    inp.style.borderColor = 'var(--red)';
+    inp.style.background = '#ffe5e5';
+    setTimeout(() => { inp.style.borderColor = ''; inp.style.background = ''; }, 1500);
+    inp.focus();
+    toast('⚠️ 请先在搜索框输入或选择型号名');
+    return;
+  }
   let model = state.models.find(m => m.name === txt);
   if (!model) {
     model = { id: 'm_'+Date.now()+'_'+Math.random().toString(36).slice(2,6), name: txt };
     state.models.push(model);
-    toast('已新建型号: ' + txt);
+    toast('✅ 已新建型号: ' + txt);
+  } else {
+    toast('✅ 已选择型号: ' + model.name);
   }
   if (modelPickerCallback) {
-    // Callback mode (used by shelf table to replace existing model)
     modelPickerCallback(model);
     modelPickerCallback = null;
   } else if (pendingModelTarget) {
-    // Standard mode: place in target slot
     const s = getSlot(pendingModelTarget.ai, pendingModelTarget.ci, pendingModelTarget.si);
-    s.modelId = model.id; s.color = null; s.qty = 0;
+    s.modelId = model.id;
+    if (!modelPickerCallback) { s.color = null; s.qty = 0; }
   }
   stopCamera(); hideSheets(); render();
 });
