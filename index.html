@@ -141,6 +141,48 @@
 .container-name .mini-btn:active { background: var(–ink); color: var(–paper); }
 .container-name .add-after-shelf { background: var(–ink); color: var(–paper); border: 0; width: 22px; height: 22px; border-radius: 5px; font-size: 13px; font-weight: 700; cursor: pointer; line-height: 1; padding: 0; }
 .container-name .add-after-shelf:active { transform: scale(0.92); }
+
+/* “+” divider between this container and the next — sits at the BOTTOM of each container */
+.add-divider {
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 6px 0 8px;
+background: rgba(0,0,0,0.02);
+border-top: 1px dashed rgba(0,0,0,0.15);
+cursor: pointer;
+-webkit-tap-highlight-color: transparent;
+}
+.add-divider .add-divider-btn {
+width: 36px;
+height: 28px;
+border-radius: 14px;
+border: 2px solid var(–ink);
+background: var(–paper);
+color: var(–ink);
+font-size: 18px;
+font-weight: 700;
+line-height: 1;
+padding: 0;
+cursor: pointer;
+box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+display: flex;
+align-items: center;
+justify-content: center;
+transition: transform .12s, background .12s;
+}
+.add-divider .add-divider-btn:active {
+transform: scale(0.88);
+background: var(–ink);
+color: var(–paper);
+}
+.add-divider .add-divider-hint {
+font-size: 10px;
+color: var(–muted);
+margin-left: 8px;
+font-weight: 600;
+letter-spacing: 0.04em;
+}
 .container-block.shelf-dragging { opacity: 0.4; }
 .container-block.shelf-drop-target { box-shadow: 0 -3px 0 var(–ink) inset, 0 3px 0 var(–ink) inset; }
 .slot { display: grid; grid-template-columns: 28px 1fr 56px 50px; gap: 5px; align-items: center; padding: 7px 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); min-height: 50px; background: var(–paper); }
@@ -571,14 +613,14 @@ margin: 8px 0;
           <div><strong>空圆框</strong> · 未标注 (单击选颜色)</div>
         </div>
         <div style="font-size:12px; color:var(--muted); padding:10px; background:var(--bg); border-radius:8px; line-height:1.7;">
-          · <b>单击</b>○颜色圆框 → 选红/黄/绿<br>
-          · <b>双击</b>○颜色圆框 → 输入数量(整数)<br>
+          · <b>单击</b>○颜色圆框 → 选红/黄/绿(立即弹出,不等待)<br>
+          · <b>长按</b>○颜色圆框 → 输入数量(整数)<br>
           · <b>双击</b>型号 → 4 种输入: 拍照/打字/手写/语音<br>
           · <b>单击</b>单位框 → 选单位(套/个/对...)<br>
           · <b>双击</b>表标题 / 通道名 / 货架层名 → 修改<br>
           · <b>长按拖动</b>型号 → 移到其他位置<br>
           · <b>长按层名</b>(整行) → 整层拖到别处(序号自动重排)<br>
-          · 货架行右边 <b>+</b> → 在该层后插入新一层<br>
+          · 每层<b>底部 +</b> → 复制此整层(含所有型号、颜色、数量)插到下方<br>
           · 整箱表上 <b>拖到底部</b> → 删除(整箱搬走)<br>
           · 顶部 <b>💾</b> 或表内 <b>Save 保存</b> → 导出/分享到微信/Drive/邮箱
         </div>
@@ -853,12 +895,11 @@ function renderListView() {
       const cblock = document.createElement('div');
       cblock.className = 'container-block' + (isShelf ? '' : ' pallet');
       const palletTools = isShelf ? '' : `<button class="mini-btn" data-act="del-pallet" data-ai="${ai}" data-ci="${ci}">删</button>`;
-      // FIX (二): No more forced ' 层' suffix — name is fully user-controlled
+      // FIX (二): No "+" in the row header anymore — moved to the BOTTOM divider below
       cblock.innerHTML = `<div class="container-name">
         <span class="shelf-drag-handle" data-ai="${ai}" data-ci="${ci}" data-table="${currentTable}" title="按住拖动整层">⠿</span>
         <span class="cont-name editable" data-ai="${ai}" data-ci="${ci}">${escapeHtml(container.name)}</span>
         <div class="container-tools">
-          <button class="add-after-shelf" data-ai="${ai}" data-ci="${ci}" title="在此后插入新${isShelf ? '层' : '托盘'}">+</button>
           ${palletTools}
         </div></div>`;
       container[sk].forEach((slot, si) => {
@@ -880,6 +921,12 @@ function renderListView() {
         cell.innerHTML = `<div class="slot-num">${slot.modelId ? serial : '—'}</div>${modelHtml}${colorHtml}${unitHtml}`;
         cblock.appendChild(cell);
       });
+      // FIX (二): "+" divider at the BOTTOM of each container — clicks duplicate this entire layer (with all slot data) below
+      const dividerLabel = isShelf ? '复制此层 / 在下方插入新层' : '复制此托盘 / 插入新托盘';
+      const divider = document.createElement('div');
+      divider.className = 'add-divider';
+      divider.innerHTML = `<button class="add-divider-btn" data-ai="${ai}" data-ci="${ci}" title="${dividerLabel}">+</button><span class="add-divider-hint">${dividerLabel}</span>`;
+      cblock.appendChild(divider);
       ablock.appendChild(cblock);
     });
     root.appendChild(ablock);
@@ -953,7 +1000,20 @@ function attachListHandlers(root) {
   root.querySelectorAll('.unit-cell[data-ai]').forEach(el => attachUnitCellHandlers(el));
   root.querySelectorAll('.editable').forEach(el => makeEditable(el));
   root.querySelectorAll('.add-child').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); addContainerToAisle(+el.dataset.ai); }); });
-  root.querySelectorAll('.add-after-shelf').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); addShelfAfter(+el.dataset.ai, +el.dataset.ci); }); });
+  // FIX (二): Bottom-divider "+" buttons → duplicate the current layer (with all data) and insert below
+  root.querySelectorAll('.add-divider-btn').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      duplicateShelfBelow(+el.dataset.ai, +el.dataset.ci);
+    });
+    // Also handle touchend explicitly to avoid iOS click delay
+    el.addEventListener('touchend', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      duplicateShelfBelow(+el.dataset.ai, +el.dataset.ci);
+    }, { passive: false });
+  });
   root.querySelectorAll('.shelf-drag-handle').forEach(el => addShelfDrag(el));
   root.querySelectorAll('.container-name').forEach(row => {
     const handle = row.querySelector('.shelf-drag-handle');
@@ -1054,38 +1114,73 @@ function attachUnitCellHandlers(el) {
   });
 }
 
+// FIX (一): Single tap → color picker IMMEDIATELY (no delay).
+// Long press (450ms) → quantity editor.
+// This eliminates the 380ms wait that caused iOS ghost-click confusion.
 function attachColorCellHandlers(el) {
-  let lastTapTime = 0;
-  let lastTapX = 0, lastTapY = 0;
-  let pendingSingleTimer = null;
   const ai = () => +el.dataset.ai, ci = () => +el.dataset.ci, si = () => +el.dataset.si;
   const onSingle = () => openColorPicker(ai(), ci(), si());
-  const onDouble = () => openQtyEditor(ai(), ci(), si());
-  el.addEventListener('click', (e) => {
+  const onLong = () => openQtyEditor(ai(), ci(), si());
+
+  let longPressTimer = null;
+  let longPressFired = false;
+  let touchStartX = 0, touchStartY = 0;
+  let touchHandled = false;
+
+  el.addEventListener('touchstart', (e) => {
     e.stopPropagation();
-    const now = Date.now();
-    if (now - lastTapTime < 380) {
-      if (pendingSingleTimer) { clearTimeout(pendingSingleTimer); pendingSingleTimer = null; }
-      lastTapTime = 0; onDouble();
-    } else {
-      lastTapTime = now;
-      pendingSingleTimer = setTimeout(() => { onSingle(); pendingSingleTimer = null; }, 380);
+    if (e.touches && e.touches.length) {
+      const t = e.touches[0];
+      touchStartX = t.clientX; touchStartY = t.clientY;
     }
-  });
-  el.addEventListener('touchend', (e) => {
-    if (e.changedTouches && e.changedTouches.length) {
-      const t = e.changedTouches[0];
-      const now = Date.now();
-      const dx = Math.abs(t.clientX - lastTapX);
-      const dy = Math.abs(t.clientY - lastTapY);
-      if (now - lastTapTime < 380 && dx < 30 && dy < 30) {
-        e.preventDefault(); e.stopPropagation();
-        if (pendingSingleTimer) { clearTimeout(pendingSingleTimer); pendingSingleTimer = null; }
-        lastTapTime = 0; onDouble(); return;
+    longPressFired = false;
+    longPressTimer = setTimeout(() => {
+      longPressFired = true;
+      if (navigator.vibrate) navigator.vibrate(40);
+      onLong();
+    }, 450);
+  }, { passive: true });
+
+  el.addEventListener('touchmove', (e) => {
+    if (e.touches && e.touches.length) {
+      const t = e.touches[0];
+      const dx = Math.abs(t.clientX - touchStartX);
+      const dy = Math.abs(t.clientY - touchStartY);
+      if (dx > 10 || dy > 10) {
+        clearTimeout(longPressTimer);
       }
-      lastTapTime = now; lastTapX = t.clientX; lastTapY = t.clientY;
+    }
+  }, { passive: true });
+
+  el.addEventListener('touchend', (e) => {
+    e.stopPropagation();
+    clearTimeout(longPressTimer);
+    if (!longPressFired) {
+      e.preventDefault();
+      touchHandled = true;
+      onSingle();
+      // Reset touchHandled after click event would have fired
+      setTimeout(() => { touchHandled = false; }, 400);
     }
   }, { passive: false });
+
+  el.addEventListener('touchcancel', () => {
+    clearTimeout(longPressTimer);
+  });
+
+  // Mouse fallback (desktop)
+  el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (touchHandled) return; // already handled by touchend
+    onSingle();
+  });
+
+  // Right-click on desktop = quantity editor
+  el.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onLong();
+  });
 }
 
 function makeEditable(el) {
@@ -1213,12 +1308,16 @@ function addTouchDrag(el) {
 let pendingSlot = null;
 function openColorPicker(ai, ci, si) { pendingSlot = { ai, ci, si }; showSheet('color-sheet'); }
 document.querySelectorAll('#color-sheet .color-opt').forEach(el => {
-  el.addEventListener('click', () => {
+  const applyColor = (e) => {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
     const c = el.dataset.color;
+    if (!pendingSlot) { hideSheets(); return; }
     const s = getSlot(pendingSlot.ai, pendingSlot.ci, pendingSlot.si);
     s.color = (c === 'none' ? null : c);
     hideSheets(); render();
-  });
+  };
+  el.addEventListener('click', applyColor);
+  el.addEventListener('touchend', applyColor, { passive: false });
 });
 
 function openQtyEditor(ai, ci, si) {
@@ -1732,12 +1831,50 @@ function addShelfAfter(ai, ci) {
   render();
 }
 
+// FIX (二): Duplicate this entire shelf/pallet (including all slot data — model, color, qty, unit) and insert below.
+// Auto-renames the duplicate so it doesn't collide with the original.
+function duplicateShelfBelow(ai, ci) {
+  const t = getActiveTable();
+  const ck = getContainerKey(), sk = getSlotsKey();
+  const list = t.aisles[ai][ck];
+  const src = list[ci];
+  if (!src) return;
+
+  // Deep clone all slots — preserves modelId, color, qty, unit
+  const clonedSlots = src[sk].map(slot => ({
+    modelId: slot.modelId,
+    color: slot.color,
+    qty: slot.qty,
+    unit: slot.unit
+  }));
+
+  // Generate a new name based on source name + suffix
+  const baseName = src.name;
+  let newName = baseName + '-副本';
+  let suffix = 2;
+  const existingNames = new Set(list.map(c => c.name));
+  while (existingNames.has(newName)) {
+    newName = baseName + '-副本' + suffix;
+    suffix++;
+  }
+
+  const newContainer = isShelfTable(currentTable)
+    ? { name: newName, slots: clonedSlots }
+    : { name: newName, layers: clonedSlots };
+
+  list.splice(ci + 1, 0, newContainer);
+  const slotCount = clonedSlots.length;
+  const filledCount = clonedSlots.filter(s => s.modelId).length;
+  toast(`✅ 已复制 "${src.name}" → "${newName}" (${filledCount}/${slotCount} 个型号)`);
+  render();
+}
+
 function addShelfDrag(dragArea, handleEl) {
   const handle = handleEl || dragArea;
   let ghost = null, longPressTimer = null, dragging = false, startX = 0, startY = 0;
   dragArea.addEventListener('touchstart', (e) => {
     const tgt = e.target;
-    if (tgt.closest('.add-after-shelf, .mini-btn') ||
+    if (tgt.closest('.add-after-shelf, .add-divider, .add-divider-btn, .mini-btn') ||
         tgt.contentEditable === 'true' ||
         (tgt.closest('.cont-name') && tgt.closest('.cont-name').contentEditable === 'true')) return;
     const t = e.touches[0];
@@ -2112,7 +2249,7 @@ loadState(); render();
 let lastTouchEnd = 0;
 document.addEventListener('touchend', (e) => {
   const tgt = e.target;
-  if (tgt && tgt.closest('button, a, input, textarea, .color-cell, .gcolor, .unit-cell, .model-cell, .gmodel, .editable, [contenteditable], .suggestion, .color-opt, .action-row, .tool, .table-tab, .unit-quick, .input-method-btn, .voice-mic-btn, canvas, .meta-save-btn')) return;
+  if (tgt && tgt.closest('button, a, input, textarea, .color-cell, .gcolor, .unit-cell, .model-cell, .gmodel, .editable, [contenteditable], .suggestion, .color-opt, .action-row, .tool, .table-tab, .unit-quick, .input-method-btn, .voice-mic-btn, canvas, .meta-save-btn, .add-divider, .add-divider-btn')) return;
   const now = Date.now();
   if (now - lastTouchEnd < 300) e.preventDefault();
   lastTouchEnd = now;
