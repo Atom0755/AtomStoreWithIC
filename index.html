@@ -126,6 +126,73 @@
   }
   .meta-save-btn:active { transform: scale(0.94); background: #b8232f; }
 
+/* Search bar — top of every list view */
+.search-bar {
+display: flex;
+align-items: center;
+gap: 6px;
+padding: 8px 12px;
+background: var(–paper);
+border-bottom: 1px solid var(–line);
+position: sticky;
+top: 0;
+z-index: 5;
+}
+.search-bar input {
+flex: 1;
+min-width: 0;
+padding: 8px 10px;
+border: 2px solid var(–line);
+border-radius: 8px;
+background: var(–bg);
+font-size: 14px;
+font-weight: 500;
+color: var(–ink);
+font-family: inherit;
+-webkit-user-select: text;
+user-select: text;
+}
+.search-bar input:focus {
+outline: none;
+background: #fff8d6;
+border-color: var(–ink);
+}
+.search-bar .search-icon-btn {
+flex-shrink: 0;
+width: 38px;
+height: 38px;
+border: 1px solid var(–line);
+border-radius: 8px;
+background: var(–paper);
+font-size: 16px;
+cursor: pointer;
+display: grid;
+place-items: center;
+}
+.search-bar .search-icon-btn:active { transform: scale(0.92); background: var(–ink); color: var(–paper); }
+.search-bar .search-clear {
+flex-shrink: 0;
+width: 28px;
+height: 28px;
+border: 0;
+border-radius: 50%;
+background: rgba(0,0,0,0.08);
+color: var(–ink);
+font-size: 14px;
+cursor: pointer;
+display: none;
+}
+.search-bar .search-clear.show { display: grid; place-items: center; }
+.search-results-info {
+font-size: 11px;
+color: var(–muted);
+padding: 4px 12px;
+background: var(–paper);
+border-bottom: 1px solid var(–line);
+font-weight: 600;
+}
+.search-results-info.has-hits { color: var(–red); background: #fff8d6; }
+
 .list-view { padding: 10px 14px 100px; }
 .aisle-block { margin-bottom: 20px; }
 .aisle-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(–aisle-bg); border: 1px solid var(–line); border-radius: 10px; margin-bottom: 6px; font-weight: 700; font-size: 14px; }
@@ -139,6 +206,22 @@
 .container-name .container-tools { display: flex; gap: 4px; align-items: center; }
 .container-name .mini-btn { background: transparent; border: 1px solid rgba(0,0,0,0.2); color: var(–muted); padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; font-family: inherit; }
 .container-name .mini-btn:active { background: var(–ink); color: var(–paper); }
+/* Delete button — red, prominent */
+.container-name .delete-btn {
+background: rgba(214,51,64,0.08);
+border: 1px solid rgba(214,51,64,0.4);
+color: #b8232f;
+font-weight: 700;
+padding: 3px 8px;
+font-size: 11px;
+letter-spacing: 0.02em;
+}
+.container-name .delete-btn:active {
+background: var(–red);
+color: white;
+border-color: var(–red);
+transform: scale(0.92);
+}
 .container-name .add-after-shelf { background: var(–ink); color: var(–paper); border: 0; width: 22px; height: 22px; border-radius: 5px; font-size: 13px; font-weight: 700; cursor: pointer; line-height: 1; padding: 0; }
 .container-name .add-after-shelf:active { transform: scale(0.92); }
 
@@ -185,7 +268,59 @@ letter-spacing: 0.04em;
 }
 .container-block.shelf-dragging { opacity: 0.4; }
 .container-block.shelf-drop-target { box-shadow: 0 -3px 0 var(–ink) inset, 0 3px 0 var(–ink) inset; }
-.slot { display: grid; grid-template-columns: 28px 1fr 56px 50px; gap: 5px; align-items: center; padding: 7px 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); min-height: 50px; background: var(–paper); }
+.slot { display: grid; grid-template-columns: 24px 1fr 38px 48px 42px; gap: 4px; align-items: center; padding: 7px 6px; border-bottom: 1px dashed rgba(0,0,0,0.1); min-height: 50px; background: var(–paper); }
+.slot.pallet-slot { grid-template-columns: 24px 1fr 36px 44px 38px 44px; }
+.slot.search-hit { animation: searchFlash 1.4s ease-in-out infinite; background: #fff8d6 !important; }
+@keyframes searchFlash {
+0%, 100% { box-shadow: inset 0 0 0 3px transparent; background: #fff8d6 !important; }
+50% { box-shadow: inset 0 0 0 3px var(–red); background: #fff0a0 !important; }
+}
+/* Quantity box — between color and unit */
+.qty-cell {
+height: 38px;
+border: 2px dashed rgba(0,0,0,0.4);
+border-radius: 8px;
+background: var(–paper);
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 14px;
+font-weight: 800;
+color: var(–ink);
+flex-shrink: 0;
+box-sizing: border-box;
+padding: 0 2px;
+line-height: 1;
+-webkit-tap-highlight-color: transparent;
+}
+.qty-cell:active { transform: scale(0.92); }
+.qty-cell.has-qty { border-style: solid; background: #fff8d6; border-color: #c79900; }
+.qty-cell.empty-qty { color: rgba(0,0,0,0.25); font-size: 16px; }
+/* Restock (补货) box — only on pallets table, far right */
+.restock-cell {
+height: 38px;
+border: 2px dashed #d63340;
+border-radius: 8px;
+background: rgba(214,51,64,0.05);
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 13px;
+font-weight: 800;
+color: #b8232f;
+flex-shrink: 0;
+box-sizing: border-box;
+padding: 0 2px;
+line-height: 1;
+-webkit-tap-highlight-color: transparent;
+}
+.restock-cell:active { transform: scale(0.92); }
+.restock-cell::before { content: ‘+’; font-size: 18px; opacity: 0.6; }
+.restock-cell.has-val::before { content: ‘’; }
 .slot:last-child { border-bottom: 0; }
 .slot.dragover { background: #fff8d6; }
 .slot.empty .model-cell { color: var(–muted); font-style: italic; }
@@ -203,12 +338,12 @@ cursor: pointer;
 display: flex;
 align-items: center;
 justify-content: center;
-font-size: 12px;
+font-size: 11px;
 font-weight: 600;
 color: var(–muted);
 overflow: hidden;
 text-align: center;
-padding: 0 4px;
+padding: 0 2px;
 line-height: 1.1;
 flex-shrink: 0;
 box-sizing: border-box;
@@ -218,19 +353,16 @@ box-sizing: border-box;
 
 /* COLOR CELL — improved visibility for empty state */
 .color-cell {
-width: 50px;
-height: 38px;
-border: 2.5px dashed rgba(0,0,0,0.55);  /* Empty: dashed border, very visible */
+width: 36px;
+height: 36px;
+border: 2.5px dashed rgba(0,0,0,0.55);
 border-radius: 50%;
 background: var(–paper);
 cursor: pointer;
 display: flex;
 align-items: center;
 justify-content: center;
-font-family: ‘JetBrains Mono’, monospace;
-font-size: 14px;
-font-weight: 700;
-color: rgba(0,0,0,0.4);
+font-size: 0;
 flex-shrink: 0;
 box-sizing: border-box;
 transition: all .15s;
@@ -287,23 +419,64 @@ line-height: 1;
 .color-opt {
 height: 80px;
 border-radius: 12px;
-border: 2px solid var(–line);
+border: 2px solid #2a2a2a;
 cursor: pointer;
 display: flex;
 align-items: center;
 justify-content: center;
-font-size: 13px;
-font-weight: 700;
-color: rgba(0,0,0,0.85);
+font-size: 14px;
+font-weight: 800;
+color: #1a1a1a;
 text-align: center;
 line-height: 1.2;
 transition: transform .12s;
+-webkit-tap-highlight-color: transparent;
 }
 .color-opt:active { transform: scale(0.92); }
-.color-opt[data-color=“red”] { background: var(–red); border-color: var(–red); color: white; }
-.color-opt[data-color=“yellow”] { background: var(–yellow); border-color: #c79900; color: #1a1a1a; }
-.color-opt[data-color=“green”] { background: var(–green); border-color: var(–green); color: white; }
-.color-opt[data-color=“none”] { background: var(–paper); color: var(–muted); }
+/* iOS Safari has a known bug with CSS variables inside attribute selectors —
+use direct hex + !important to guarantee the colors render */
+#color-sheet .color-opt[data-color=“red”],
+.color-opt.color-red {
+background-color: #d63340 !important;
+background: #d63340 !important;
+border-color: #a02028 !important;
+color: #ffffff !important;
+}
+#color-sheet .color-opt[data-color=“yellow”],
+.color-opt.color-yellow {
+background-color: #f4c430 !important;
+background: #f4c430 !important;
+border-color: #c79900 !important;
+color: #1a1a1a !important;
+}
+#color-sheet .color-opt[data-color=“green”],
+.color-opt.color-green {
+background-color: #4a9b3f !important;
+background: #4a9b3f !important;
+border-color: #2f7028 !important;
+color: #ffffff !important;
+}
+#color-sheet .color-opt[data-color=“none”],
+.color-opt.color-none {
+background-color: #faf8f3 !important;
+background: #faf8f3 !important;
+border: 2px dashed #8a8580 !important;
+color: #555 !important;
+}
+/* Make the label text always readable on top of the color */
+.color-opt .color-label {
+background: rgba(0,0,0,0.18);
+padding: 4px 10px;
+border-radius: 999px;
+font-size: 13px;
+font-weight: 800;
+letter-spacing: 0.04em;
+}
+.color-opt[data-color=“yellow”] .color-label,
+.color-opt[data-color=“none”] .color-label {
+background: rgba(255,255,255,0.6);
+color: #1a1a1a;
+}
 .sheet-cancel, .sheet-confirm { width: 100%; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid var(–line); }
 .sheet-cancel { background: var(–bg); }
 .sheet-confirm { background: var(–ink); color: var(–paper); margin-bottom: 8px; }
@@ -463,6 +636,12 @@ margin: 8px 0;
           <button class="meta-save-btn" data-meta-save>💾 Save 保存</button>
         </div>
       </div>
+      <div class="search-bar">
+        <input type="text" class="search-input" data-search="shelfBlack" placeholder="🔍 搜索型号(高亮闪光显示)..." autocomplete="off">
+        <button class="search-icon-btn" data-search-input-btn="shelfBlack" title="拍照/手写/语音搜索">📷</button>
+        <button class="search-clear" data-search-clear="shelfBlack">✕</button>
+      </div>
+      <div class="search-results-info" data-search-info="shelfBlack" style="display:none;"></div>
       <div class="list-view" id="shelfBlack-list"></div>
       <div class="grid-view" id="shelfBlack-grid"></div>
     </div>
@@ -475,6 +654,12 @@ margin: 8px 0;
           <button class="meta-save-btn" data-meta-save>💾 Save 保存</button>
         </div>
       </div>
+      <div class="search-bar">
+        <input type="text" class="search-input" data-search="shelfWhite" placeholder="🔍 搜索型号(高亮闪光显示)..." autocomplete="off">
+        <button class="search-icon-btn" data-search-input-btn="shelfWhite" title="拍照/手写/语音搜索">📷</button>
+        <button class="search-clear" data-search-clear="shelfWhite">✕</button>
+      </div>
+      <div class="search-results-info" data-search-info="shelfWhite" style="display:none;"></div>
       <div class="list-view" id="shelfWhite-list"></div>
       <div class="grid-view" id="shelfWhite-grid"></div>
     </div>
@@ -487,6 +672,12 @@ margin: 8px 0;
           <button class="meta-save-btn" data-meta-save>💾 Save 保存</button>
         </div>
       </div>
+      <div class="search-bar">
+        <input type="text" class="search-input" data-search="pallet" placeholder="🔍 搜索型号(高亮闪光显示)..." autocomplete="off">
+        <button class="search-icon-btn" data-search-input-btn="pallet" title="拍照/手写/语音搜索">📷</button>
+        <button class="search-clear" data-search-clear="pallet">✕</button>
+      </div>
+      <div class="search-results-info" data-search-info="pallet" style="display:none;"></div>
       <div class="list-view" id="pallet-list"></div>
       <div class="grid-view" id="pallet-grid"></div>
     </div>
@@ -500,10 +691,10 @@ margin: 8px 0;
     <div class="sheet-body">
       <h3>库存状态颜色</h3>
       <div class="color-options">
-        <div class="color-opt" data-color="red">无货</div>
-        <div class="color-opt" data-color="yellow">少量</div>
-        <div class="color-opt" data-color="green">充足</div>
-        <div class="color-opt" data-color="none">清除</div>
+        <div class="color-opt color-red" data-color="red" style="background:#d63340; border-color:#a02028; color:#fff;"><span class="color-label">无货</span></div>
+        <div class="color-opt color-yellow" data-color="yellow" style="background:#f4c430; border-color:#c79900; color:#1a1a1a;"><span class="color-label">少量</span></div>
+        <div class="color-opt color-green" data-color="green" style="background:#4a9b3f; border-color:#2f7028; color:#fff;"><span class="color-label">充足</span></div>
+        <div class="color-opt color-none" data-color="none" style="background:#faf8f3; border:2px dashed #8a8580; color:#555;"><span class="color-label">清除</span></div>
       </div>
     </div>
     <div class="sheet-footer">
@@ -521,6 +712,13 @@ margin: 8px 0;
         <input type="number" inputmode="numeric" pattern="[0-9]*" id="qty-input" min="0" step="1">
         <button class="qty-btn" id="qty-plus">+</button>
       </div>
+      <div style="font-size:11px; color:var(--muted); margin-bottom:6px; font-weight:600; letter-spacing:0.04em;">或用其他方式输入数字 / OTHER INPUT METHODS</div>
+      <div class="input-methods" style="margin-bottom:8px;">
+        <button class="input-method-btn" data-qty-method="camera"><span class="imico">📷</span><span>拍照</span></button>
+        <button class="input-method-btn" data-qty-method="handwrite"><span class="imico">✍️</span><span>手写</span></button>
+        <button class="input-method-btn" data-qty-method="voice"><span class="imico">🎤</span><span>语音</span></button>
+      </div>
+      <div id="qty-method-status" style="display:none; padding:8px; background:#fff8d6; border:1px solid var(--line); border-radius:8px; font-size:12px; font-weight:600; text-align:center; margin-bottom:8px;"></div>
     </div>
     <div class="sheet-footer">
       <button class="sheet-confirm" id="qty-confirm">确定</button>
@@ -587,6 +785,55 @@ margin: 8px 0;
     </div>
     <div class="sheet-footer">
       <button class="sheet-cancel" data-close>取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- Restock target table chooser -->
+
+<div class="sheet-backdrop modal-style" id="restock-choose-sheet">
+  <div class="sheet">
+    <div class="sheet-body">
+      <h3>补货到哪张零散表?</h3>
+      <div id="restock-choose-info" style="background:#fff8d6; border:2px solid var(--ink); border-radius:10px; padding:12px; margin-bottom:14px; font-size:14px; line-height:1.5;"></div>
+      <div class="actions-list">
+        <button class="action-row" data-restock-target="shelfBlackTable">
+          <span class="ico">⬛</span>
+          <div><div style="font-weight:700;">黑色 MUG+IC 货架</div><div id="restock-black-info" style="font-size:11px; color:var(--muted);"></div></div>
+        </button>
+        <button class="action-row" data-restock-target="shelfWhiteTable">
+          <span class="ico">⬜</span>
+          <div><div style="font-weight:700;">白色 BK/CH 货架</div><div id="restock-white-info" style="font-size:11px; color:var(--muted);"></div></div>
+        </button>
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="sheet-cancel" data-close>取消(不补货)</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bilingual delete confirmation modal -->
+
+<div class="sheet-backdrop modal-style" id="confirm-delete-sheet">
+  <div class="sheet">
+    <div class="sheet-body" style="text-align:center;">
+      <div style="font-size:48px; margin: 8px 0 12px;">⚠️</div>
+      <div style="font-size: 16px; font-weight: 800; color: var(--red); margin-bottom: 4px;">请谨慎操作</div>
+      <div style="font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 14px; letter-spacing: 0.02em;">PLEASE BE CAREFUL</div>
+      <div style="background: #fff8d6; border: 2px solid var(--ink); border-radius: 10px; padding: 14px; margin-bottom: 12px;">
+        <div id="confirm-delete-target" style="font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 8px;">即将删除: ?</div>
+        <div style="font-size: 13px; line-height: 1.6; color: var(--ink);">
+          删除后<b style="color: var(--red);">不可恢复</b>,所有内容(型号、颜色、数量、单位)都会丢失。
+        </div>
+        <div style="font-size: 12px; line-height: 1.5; color: var(--muted); margin-top: 6px; font-style: italic;">
+          This action <b>cannot be undone</b>. All data (models, colors, quantities, units) will be lost.
+        </div>
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="sheet-confirm" id="confirm-delete-yes" style="background: var(--red); border-color: var(--red);">确定删除 / Confirm Delete</button>
+      <button class="sheet-cancel" data-close>取消 / Cancel</button>
     </div>
   </div>
 </div>
@@ -680,6 +927,15 @@ margin: 8px 0;
   <div style="font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600;">型号名 (可手动修改):</div>
   <textarea class="model-search-input" id="model-search" placeholder="输入型号名,或选下方建议..." autocomplete="off" rows="2" spellcheck="false"></textarea>
   <div class="model-suggestions" id="model-suggestions"></div>
+
+  <!-- Box-to-set conversion ratio (used by restock flow to convert pallet boxes → scattered sets) -->
+  <div style="margin-top:8px; padding:10px; background:var(--bg); border:1px dashed var(--line); border-radius:8px; font-size:12px; display:flex; align-items:center; gap:8px;">
+    <span style="font-size:18px;">📦</span>
+    <span style="font-weight:600; color:var(--ink);">1 箱 =</span>
+    <input type="number" id="model-ratio-input" min="1" step="1" value="1" style="width:60px; padding:6px 8px; border:1px solid var(--line); border-radius:6px; text-align:center; font-family:'JetBrains Mono', monospace; font-weight:700; font-size:14px;">
+    <span style="font-weight:600; color:var(--ink);">套</span>
+    <span style="font-size:10px; color:var(--muted); margin-left:auto;">补货换算用</span>
+  </div>
 </div>
 <div class="sheet-footer">
   <button class="sheet-confirm" id="model-confirm">确定</button>
@@ -691,6 +947,35 @@ margin: 8px 0;
 </div>
 
 <div class="toast" id="toast"></div>
+
+<script>
+// === GLOBAL ERROR DISPLAY (debug mode) ===
+// Captures any uncaught error and shows the actual message + line on screen,
+// instead of the generic "Script error" iOS Safari shows.
+(function() {
+  let errBox = null;
+  function showError(msg, src, line, col, err) {
+    try {
+      if (!errBox) {
+        errBox = document.createElement('div');
+        errBox.id = '__err_box';
+        errBox.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;z-index:99999;background:#d63340;color:#fff;padding:10px 12px;border-radius:10px;font-family:monospace;font-size:11px;line-height:1.4;max-height:40vh;overflow:auto;box-shadow:0 4px 16px rgba(0,0,0,0.5);white-space:pre-wrap;word-break:break-word;';
+        errBox.addEventListener('click', () => errBox.remove());
+        document.body && document.body.appendChild(errBox);
+      }
+      const stack = err && err.stack ? '\n' + String(err.stack).split('\n').slice(0,4).join('\n') : '';
+      errBox.textContent = `❌ ${msg}\nat ${src || '?'}:${line || '?'}:${col || '?'}${stack}\n\n(点击关闭)`;
+    } catch(e) {}
+  }
+  window.addEventListener('error', e => {
+    showError(e.message || 'unknown', e.filename, e.lineno, e.colno, e.error);
+  });
+  window.addEventListener('unhandledrejection', e => {
+    showError('Unhandled promise: ' + (e.reason && e.reason.message ? e.reason.message : String(e.reason)), '', '', '', e.reason);
+  });
+})();
+// === END ERROR DISPLAY ===
+</script>
 
 <script>
 const INITIAL_MODELS = [
@@ -717,11 +1002,18 @@ const LAYERS_PER_PALLET = 10;
 let state = null;
 let currentTable = 'shelfBlack';
 
-function newSlot() { return { modelId: null, color: null, qty: 0, unit: null }; }
+function newSlot() { return { modelId: null, color: null, qty: 0, unit: null, restock: 0 }; }
 function loadState() {
   try {
     const raw = localStorage.getItem('inventoryV3');
-    if (raw) { state = JSON.parse(raw); if (state.models && state.shelfBlackTable && state.shelfWhiteTable && state.palletTable) return; }
+    if (raw) {
+      state = JSON.parse(raw);
+      if (state.models && state.shelfBlackTable && state.shelfWhiteTable && state.palletTable) {
+        // Migrate: ensure all slots have restock field, all models have boxToSetRatio
+        migrateState();
+        return;
+      }
+    }
     const oldRaw = localStorage.getItem('inventoryV2');
     if (oldRaw) {
       const old = JSON.parse(oldRaw);
@@ -733,11 +1025,32 @@ function loadState() {
           palletTable: old.palletTable,
           meta: { shelfBlack: { filler: '', date: '' }, shelfWhite: { filler: '', date: '' }, pallet: { filler: '', date: '' } }
         };
+        migrateState();
         return;
       }
     }
   } catch(e) {}
   state = buildInitial();
+}
+
+function migrateState() {
+  // Ensure all models have boxToSetRatio
+  if (state.models) state.models.forEach(m => { if (!m.boxToSetRatio) m.boxToSetRatio = 1; });
+  // Ensure all slots have restock and unit fields
+  const tables = [state.shelfBlackTable, state.shelfWhiteTable];
+  for (const t of tables) {
+    if (!t) continue;
+    for (const a of (t.aisles || [])) for (const c of (a.shelves || [])) for (const s of (c.slots || [])) {
+      if (s.restock === undefined) s.restock = 0;
+      if (s.unit === undefined) s.unit = null;
+    }
+  }
+  if (state.palletTable) {
+    for (const a of (state.palletTable.aisles || [])) for (const c of (a.pallets || [])) for (const s of (c.layers || [])) {
+      if (s.restock === undefined) s.restock = 0;
+      if (s.unit === undefined) s.unit = null;
+    }
+  }
 }
 function saveState() { try { localStorage.setItem('inventoryV3', JSON.stringify(state)); } catch(e) {} }
 function buildEmptyShelfTable() {
@@ -811,7 +1124,7 @@ function getSlotsKey() { return isShelfTable(currentTable) ? 'slots' : 'layers';
 function getSlot(ai, ci, si) { return getActiveTable().aisles[ai][getContainerKey()][ci][getSlotsKey()][si]; }
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-function render() { renderMetaBars(); renderListView(); renderGridView(); saveState(); }
+function render() { renderMetaBars(); renderListView(); renderGridView(); applySearchHighlight(); saveState(); }
 
 function renderMetaBars() {
   if (!state.meta) state.meta = { shelfBlack:{filler:'',date:'',title:'黑色 MUG 和 IC 零散货架表'}, shelfWhite:{filler:'',date:'',title:'白色 BK/CH 零散货架表'}, pallet:{filler:'',date:'',title:'整箱货堆库存表'} };
@@ -894,31 +1207,43 @@ function renderListView() {
     aisle[ck].forEach((container, ci) => {
       const cblock = document.createElement('div');
       cblock.className = 'container-block' + (isShelf ? '' : ' pallet');
-      const palletTools = isShelf ? '' : `<button class="mini-btn" data-act="del-pallet" data-ai="${ai}" data-ci="${ci}">删</button>`;
+      // FIX: Delete button (✕ 删) on every container — works for shelves and pallets
+      const deleteBtn = `<button class="mini-btn delete-btn" data-act="del-container" data-ai="${ai}" data-ci="${ci}" title="删除整层 / 整个托盘">✕ 删</button>`;
       // FIX (二): No "+" in the row header anymore — moved to the BOTTOM divider below
       cblock.innerHTML = `<div class="container-name">
         <span class="shelf-drag-handle" data-ai="${ai}" data-ci="${ci}" data-table="${currentTable}" title="按住拖动整层">⠿</span>
         <span class="cont-name editable" data-ai="${ai}" data-ci="${ci}">${escapeHtml(container.name)}</span>
         <div class="container-tools">
-          ${palletTools}
+          ${deleteBtn}
         </div></div>`;
       container[sk].forEach((slot, si) => {
         serial++;
         const cell = document.createElement('div');
-        cell.className = 'slot' + (slot.modelId ? '' : ' empty');
+        cell.className = 'slot' + (slot.modelId ? '' : ' empty') + (isShelf ? '' : ' pallet-slot');
         cell.dataset.ai = ai; cell.dataset.ci = ci; cell.dataset.si = si;
+        if (slot.modelId) cell.dataset.mid = slot.modelId;
         const m = slot.modelId ? getModel(slot.modelId) : null;
         const modelHtml = slot.modelId
           ? `<div class="model-cell has-model" draggable="true" data-mid="${slot.modelId}" data-ai="${ai}" data-ci="${ci}" data-si="${si}" data-table="${currentTable}">${escapeHtml(m ? m.name : '?')}</div>`
           : `<div class="model-cell empty-clickable" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${isShelf ? '空格 (点击添加)' : '空层 (拍照添加)'}</div>`;
-        // FIX (一): Always render color cell — empty state shows dashed circle with ○ symbol
+        // Color cell now ONLY shows color (no number) — number moved to dedicated qty-cell
         const colorHtml = slot.modelId
-          ? `<div class="color-cell" data-color="${slot.color||''}" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${slot.qty>0 ? slot.qty : ''}</div>`
+          ? `<div class="color-cell" data-color="${slot.color||''}" data-ai="${ai}" data-ci="${ci}" data-si="${si}"></div>`
           : `<div class="color-cell" style="visibility:hidden"></div>`;
+        // NEW: dedicated quantity dashed-box between color and unit
+        const qtyHtml = slot.modelId
+          ? `<div class="qty-cell ${slot.qty > 0 ? 'has-qty' : 'empty-qty'}" data-ai="${ai}" data-ci="${ci}" data-si="${si}" title="数量(双击修改)">${slot.qty > 0 ? slot.qty : '—'}</div>`
+          : `<div class="qty-cell" style="visibility:hidden"></div>`;
         const unitHtml = slot.modelId
           ? `<div class="unit-cell ${slot.unit ? 'has-unit' : ''}" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${slot.unit ? escapeHtml(slot.unit) : '单位'}</div>`
           : `<div class="unit-cell" style="visibility:hidden"></div>`;
-        cell.innerHTML = `<div class="slot-num">${slot.modelId ? serial : '—'}</div>${modelHtml}${colorHtml}${unitHtml}`;
+        // NEW: pallet-only "restock" cell on the far right
+        const restockHtml = !isShelf
+          ? (slot.modelId
+              ? `<div class="restock-cell ${slot.restock > 0 ? 'has-val' : ''}" data-ai="${ai}" data-ci="${ci}" data-si="${si}" title="补货数量(双击)">${slot.restock > 0 ? slot.restock : ''}</div>`
+              : `<div class="restock-cell" style="visibility:hidden"></div>`)
+          : '';
+        cell.innerHTML = `<div class="slot-num">${slot.modelId ? serial : '—'}</div>${modelHtml}${colorHtml}${qtyHtml}${unitHtml}${restockHtml}`;
         cblock.appendChild(cell);
       });
       // FIX (二): "+" divider at the BOTTOM of each container — clicks duplicate this entire layer (with all slot data) below
@@ -998,6 +1323,10 @@ function attachListHandlers(root) {
   });
   root.querySelectorAll('.color-cell[data-ai]').forEach(el => attachColorCellHandlers(el));
   root.querySelectorAll('.unit-cell[data-ai]').forEach(el => attachUnitCellHandlers(el));
+  // NEW: qty-cell — double-tap opens 4-method input picker for the quantity
+  root.querySelectorAll('.qty-cell[data-ai]').forEach(el => attachQtyCellHandlers(el));
+  // NEW: restock-cell (pallets only) — double-tap opens restock input + flow
+  root.querySelectorAll('.restock-cell[data-ai]').forEach(el => attachRestockCellHandlers(el));
   root.querySelectorAll('.editable').forEach(el => makeEditable(el));
   root.querySelectorAll('.add-child').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); addContainerToAisle(+el.dataset.ai); }); });
   // FIX (二): Bottom-divider "+" buttons → duplicate the current layer (with all data) and insert below
@@ -1044,15 +1373,59 @@ function attachListHandlers(root) {
       if (act === 'add-layer') {
         state.palletTable.aisles[ai].pallets[ci].layers.push(newSlot());
         toast('已加一层'); render();
-      } else if (act === 'del-pallet') {
-        if (confirm('删除整个托盘?(该托盘上所有整箱将清除)')) {
-          state.palletTable.aisles[ai].pallets.splice(ci, 1);
-          toast('已删除托盘'); render();
-        }
+      } else if (act === 'del-container' || act === 'del-pallet') {
+        // FIX: Use bilingual confirm modal — works for shelves and pallets
+        requestDeleteContainer(ai, ci);
       }
     });
   });
 }
+
+// Bilingual delete confirmation flow
+let pendingDelete = null;
+function requestDeleteContainer(ai, ci) {
+  const t = getActiveTable();
+  const ck = getContainerKey(), sk = getSlotsKey();
+  const container = t.aisles[ai][ck][ci];
+  if (!container) return;
+  const aisleName = t.aisles[ai].name;
+  const filledCount = container[sk].filter(s => s.modelId).length;
+  const totalCount = container[sk].length;
+  pendingDelete = { ai, ci };
+  const targetEl = document.getElementById('confirm-delete-target');
+  if (targetEl) {
+    targetEl.innerHTML = `即将删除 / About to delete:<br>
+      <span style="color:var(--red); font-size:17px;">${escapeHtml(aisleName)} · ${escapeHtml(container.name)}</span><br>
+      <span style="font-size:12px; color:var(--muted); font-weight:600;">(${filledCount}/${totalCount} 个型号 · ${filledCount}/${totalCount} models)</span>`;
+  }
+  showSheet('confirm-delete-sheet');
+}
+
+document.getElementById('confirm-delete-yes').addEventListener('click', (e) => {
+  e.preventDefault(); e.stopPropagation();
+  if (!pendingDelete) { hideSheets(); return; }
+  const { ai, ci } = pendingDelete;
+  const t = getActiveTable();
+  const ck = getContainerKey();
+  const removed = t.aisles[ai][ck].splice(ci, 1)[0];
+  pendingDelete = null;
+  hideSheets();
+  toast(`🗑️ 已删除: ${removed?.name || ''}`);
+  render();
+});
+
+document.getElementById('confirm-delete-yes').addEventListener('touchend', (e) => {
+  e.preventDefault(); e.stopPropagation();
+  if (!pendingDelete) { hideSheets(); return; }
+  const { ai, ci } = pendingDelete;
+  const t = getActiveTable();
+  const ck = getContainerKey();
+  const removed = t.aisles[ai][ck].splice(ci, 1)[0];
+  pendingDelete = null;
+  hideSheets();
+  toast(`🗑️ 已删除: ${removed?.name || ''}`);
+  render();
+}, { passive: false });
 
 function attachModelDoubleTap(el) {
   let lastTapTime = 0;
@@ -1114,72 +1487,59 @@ function attachUnitCellHandlers(el) {
   });
 }
 
-// FIX (一): Single tap → color picker IMMEDIATELY (no delay).
-// Long press (450ms) → quantity editor.
-// This eliminates the 380ms wait that caused iOS ghost-click confusion.
-function attachColorCellHandlers(el) {
+// NEW: Quantity cell — double-tap opens the multi-input number picker
+// Single tap also opens it (numbers don't have a meaningful single-tap action)
+function attachQtyCellHandlers(el) {
   const ai = () => +el.dataset.ai, ci = () => +el.dataset.ci, si = () => +el.dataset.si;
-  const onSingle = () => openColorPicker(ai(), ci(), si());
-  const onLong = () => openQtyEditor(ai(), ci(), si());
-
-  let longPressTimer = null;
-  let longPressFired = false;
-  let touchStartX = 0, touchStartY = 0;
+  const onTap = () => openQtyMultiInput(ai(), ci(), si(), 'qty');
   let touchHandled = false;
-
-  el.addEventListener('touchstart', (e) => {
-    e.stopPropagation();
-    if (e.touches && e.touches.length) {
-      const t = e.touches[0];
-      touchStartX = t.clientX; touchStartY = t.clientY;
-    }
-    longPressFired = false;
-    longPressTimer = setTimeout(() => {
-      longPressFired = true;
-      if (navigator.vibrate) navigator.vibrate(40);
-      onLong();
-    }, 450);
-  }, { passive: true });
-
-  el.addEventListener('touchmove', (e) => {
-    if (e.touches && e.touches.length) {
-      const t = e.touches[0];
-      const dx = Math.abs(t.clientX - touchStartX);
-      const dy = Math.abs(t.clientY - touchStartY);
-      if (dx > 10 || dy > 10) {
-        clearTimeout(longPressTimer);
-      }
-    }
-  }, { passive: true });
-
   el.addEventListener('touchend', (e) => {
-    e.stopPropagation();
-    clearTimeout(longPressTimer);
-    if (!longPressFired) {
-      e.preventDefault();
-      touchHandled = true;
-      onSingle();
-      // Reset touchHandled after click event would have fired
-      setTimeout(() => { touchHandled = false; }, 400);
-    }
+    e.stopPropagation(); e.preventDefault();
+    touchHandled = true;
+    onTap();
+    setTimeout(() => { touchHandled = false; }, 400);
   }, { passive: false });
-
-  el.addEventListener('touchcancel', () => {
-    clearTimeout(longPressTimer);
-  });
-
-  // Mouse fallback (desktop)
   el.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (touchHandled) return; // already handled by touchend
-    onSingle();
+    if (touchHandled) return;
+    onTap();
   });
+}
 
-  // Right-click on desktop = quantity editor
-  el.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
+// NEW: Restock cell — double-tap opens multi-input number picker, then runs the restock flow
+function attachRestockCellHandlers(el) {
+  const ai = () => +el.dataset.ai, ci = () => +el.dataset.ci, si = () => +el.dataset.si;
+  const onTap = () => openQtyMultiInput(ai(), ci(), si(), 'restock');
+  let touchHandled = false;
+  el.addEventListener('touchend', (e) => {
+    e.stopPropagation(); e.preventDefault();
+    touchHandled = true;
+    onTap();
+    setTimeout(() => { touchHandled = false; }, 400);
+  }, { passive: false });
+  el.addEventListener('click', (e) => {
     e.stopPropagation();
-    onLong();
+    if (touchHandled) return;
+    onTap();
+  });
+}
+
+// Color cell — single tap = color picker (immediate, no delay)
+// Quantity is now in a separate qty-cell, so this only handles color.
+function attachColorCellHandlers(el) {
+  const ai = () => +el.dataset.ai, ci = () => +el.dataset.ci, si = () => +el.dataset.si;
+  const onTap = () => openColorPicker(ai(), ci(), si());
+  let touchHandled = false;
+  el.addEventListener('touchend', (e) => {
+    e.stopPropagation(); e.preventDefault();
+    touchHandled = true;
+    onTap();
+    setTimeout(() => { touchHandled = false; }, 400);
+  }, { passive: false });
+  el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (touchHandled) return;
+    onTap();
   });
 }
 
@@ -1322,6 +1682,7 @@ document.querySelectorAll('#color-sheet .color-opt').forEach(el => {
 
 function openQtyEditor(ai, ci, si) {
   pendingSlot = { ai, ci, si };
+  pendingQtyField = 'qty';
   const s = getSlot(ai, ci, si);
   const m = s.modelId ? getModel(s.modelId) : null;
   document.getElementById('qty-title').textContent = m ? `${m.name} · 数量` : '数量';
@@ -1329,14 +1690,292 @@ function openQtyEditor(ai, ci, si) {
   showSheet('qty-sheet');
   setTimeout(() => { inp.focus(); inp.select(); }, 100);
 }
+
+// NEW: Universal multi-input number editor — handles both 'qty' and 'restock' fields
+let pendingQtyField = 'qty'; // 'qty' or 'restock'
+function openQtyMultiInput(ai, ci, si, field) {
+  pendingSlot = { ai, ci, si };
+  pendingQtyField = field || 'qty';
+  const s = getSlot(ai, ci, si);
+  const m = s.modelId ? getModel(s.modelId) : null;
+  const titleEl = document.getElementById('qty-title');
+  if (field === 'restock') {
+    titleEl.innerHTML = m ? `${escapeHtml(m.name)} · <span style="color:var(--red);">补货数量</span>` : '补货数量';
+  } else {
+    titleEl.textContent = m ? `${m.name} · 数量` : '数量';
+  }
+  const inp = document.getElementById('qty-input');
+  inp.value = (field === 'restock' ? (s.restock || 0) : (s.qty || 0));
+  // Reset method status
+  const status = document.getElementById('qty-method-status');
+  if (status) { status.style.display = 'none'; status.textContent = ''; }
+  document.querySelectorAll('[data-qty-method]').forEach(b => b.classList.remove('active'));
+  showSheet('qty-sheet');
+  setTimeout(() => { inp.focus(); inp.select(); }, 100);
+}
+
 document.getElementById('qty-minus').addEventListener('click', () => { const inp = document.getElementById('qty-input'); inp.value = Math.max(0, (parseInt(inp.value)||0)-1); });
 document.getElementById('qty-plus').addEventListener('click', () => { const inp = document.getElementById('qty-input'); inp.value = (parseInt(inp.value)||0)+1; });
-document.getElementById('qty-confirm').addEventListener('click', () => {
+
+function commitQtyValue() {
   const v = Math.max(0, parseInt(document.getElementById('qty-input').value) || 0);
-  const s = getSlot(pendingSlot.ai, pendingSlot.ci, pendingSlot.si); s.qty = v;
-  hideSheets(); render();
-});
+  if (!pendingSlot) { hideSheets(); return; }
+  const s = getSlot(pendingSlot.ai, pendingSlot.ci, pendingSlot.si);
+  if (pendingQtyField === 'restock') {
+    // Restock flow: applies the restock amount, deducts from pallet, adds to scattered shelves (with conversion)
+    if (v <= 0) { s.restock = 0; hideSheets(); render(); return; }
+    s.restock = v;
+    hideSheets();
+    runRestockFlow(pendingSlot.ai, pendingSlot.ci, pendingSlot.si, v);
+  } else {
+    s.qty = v;
+    hideSheets(); render();
+  }
+}
+document.getElementById('qty-confirm').addEventListener('click', commitQtyValue);
+document.getElementById('qty-confirm').addEventListener('touchend', (e) => { e.preventDefault(); commitQtyValue(); }, { passive: false });
 document.getElementById('qty-input').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/[^\d]/g, ''); });
+
+// Multi-input methods inside qty-sheet — camera/handwrite/voice that fill the input with digits
+document.querySelectorAll('[data-qty-method]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const method = btn.dataset.qtyMethod;
+    document.querySelectorAll('[data-qty-method]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const status = document.getElementById('qty-method-status');
+    if (method === 'camera') {
+      status.style.display = ''; status.textContent = '⏳ 打开摄像头中...';
+      await runQtyCameraOcr(status);
+    } else if (method === 'handwrite') {
+      status.style.display = ''; status.innerHTML = '✍️ 手写功能 → 请用键盘上方的 +/- 或直接点击数字键盘输入<br>(为节省空间,数字弹窗不内嵌画板)';
+    } else if (method === 'voice') {
+      status.style.display = ''; status.textContent = '🎤 正在录音... 请说出数字';
+      await runQtyVoice(status);
+    }
+  });
+});
+
+// Camera OCR for digits inside qty-sheet
+async function runQtyCameraOcr(statusEl) {
+  try {
+    if (!navigator.mediaDevices) { statusEl.textContent = '⚠️ 此设备不支持摄像头'; return; }
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+    // Create temporary preview overlay
+    const overlay = document.createElement('div');
+    Object.assign(overlay.style, { position:'fixed', inset:'0', background:'#000', zIndex:'500', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' });
+    const video = document.createElement('video');
+    video.autoplay = true; video.playsInline = true; video.muted = true;
+    video.srcObject = stream;
+    Object.assign(video.style, { maxWidth:'95%', maxHeight:'70%', borderRadius:'8px' });
+    const btnRow = document.createElement('div');
+    Object.assign(btnRow.style, { marginTop:'16px', display:'flex', gap:'12px' });
+    const captureBtn = document.createElement('button');
+    captureBtn.textContent = '📸 拍下';
+    Object.assign(captureBtn.style, { padding:'14px 24px', fontSize:'16px', fontWeight:'700', borderRadius:'8px', border:'0', background:'#fff', color:'#000', cursor:'pointer' });
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = '取消';
+    Object.assign(cancelBtn.style, { padding:'14px 24px', fontSize:'16px', fontWeight:'600', borderRadius:'8px', border:'2px solid #fff', background:'transparent', color:'#fff', cursor:'pointer' });
+    btnRow.appendChild(captureBtn); btnRow.appendChild(cancelBtn);
+    overlay.appendChild(video); overlay.appendChild(btnRow);
+    document.body.appendChild(overlay);
+    statusEl.textContent = '📸 对准数字后点"拍下"';
+    const cleanup = () => { stream.getTracks().forEach(t => t.stop()); overlay.remove(); };
+    cancelBtn.onclick = () => { cleanup(); statusEl.textContent = '已取消'; };
+    captureBtn.onclick = async () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      cleanup();
+      statusEl.textContent = '⏳ 识别数字中...';
+      try {
+        const processed = preprocessForOcr(canvas);
+        const result = await Tesseract.recognize(processed, 'eng', {
+          logger: m => { if (m.status === 'recognizing text') statusEl.textContent = `⏳ 识别 ${Math.round(m.progress*100)}%`; }
+        });
+        const text = (result.data.text || '').trim();
+        // Extract first contiguous run of digits
+        const match = text.match(/\d+/);
+        if (match) {
+          document.getElementById('qty-input').value = match[0];
+          statusEl.textContent = '✅ 识别为: ' + match[0] + ' (可手动修改)';
+        } else {
+          statusEl.textContent = '⚠️ 未找到数字 (识别文字: ' + text.slice(0,40) + '),请手动输入';
+        }
+      } catch(e) { statusEl.textContent = '❌ 识别失败: ' + (e.message || e.name); }
+    };
+  } catch(e) {
+    statusEl.textContent = '⚠️ 无法打开摄像头: ' + (e.message || e.name);
+  }
+}
+
+// Voice input for digits inside qty-sheet
+async function runQtyVoice(statusEl) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { statusEl.textContent = '⚠️ 此设备不支持语音识别'; return; }
+  const rec = new SR();
+  rec.lang = 'zh-CN';
+  rec.continuous = false;
+  rec.interimResults = true;
+  rec.onresult = (e) => {
+    let txt = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) txt += e.results[i][0].transcript;
+    // Convert Chinese number words to digits (simple cases)
+    const num = chineseToNumber(txt) || (txt.match(/\d+/) ? txt.match(/\d+/)[0] : null);
+    if (num !== null) {
+      document.getElementById('qty-input').value = num;
+      statusEl.textContent = '✅ 识别为: ' + num;
+    } else {
+      statusEl.textContent = '识别中: ' + txt;
+    }
+  };
+  rec.onerror = (e) => { statusEl.textContent = '⚠️ 错误: ' + e.error; };
+  rec.onend = () => { /* keep last status */ };
+  try { rec.start(); } catch(e) { statusEl.textContent = '启动失败'; }
+}
+
+// Convert Chinese numerals like 三十五 → 35
+function chineseToNumber(text) {
+  const map = { '零':0, '一':1, '二':2, '两':2, '三':3, '四':4, '五':5, '六':6, '七':7, '八':8, '九':9, '十':10, '百':100, '千':1000, '万':10000 };
+  let total = 0, current = 0;
+  let hasChinese = false;
+  for (const ch of text) {
+    if (map[ch] === undefined) continue;
+    hasChinese = true;
+    const v = map[ch];
+    if (v === 10 || v === 100 || v === 1000 || v === 10000) {
+      if (current === 0) current = 1;
+      total += current * v;
+      current = 0;
+    } else {
+      current = current * 10 + v;
+    }
+  }
+  total += current;
+  return hasChinese && total > 0 ? String(total) : null;
+}
+
+// =============== RESTOCK FLOW ===============
+// When user enters a value in pallet's restock cell:
+//   1. Deduct that amount (in boxes) from pallet's qty
+//   2. Multiply by boxToSetRatio (model's "1 box = ? sets" ratio)
+//   3. Find the model in shelfBlack/shelfWhite tables
+//   4. If found in both → ask which to add to
+//   5. If found in one → add directly
+//   6. If found in neither → show toast warning
+let pendingRestock = null; // { palletAi, palletCi, palletSi, modelId, boxes, sets, targets: [{table, ai, ci, si}] }
+
+function runRestockFlow(palletAi, palletCi, palletSi, boxes) {
+  const palletSlot = state.palletTable.aisles[palletAi].pallets[palletCi].layers[palletSi];
+  if (!palletSlot.modelId) {
+    toast('⚠️ 此格无型号'); palletSlot.restock = 0; render(); return;
+  }
+  const m = getModel(palletSlot.modelId);
+  if (!m) { palletSlot.restock = 0; render(); return; }
+
+  // Check pallet stock is enough
+  const currentPalletQty = palletSlot.qty || 0;
+  if (currentPalletQty < boxes) {
+    if (!confirm(`⚠️ 整箱货堆里 "${m.name}" 当前只有 ${currentPalletQty} 箱,补货 ${boxes} 箱会导致负库存。\n\n是否仍要继续?`)) {
+      palletSlot.restock = 0; render(); return;
+    }
+  }
+
+  // Conversion ratio: 1 box = ? sets (default 1)
+  const ratio = m.boxToSetRatio || 1;
+  const sets = boxes * ratio;
+
+  // Find the model in scattered shelf tables
+  const targets = [];
+  ['shelfBlackTable', 'shelfWhiteTable'].forEach(tableKey => {
+    const table = state[tableKey];
+    table.aisles.forEach((aisle, ai) => {
+      aisle.shelves.forEach((shelf, ci) => {
+        shelf.slots.forEach((slot, si) => {
+          if (slot.modelId === m.id) {
+            targets.push({ table: tableKey, ai, ci, si, location: `${aisle.name}通道-${shelf.name}` });
+          }
+        });
+      });
+    });
+  });
+
+  if (targets.length === 0) {
+    // Not found in any scattered shelf
+    palletSlot.qty = Math.max(0, currentPalletQty - boxes);
+    palletSlot.restock = 0;
+    toast(`⚠️ "${m.name}" 在零散表中未找到 — 整箱已扣 ${boxes},但无处可补`);
+    render();
+    return;
+  }
+
+  pendingRestock = { palletAi, palletCi, palletSi, modelId: m.id, modelName: m.name, boxes, sets, ratio, targets };
+
+  // Group by table
+  const blackTargets = targets.filter(t => t.table === 'shelfBlackTable');
+  const whiteTargets = targets.filter(t => t.table === 'shelfWhiteTable');
+
+  // If only one table has it, skip the table-choice dialog
+  if (blackTargets.length === 0 && whiteTargets.length > 0) {
+    confirmRestock('shelfWhiteTable');
+  } else if (whiteTargets.length === 0 && blackTargets.length > 0) {
+    confirmRestock('shelfBlackTable');
+  } else {
+    // Both tables have it — ask user
+    showRestockTableChoice(blackTargets, whiteTargets);
+  }
+}
+
+function showRestockTableChoice(blackTargets, whiteTargets) {
+  const sheet = document.getElementById('restock-choose-sheet');
+  if (!sheet) return;
+  document.getElementById('restock-choose-info').innerHTML =
+    `<b>${escapeHtml(pendingRestock.modelName)}</b> · 补货 <b style="color:var(--red);">${pendingRestock.boxes} 箱</b> = <b style="color:#2f7028;">${pendingRestock.sets} 套</b><br>
+     <span style="font-size:11px; color:var(--muted);">(换算 1 箱 = ${pendingRestock.ratio} 套)</span>`;
+  document.getElementById('restock-black-info').textContent = `黑色 MUG+IC (${blackTargets.length} 个位置)`;
+  document.getElementById('restock-white-info').textContent = `白色 BK/CH (${whiteTargets.length} 个位置)`;
+  showSheet('restock-choose-sheet');
+}
+
+function confirmRestock(tableKey) {
+  if (!pendingRestock) { hideSheets(); return; }
+  const { palletAi, palletCi, palletSi, modelId, boxes, sets, targets } = pendingRestock;
+  const palletSlot = state.palletTable.aisles[palletAi].pallets[palletCi].layers[palletSi];
+  const targetsInTable = targets.filter(t => t.table === tableKey);
+
+  if (targetsInTable.length === 0) {
+    toast('⚠️ 该表中无此型号');
+    pendingRestock = null; hideSheets(); render(); return;
+  }
+
+  // Add all sets to the FIRST matching slot (simplest predictable behavior)
+  const tgt = targetsInTable[0];
+  const tgtSlot = state[tableKey].aisles[tgt.ai].shelves[tgt.ci].slots[tgt.si];
+  const oldQty = tgtSlot.qty || 0;
+  tgtSlot.qty = oldQty + sets;
+  // Also default unit to 套 if not set
+  if (!tgtSlot.unit) tgtSlot.unit = '套';
+
+  // Deduct from pallet
+  palletSlot.qty = Math.max(0, (palletSlot.qty || 0) - boxes);
+  palletSlot.restock = 0;
+  if (!palletSlot.unit) palletSlot.unit = '箱';
+
+  const tableName = tableKey === 'shelfBlackTable' ? '黑色MUG+IC' : '白色BK/CH';
+  toast(`✅ 整箱 -${boxes}箱 → ${tableName} ${tgt.location} +${sets}套`);
+  pendingRestock = null;
+  hideSheets();
+  render();
+}
+
+// Bind restock target choice buttons
+document.querySelectorAll('[data-restock-target]').forEach(btn => {
+  const handler = (e) => {
+    e.preventDefault(); e.stopPropagation();
+    confirmRestock(btn.dataset.restockTarget);
+  };
+  btn.addEventListener('click', handler);
+  btn.addEventListener('touchend', handler, { passive: false });
+});
 
 function openUnitEditor(ai, ci, si) {
   pendingSlot = { ai, ci, si };
@@ -1373,9 +2012,23 @@ function openModelPicker(ai, ci, si, withCamera, callback) {
   switchInputMethod('type');
   document.getElementById('camera-title').textContent = '添加 / 修改型号';
   document.getElementById('model-search').value = '';
+  // Pre-fill ratio if there's already a model in this slot
+  const ratioInp = document.getElementById('model-ratio-input');
+  if (ratioInp) {
+    let preRatio = 1;
+    if (ai !== null && ci !== null && si !== null) {
+      try {
+        const slot = getSlot(ai, ci, si);
+        if (slot.modelId) {
+          const m = getModel(slot.modelId);
+          if (m && m.boxToSetRatio) preRatio = m.boxToSetRatio;
+        }
+      } catch(e) {}
+    }
+    ratioInp.value = preRatio;
+  }
   renderSuggestions('');
   showSheet('camera-sheet');
-  // Auto-focus the text field
   setTimeout(() => {
     const inp = document.getElementById('model-search');
     if (inp) inp.focus();
@@ -1749,11 +2402,17 @@ function commitModelChoice() {
   }
   let model = state.models.find(m => m.name === txt);
   if (!model) {
-    model = { id: 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), name: txt };
+    model = { id: 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), name: txt, boxToSetRatio: 1 };
     state.models.push(model);
     toast('✅ 已新建型号: ' + txt);
   } else {
     toast('✅ 已选择: ' + model.name);
+  }
+  // Save the box-to-set ratio
+  const ratioInp = document.getElementById('model-ratio-input');
+  if (ratioInp) {
+    const r = Math.max(1, parseInt(ratioInp.value) || 1);
+    model.boxToSetRatio = r;
   }
   if (modelPickerCallback) {
     try { modelPickerCallback(model); } catch(e) { console.error(e); }
@@ -2244,12 +2903,110 @@ function toast(msg) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
 }
 
+// =============== SEARCH HIGHLIGHT ===============
+const searchQueries = { shelfBlack: '', shelfWhite: '', pallet: '' };
+
+function applySearchHighlight() {
+  const q = (searchQueries[currentTable] || '').trim().toLowerCase();
+  const root = document.getElementById(currentTable + '-list');
+  if (!root) return;
+  // Clear all hits first
+  root.querySelectorAll('.slot.search-hit').forEach(el => el.classList.remove('search-hit'));
+  const infoEl = document.querySelector(`[data-search-info="${currentTable}"]`);
+  if (!q) {
+    if (infoEl) { infoEl.style.display = 'none'; infoEl.textContent = ''; infoEl.classList.remove('has-hits'); }
+    return;
+  }
+  // Tokenize query (multiple terms separated by space, comma, or 中文逗号)
+  const terms = q.split(/[\s,，]+/).filter(Boolean);
+  if (!terms.length) return;
+  let hitCount = 0;
+  let firstHit = null;
+  root.querySelectorAll('.slot[data-mid]').forEach(slotEl => {
+    const mid = slotEl.dataset.mid;
+    const m = getModel(mid);
+    if (!m) return;
+    const name = m.name.toLowerCase();
+    const matches = terms.some(term => name.includes(term));
+    if (matches) {
+      slotEl.classList.add('search-hit');
+      hitCount++;
+      if (!firstHit) firstHit = slotEl;
+    }
+  });
+  if (infoEl) {
+    if (hitCount > 0) {
+      infoEl.style.display = '';
+      infoEl.classList.add('has-hits');
+      infoEl.textContent = `🔍 找到 ${hitCount} 个匹配 — 已闪光高亮 (查询: "${q}")`;
+    } else {
+      infoEl.style.display = '';
+      infoEl.classList.remove('has-hits');
+      infoEl.textContent = `🔍 未找到 "${q}"`;
+    }
+  }
+  // Auto-scroll to first hit
+  if (firstHit) {
+    setTimeout(() => {
+      firstHit.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 80);
+  }
+}
+
+// Bind search inputs
+document.querySelectorAll('.search-input').forEach(inp => {
+  inp.addEventListener('input', (e) => {
+    const tbl = inp.dataset.search;
+    searchQueries[tbl] = e.target.value;
+    const clearBtn = document.querySelector(`[data-search-clear="${tbl}"]`);
+    if (clearBtn) clearBtn.classList.toggle('show', !!e.target.value);
+    if (tbl === currentTable) applySearchHighlight();
+  });
+});
+document.querySelectorAll('[data-search-clear]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tbl = btn.dataset.searchClear;
+    const inp = document.querySelector(`[data-search="${tbl}"]`);
+    if (inp) { inp.value = ''; searchQueries[tbl] = ''; }
+    btn.classList.remove('show');
+    if (tbl === currentTable) applySearchHighlight();
+  });
+});
+// Search via 4-input methods (camera/handwrite/voice picker)
+document.querySelectorAll('[data-search-input-btn]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tbl = btn.dataset.searchInputBtn;
+    // Open the model picker but redirect its result to the search input
+    pendingModelTarget = null;
+    modelPickerCallback = (model) => {
+      const inp = document.querySelector(`[data-search="${tbl}"]`);
+      if (inp) {
+        inp.value = model.name;
+        searchQueries[tbl] = model.name;
+        const clearBtn = document.querySelector(`[data-search-clear="${tbl}"]`);
+        if (clearBtn) clearBtn.classList.add('show');
+        if (tbl === currentTable) applySearchHighlight();
+      }
+      // Don't actually create a slot — just use the name for searching
+    };
+    selectedSuggestionId = null;
+    switchInputMethod('type');
+    document.getElementById('camera-title').textContent = '🔍 搜索型号 (拍照/打字/手写/语音)';
+    document.getElementById('model-search').value = '';
+    const ratioInp = document.getElementById('model-ratio-input');
+    if (ratioInp) ratioInp.value = 1;
+    renderSuggestions('');
+    showSheet('camera-sheet');
+    setTimeout(() => { document.getElementById('model-search').focus(); }, 200);
+  });
+});
+
 loadState(); render();
 
 let lastTouchEnd = 0;
 document.addEventListener('touchend', (e) => {
   const tgt = e.target;
-  if (tgt && tgt.closest('button, a, input, textarea, .color-cell, .gcolor, .unit-cell, .model-cell, .gmodel, .editable, [contenteditable], .suggestion, .color-opt, .action-row, .tool, .table-tab, .unit-quick, .input-method-btn, .voice-mic-btn, canvas, .meta-save-btn, .add-divider, .add-divider-btn')) return;
+  if (tgt && tgt.closest('button, a, input, textarea, .color-cell, .gcolor, .unit-cell, .qty-cell, .restock-cell, .model-cell, .gmodel, .editable, [contenteditable], .suggestion, .color-opt, .action-row, .tool, .table-tab, .unit-quick, .input-method-btn, .voice-mic-btn, canvas, .meta-save-btn, .add-divider, .add-divider-btn, .search-bar, .search-input, .search-icon-btn, .search-clear')) return;
   const now = Date.now();
   if (now - lastTouchEnd < 300) e.preventDefault();
   lastTouchEnd = now;
