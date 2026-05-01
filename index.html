@@ -209,7 +209,25 @@ font-size: 12px;
 .action-row .ico { font-size: 18px; }
 .action-row:active { background: var(–ink); color: var(–paper); }
 
-.model-search-input { width: 100%; padding: 12px; border: 1px solid var(–line); border-radius: 10px; background: var(–bg); font-size: 15px; margin-bottom: 10px; -webkit-user-select: text; user-select: text; font-family: inherit; }
+.model-search-input {
+width: 100%;
+padding: 12px 14px;
+border: 2px solid var(–ink);
+border-radius: 10px;
+background: #fff8d6;
+font-size: 17px;
+font-weight: 600;
+line-height: 1.4;
+margin-bottom: 10px;
+-webkit-user-select: text;
+user-select: text;
+font-family: inherit;
+resize: vertical;
+min-height: 60px;
+color: var(–ink);
+-webkit-appearance: none;
+}
+.model-search-input:focus { outline: 3px solid rgba(214,51,64,0.3); outline-offset: -1px; }
 .model-suggestions { max-height: 220px; overflow-y: auto; border: 1px solid var(–line); border-radius: 10px; margin-bottom: 12px; background: var(–bg); }
 .suggestion { padding: 10px 12px; border-bottom: 1px solid rgba(0,0,0,0.08); cursor: pointer; font-size: 13px; }
 .suggestion:last-child { border-bottom: 0; }
@@ -407,7 +425,8 @@ font-size: 12px;
         <button id="camera-retake" style="display:none;">↻ 重拍</button>
       </div>
       <div id="ocr-status" style="display:none; padding: 8px 12px; background: #fff8d6; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; margin-bottom: 10px;"></div>
-      <input type="text" class="model-search-input" id="model-search" placeholder="或手动输入型号关键词搜索/新建..." autocomplete="off">
+      <div style="font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600;">识别结果 (可手动修改):</div>
+      <textarea class="model-search-input" id="model-search" placeholder="拍照后会自动填入识别文字,可在此手动修改..." autocomplete="off" rows="2" spellcheck="false"></textarea>
       <div class="model-suggestions" id="model-suggestions"></div>
     </div>
     <div class="sheet-footer">
@@ -1066,10 +1085,9 @@ function capturePhotoNow() {
 async function runOcrOnCanvas(canvas) {
   const searchInput = document.getElementById('model-search');
   searchInput.value = '';
-  // Show OCR loading state
   toast('🔍 正在识别照片中的文字...');
   const ocrStatus = document.getElementById('ocr-status');
-  if (ocrStatus) { ocrStatus.style.display = ''; ocrStatus.textContent = '⏳ 识别中,请稍候 (5-15秒)...'; }
+  if (ocrStatus) { ocrStatus.style.display = ''; ocrStatus.textContent = '⏳ 处理图片中...'; }
 
   try {
     if (typeof Tesseract === 'undefined') {
@@ -1077,40 +1095,48 @@ async function runOcrOnCanvas(canvas) {
       if (ocrStatus) ocrStatus.style.display = 'none';
       return;
     }
-    // Recognize English (most car model text is English/numbers)
-    const result = await Tesseract.recognize(canvas, 'eng', {
+
+    // Preprocess: convert to grayscale + boost contrast for better OCR
+    const processed = preprocessForOcr(canvas);
+
+    if (ocrStatus) ocrStatus.textContent = '⏳ 识别中文字 0%...';
+
+    // Use English + Simplified Chinese for car labels (车型 + Tacoma etc)
+    const result = await Tesseract.recognize(processed, 'eng+chi_sim', {
       logger: m => {
         if (m.status === 'recognizing text' && ocrStatus) {
           ocrStatus.textContent = `⏳ 识别中 ${Math.round(m.progress * 100)}%`;
+        } else if (m.status === 'loading language traineddata' && ocrStatus) {
+          ocrStatus.textContent = `⏳ 加载语言库 ${Math.round((m.progress||0) * 100)}%`;
         }
       }
     });
+
     let text = (result.data.text || '').trim();
-    // Clean up: remove excessive whitespace
-    text = text.replace(/\s+/g, ' ').replace(/[^\w\s\-/+().年代]/g, ' ').replace(/\s+/g, ' ').trim();
     if (ocrStatus) ocrStatus.style.display = 'none';
     if (!text) {
       toast('未识别到文字,请手动输入或重拍');
       searchInput.focus();
       return;
     }
-    // Try to find a likely car model substring
+
+    // Extract best candidate (prefer year-range patterns, ignore "车型" header)
     const candidate = extractBestCandidate(text);
-    searchInput.value = candidate || text;
+    searchInput.value = candidate;
     renderSuggestions(searchInput.value);
-    // Auto-select top suggestion if very high match
+
     setTimeout(() => {
       const topSuggestion = document.querySelector('#model-suggestions .suggestion[data-mid]');
       if (topSuggestion) {
         const score = parseInt(topSuggestion.querySelector('.match-score')?.textContent || '0');
         if (score >= 60) {
-          topSuggestion.click(); // Select it
-          toast('✅ 已识别并自动匹配,点确定填入');
+          topSuggestion.click();
+          toast('✅ 已识别并匹配,可点确定');
         } else {
-          toast('已识别文字,请检查或选择匹配型号');
+          toast('已识别,可手动修改后确定');
         }
       } else {
-        toast('已识别:' + searchInput.value.slice(0, 30));
+        toast('已识别 — 请检查文字是否正确');
       }
     }, 200);
   } catch (e) {
@@ -1120,18 +1146,69 @@ async function runOcrOnCanvas(canvas) {
   }
 }
 
-// Pull out the most likely model string from messy OCR output
+// Image preprocessing: grayscale + threshold for better OCR accuracy
+function preprocessForOcr(srcCanvas) {
+  const w = srcCanvas.width, h = srcCanvas.height;
+  // Scale up if too small (target ~ 1500px wide for best OCR)
+  const targetW = Math.max(w, 1500);
+  const scale = targetW / w;
+  const out = document.createElement('canvas');
+  out.width = Math.round(w * scale);
+  out.height = Math.round(h * scale);
+  const ctx = out.getContext('2d');
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(srcCanvas, 0, 0, out.width, out.height);
+
+  const imgData = ctx.getImageData(0, 0, out.width, out.height);
+  const d = imgData.data;
+  // Grayscale + contrast stretch
+  let min = 255, max = 0;
+  // First pass: find histogram range
+  for (let i = 0; i < d.length; i += 4) {
+    const gray = (d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114) | 0;
+    if (gray < min) min = gray;
+    if (gray > max) max = gray;
+  }
+  const range = Math.max(1, max - min);
+  // Second pass: apply contrast and grayscale
+  for (let i = 0; i < d.length; i += 4) {
+    let gray = (d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114) | 0;
+    gray = Math.max(0, Math.min(255, ((gray - min) / range) * 255));
+    // Slight binarization for crisp text
+    if (gray > 180) gray = 255;
+    else if (gray < 80) gray = 0;
+    d[i] = d[i+1] = d[i+2] = gray;
+  }
+  ctx.putImageData(imgData, 0, 0);
+  return out;
+}
+
 function extractBestCandidate(text) {
-  // Split by line / period / comma
-  const parts = text.split(/[\n.,;]+/).map(s => s.trim()).filter(Boolean);
-  // Prefer parts containing a year range pattern (e.g. "2016-2023")
-  const yearPart = parts.find(p => /\b(19|20)\d{2}\s*[-~–]\s*(19|20)\d{2}\b/.test(p));
-  if (yearPart) return yearPart;
-  // Or a single year + word
-  const singleYear = parts.find(p => /\b(19|20)\d{2}\b/.test(p) && /[A-Za-z]{3,}/.test(p));
+  // Split by lines (preserve structure since label is often 2 lines)
+  const lines = text.split(/\n+/).map(s => s.trim()).filter(Boolean);
+  // Filter out obvious headers like 车型, 型号, etc
+  const filtered = lines.filter(l => !/^(车型|型号|品牌|名称)$/.test(l));
+  // Find lines containing year range
+  const yearLines = filtered.filter(l => /\b(19|20)\d{2}\s*[-~–—]\s*(19|20)\d{2}\b/.test(l));
+  if (yearLines.length) {
+    // Combine year line with next line if it looks like a continuation
+    const idx = filtered.indexOf(yearLines[0]);
+    if (idx >= 0 && idx + 1 < filtered.length) {
+      const next = filtered[idx + 1];
+      if (/^[A-Za-z]/.test(next) && next.length < 30) {
+        return yearLines[0] + ' ' + next;
+      }
+    }
+    return yearLines[0];
+  }
+  // Single year + word
+  const singleYear = filtered.find(l => /\b(19|20)\d{2}\b/.test(l) && /[A-Za-z]{3,}/.test(l));
   if (singleYear) return singleYear;
-  // Else longest part with letters
-  return parts.filter(p => /[A-Za-z]{3,}/.test(p)).sort((a, b) => b.length - a.length)[0] || text;
+  // Otherwise: join filtered lines and clean
+  const joined = filtered.join(' ').replace(/\s+/g, ' ').trim();
+  // Remove obviously garbage characters (random single chars)
+  return joined.replace(/\s+[a-zA-Z0-9]\s+/g, ' ').replace(/\s+/g, ' ').trim() || text;
 }
 
 document.getElementById('camera-retake').addEventListener('click', () => {
