@@ -22,109 +22,118 @@
   html, body { height: 100%; overscroll-behavior: none; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
   body { font-family: 'Bricolage Grotesque', system-ui, sans-serif; background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.4; overflow: hidden; padding-top: var(--safe-top); }
   .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
-  header { flex-shrink: 0; padding: 12px 16px 8px; background: var(--paper); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; }
-  header h1 { font-size: 16px; font-weight: 700; flex: 1; min-width: 0; }
-  .icon-btn { width: 36px; height: 36px; border: 1px solid var(--line); background: var(--paper); border-radius: 10px; display: grid; place-items: center; cursor: pointer; font-size: 16px; flex-shrink: 0; }
-  .icon-btn:active { transform: scale(0.94); background: var(--ink); color: var(--paper); }
-  .table-tabs { flex-shrink: 0; display: flex; background: var(--paper); border-bottom: 1px solid var(--line); }
-  .table-tab {
-    flex: 1; padding: 10px 6px; font-size: 12px; font-weight: 500;
-    background: transparent; border: 0; cursor: pointer;
-    color: var(--muted); border-bottom: 3px solid transparent;
-    transition: all .18s;
-  }
-  .table-tab.active {
-    color: var(--red);
-    border-bottom-color: var(--red);
-    background: var(--bg);
-    font-weight: 800;
-    font-size: 16px;
-    letter-spacing: -0.01em;
-  }
-  .table-tab small { display: block; font-size: 9px; font-weight: 500; margin-top: 2px; opacity: 0.7; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; }
-  .table-tab.active small { opacity: 0.85; font-size: 10px; font-weight: 700; }
-  .toolbar { flex-shrink: 0; padding: 8px 12px; background: var(--paper); border-bottom: 1px solid var(--line); display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-  .toolbar::-webkit-scrollbar { display: none; }
-  .tool { flex-shrink: 0; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--paper); font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; }
-  .tool.active { background: var(--ink); color: var(--paper); }
-  .tool:active { transform: scale(0.96); }
-  main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-  .table-pane { display: none; }
-  .table-pane.active { display: block; }
-  .meta-bar {
-    background: var(--paper);
-    border-bottom: 1px solid var(--line);
-    padding: 10px 14px;
-  }
-  .meta-title {
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--red);
-    margin-bottom: 8px;
-    letter-spacing: -0.01em;
-    cursor: pointer;
-    display: inline-block;
-    padding: 2px 6px;
-    margin-left: -6px;
-    border-radius: 4px;
-    transition: background .15s;
-  }
-  .meta-title:active { background: rgba(0,0,0,0.06); }
-  .meta-fields {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .meta-fields label {
-    flex: 1;
-    min-width: 130px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  .meta-fields input {
-    flex: 1;
-    min-width: 0;
-    padding: 6px 8px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    background: var(--bg);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink);
-    font-family: inherit;
-    -webkit-user-select: text;
-    user-select: text;
-  }
-  .meta-fields input:focus {
-    outline: none;
-    background: #fff8d6;
-  }
-  .meta-fields input[type="date"] {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-  }
-  .meta-save-btn {
-    flex-shrink: 0;
-    background: var(--red);
-    color: white;
-    border: 0;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(214,51,64,0.35);
-    font-family: inherit;
-    letter-spacing: 0.02em;
-  }
-  .meta-save-btn:active { transform: scale(0.94); background: #b8232f; }
+
+/* Google Translate widget compatibility — let its banner sit above our app without overlap */
+body { top: 0 !important; }  /* Google adds inline top:40px which breaks our layout */
+.goog-te-banner-frame { z-index: 1001 !important; }
+.skiptranslate iframe { display: none !important; }  /* Hide the popup banner Google shows */
+.goog-te-gadget { font-family: inherit !important; }
+font[face] { font-family: inherit !important; background: transparent !important; box-shadow: none !important; }
+/* Hide Google’s tooltip on hover (it’s annoying on mobile) */
+.goog-tooltip, .goog-tooltip:hover, .goog-text-highlight { background: none !important; box-shadow: none !important; }
+header { flex-shrink: 0; padding: 12px 16px 8px; background: var(–paper); border-bottom: 1px solid var(–line); display: flex; align-items: center; gap: 8px; }
+header h1 { font-size: 16px; font-weight: 700; flex: 1; min-width: 0; }
+.icon-btn { width: 36px; height: 36px; border: 1px solid var(–line); background: var(–paper); border-radius: 10px; display: grid; place-items: center; cursor: pointer; font-size: 16px; flex-shrink: 0; }
+.icon-btn:active { transform: scale(0.94); background: var(–ink); color: var(–paper); }
+.table-tabs { flex-shrink: 0; display: flex; background: var(–paper); border-bottom: 1px solid var(–line); }
+.table-tab {
+flex: 1; padding: 10px 6px; font-size: 12px; font-weight: 500;
+background: transparent; border: 0; cursor: pointer;
+color: var(–muted); border-bottom: 3px solid transparent;
+transition: all .18s;
+}
+.table-tab.active {
+color: var(–red);
+border-bottom-color: var(–red);
+background: var(–bg);
+font-weight: 800;
+font-size: 16px;
+letter-spacing: -0.01em;
+}
+.table-tab small { display: block; font-size: 9px; font-weight: 500; margin-top: 2px; opacity: 0.7; font-family: ‘JetBrains Mono’, monospace; letter-spacing: 0.05em; }
+.table-tab.active small { opacity: 0.85; font-size: 10px; font-weight: 700; }
+.toolbar { flex-shrink: 0; padding: 8px 12px; background: var(–paper); border-bottom: 1px solid var(–line); display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.toolbar::-webkit-scrollbar { display: none; }
+.tool { flex-shrink: 0; padding: 7px 12px; border: 1px solid var(–line); border-radius: 999px; background: var(–paper); font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+.tool.active { background: var(–ink); color: var(–paper); }
+.tool:active { transform: scale(0.96); }
+main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.table-pane { display: none; }
+.table-pane.active { display: block; }
+.meta-bar {
+background: var(–paper);
+border-bottom: 1px solid var(–line);
+padding: 10px 14px;
+}
+.meta-title {
+font-size: 16px;
+font-weight: 800;
+color: var(–red);
+margin-bottom: 8px;
+letter-spacing: -0.01em;
+cursor: pointer;
+display: inline-block;
+padding: 2px 6px;
+margin-left: -6px;
+border-radius: 4px;
+transition: background .15s;
+}
+.meta-title:active { background: rgba(0,0,0,0.06); }
+.meta-fields {
+display: flex;
+gap: 8px;
+flex-wrap: wrap;
+align-items: center;
+}
+.meta-fields label {
+flex: 1;
+min-width: 130px;
+display: flex;
+align-items: center;
+gap: 6px;
+font-size: 11px;
+font-weight: 600;
+color: var(–muted);
+text-transform: uppercase;
+letter-spacing: 0.05em;
+}
+.meta-fields input {
+flex: 1;
+min-width: 0;
+padding: 6px 8px;
+border: 1px solid var(–line);
+border-radius: 6px;
+background: var(–bg);
+font-size: 13px;
+font-weight: 500;
+color: var(–ink);
+font-family: inherit;
+-webkit-user-select: text;
+user-select: text;
+}
+.meta-fields input:focus {
+outline: none;
+background: #fff8d6;
+}
+.meta-fields input[type=“date”] {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 12px;
+}
+.meta-save-btn {
+flex-shrink: 0;
+background: var(–red);
+color: white;
+border: 0;
+padding: 8px 14px;
+border-radius: 8px;
+font-size: 13px;
+font-weight: 700;
+cursor: pointer;
+box-shadow: 0 2px 6px rgba(214,51,64,0.35);
+font-family: inherit;
+letter-spacing: 0.02em;
+}
+.meta-save-btn:active { transform: scale(0.94); background: #b8232f; }
 
 /* Search bar — top of every list view */
 .search-bar {
@@ -268,9 +277,17 @@ letter-spacing: 0.04em;
 }
 .container-block.shelf-dragging { opacity: 0.4; }
 .container-block.shelf-drop-target { box-shadow: 0 -3px 0 var(–ink) inset, 0 3px 0 var(–ink) inset; }
-.slot { display: grid; grid-template-columns: 24px 1fr 38px 48px 42px; gap: 4px; align-items: center; padding: 7px 6px; border-bottom: 1px dashed rgba(0,0,0,0.1); min-height: 50px; background: var(–paper); }
-.slot.pallet-slot { grid-template-columns: 24px 1fr 36px 44px 38px 44px; }
+.slot { display: grid; grid-template-columns: 32px 1fr 38px 48px 42px; gap: 4px; align-items: center; padding: 7px 6px; border-bottom: 1px dashed rgba(0,0,0,0.1); min-height: 50px; background: var(–paper); }
+.slot.pallet-slot { grid-template-columns: 32px 1fr 36px 44px 38px 44px; }
 .slot.search-hit { animation: searchFlash 1.4s ease-in-out infinite; background: #fff8d6 !important; }
+.grid-slot.search-hit {
+animation: searchFlash 1.4s ease-in-out infinite;
+background: #fff8d6 !important;
+box-shadow: 0 0 0 2px var(–red), 0 0 8px rgba(214,51,64,0.5);
+border-radius: 3px;
+z-index: 5;
+position: relative;
+}
 @keyframes searchFlash {
 0%, 100% { box-shadow: inset 0 0 0 3px transparent; background: #fff8d6 !important; }
 50% { box-shadow: inset 0 0 0 3px var(–red); background: #fff0a0 !important; }
@@ -324,7 +341,131 @@ line-height: 1;
 .slot:last-child { border-bottom: 0; }
 .slot.dragover { background: #fff8d6; }
 .slot.empty .model-cell { color: var(–muted); font-style: italic; }
-.slot-num { font-family: ‘JetBrains Mono’, monospace; font-size: 11px; color: var(–muted); text-align: right; font-weight: 600; }
+.slot-num {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 10px;
+color: var(–muted);
+font-weight: 700;
+width: 26px;
+height: 26px;
+border: 1.5px dashed rgba(0,0,0,0.4);
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+background: var(–paper);
+box-sizing: border-box;
+flex-shrink: 0;
+grid-row: 1;
+}
+.slot-num:empty,
+.slot-num.empty-num { border-style: dotted; opacity: 0.4; }
+
+/* === Product info row (image + EN/CN names) — appears below the main row === */
+.slot-info-row {
+grid-column: 1 / -1;
+display: grid;
+grid-template-columns: 50px 1fr;
+gap: 8px;
+align-items: stretch;
+padding: 6px 0 4px 0;
+margin-top: 4px;
+border-top: 1px dotted rgba(0,0,0,0.08);
+}
+.product-img-cell {
+width: 50px;
+height: 50px;
+border: 1.5px dashed rgba(0,0,0,0.3);
+border-radius: 8px;
+background: var(–paper);
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+overflow: hidden;
+box-sizing: border-box;
+position: relative;
+-webkit-tap-highlight-color: transparent;
+}
+.product-img-cell:active { transform: scale(0.94); }
+.product-img-cell.has-img { border-style: solid; border-color: var(–green); padding: 0; }
+.product-img-cell .img-plus {
+font-size: 22px;
+color: rgba(0,0,0,0.4);
+font-weight: 300;
+line-height: 1;
+}
+.product-img-cell img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+border-radius: 6px;
+display: block;
+}
+.product-names {
+display: flex;
+flex-direction: column;
+justify-content: center;
+gap: 3px;
+min-width: 0;
+}
+.product-name {
+border: 1px dashed rgba(0,0,0,0.18);
+border-radius: 5px;
+padding: 3px 6px;
+font-size: 11px;
+line-height: 1.3;
+background: var(–paper);
+cursor: text;
+min-height: 20px;
+word-break: break-word;
+-webkit-user-select: text;
+user-select: text;
+}
+.product-name.empty {
+color: rgba(0,0,0,0.3);
+font-style: italic;
+}
+.product-name input {
+width: 100%;
+border: 0;
+background: transparent;
+font-size: 11px;
+font-family: inherit;
+padding: 0;
+outline: none;
+-webkit-user-select: text;
+user-select: text;
+}
+.product-name input:focus { background: #fff8d6; }
+.product-name.en { font-weight: 600; color: var(–ink); }
+.product-name.cn { font-weight: 500; color: rgba(0,0,0,0.75); }
+/* Autocomplete suggestions popup */
+.name-suggest {
+position: absolute;
+z-index: 60;
+background: var(–paper);
+border: 1.5px solid var(–ink);
+border-radius: 6px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+max-height: 140px;
+overflow-y: auto;
+-webkit-overflow-scrolling: touch;
+min-width: 180px;
+max-width: 90vw;
+font-size: 12px;
+}
+.name-suggest-item {
+padding: 6px 10px;
+border-bottom: 1px solid rgba(0,0,0,0.06);
+cursor: pointer;
+word-break: break-word;
+}
+.name-suggest-item:last-child { border-bottom: 0; }
+.name-suggest-item:active,
+.name-suggest-item.highlight { background: var(–ink); color: var(–paper); }
+.name-suggest-item .matched { background: rgba(255,238,150,0.6); border-radius: 2px; padding: 0 1px; }
+.name-suggest-item .completion { color: var(–muted); }
 .model-cell { font-size: 13px; font-weight: 500; cursor: grab; padding: 4px 0; line-height: 1.25; word-break: break-word; }
 .model-cell.dragging { opacity: 0.4; }
 .model-cell.empty-clickable { color: var(–muted); font-style: italic; cursor: pointer; }
@@ -537,6 +678,19 @@ transition: transform .12s;
 /* Barcode/QR scanner */
 .barcode-wrap { display: none; margin-bottom: 10px; position: relative; }
 .barcode-wrap.show { display: block; }
+/* IMPORTANT: lock the scanner UI orientation — when user rotates phone, the frame should NOT rotate.
+We force a fixed aspect ratio and disable any auto-rotation behaviors. */
+.barcode-wrap #barcode-video {
+width: 100%;
+aspect-ratio: 4/3;
+object-fit: cover;
+border-radius: 10px;
+margin-bottom: 10px;
+background: #000;
+/* Lock orientation: ignore device rotation, always render in document orientation */
+transform: none !important;
+-webkit-transform: none !important;
+}
 .barcode-frame {
 position: relative;
 width: 100%;
@@ -546,15 +700,6 @@ pointer-events: none;
 }
 .barcode-wrap .camera-preview {
 border-radius: 10px;
-}
-/* Position the frame overlay on top of the video */
-.barcode-wrap {
-position: relative;
-}
-.barcode-wrap #barcode-video {
-width: 100%;
-border-radius: 10px;
-margin-bottom: 10px;
 }
 .barcode-frame {
 position: absolute;
@@ -666,6 +811,7 @@ margin: 8px 0;
   <header>
     <h1>MUG 库存标注</h1>
     <button class="icon-btn" id="upload-btn" title="📋 型号库管理 (查看/上传新型号清单)" aria-label="型号库管理">📋</button>
+    <button class="icon-btn" id="translate-btn" title="🌐 翻译整页 (Translate page)" aria-label="翻译">🌐</button>
     <button class="icon-btn" id="save-btn" title="保存">💾</button>
   </header>
 
@@ -915,6 +1061,76 @@ margin: 8px 0;
       <button class="sheet-confirm" id="confirm-delete-yes" style="background: var(--red); border-color: var(--red);">确定删除 / Confirm Delete</button>
       <button class="sheet-cancel" data-close>取消 / Cancel</button>
     </div>
+  </div>
+</div>
+
+<!-- Product image upload sheet -->
+
+<div class="sheet-backdrop modal-style" id="product-img-sheet">
+  <div class="sheet">
+    <div class="sheet-body">
+      <h3 id="product-img-title">产品图片</h3>
+      <div id="product-img-preview" style="margin-bottom: 14px;"></div>
+      <div class="actions-list">
+        <button class="action-row" id="img-from-camera"><span class="ico">📷</span><div style="flex:1;"><div style="font-weight:700;">拍照</div><div style="font-size:11px; color:var(--muted);">用摄像头拍一张</div></div></button>
+        <button class="action-row" id="img-from-album"><span class="ico">🖼️</span><div style="flex:1;"><div style="font-weight:700;">从相册选</div><div style="font-size:11px; color:var(--muted);">从手机相册选一张</div></div></button>
+        <button class="action-row" id="img-from-url"><span class="ico">🔗</span><div style="flex:1;"><div style="font-weight:700;">输入图片网址</div><div style="font-size:11px; color:var(--muted);">如已有 https://... 链接</div></div></button>
+        <button class="action-row" id="img-remove" style="background: #ffe5e5; border-color: var(--red);"><span class="ico">🗑️</span><div style="flex:1;"><div style="font-weight:700; color: var(--red);">移除图片</div></div></button>
+      </div>
+    </div>
+    <div class="sheet-footer">
+      <button class="sheet-cancel" data-close>关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- Translate sheet (Google Translate Widget) -->
+
+<div class="sheet-backdrop" id="translate-sheet">
+  <div class="sheet">
+    <div class="sheet-body">
+      <h3>🌐 翻译 / Translate Page</h3>
+      <div style="background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+        <div style="font-size: 12px; line-height: 1.6; color: var(--ink);">
+          <div style="font-weight: 700; margin-bottom: 4px;">📌 使用说明 / How to use</div>
+          <div style="color: var(--muted);">
+            • 选择一种语言后,整个页面会被翻译<br>
+            • Pick a language and the whole page will be translated<br>
+            • 翻译完成后会出现 Google 工具条,可随时切换或关闭<br>
+            • Use the Google bar to switch or stop translation
+          </div>
+        </div>
+      </div>
+
+```
+  <div style="font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.05em;">🌍 选择语言 / SELECT LANGUAGE</div>
+  <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px;">
+    <button class="action-row translate-lang" data-lang="en"><span class="ico">🇺🇸</span><div style="flex:1; font-weight:700;">English</div></button>
+    <button class="action-row translate-lang" data-lang="es"><span class="ico">🇪🇸</span><div style="flex:1; font-weight:700;">Español</div></button>
+    <button class="action-row translate-lang" data-lang="ja"><span class="ico">🇯🇵</span><div style="flex:1; font-weight:700;">日本語</div></button>
+    <button class="action-row translate-lang" data-lang="ko"><span class="ico">🇰🇷</span><div style="flex:1; font-weight:700;">한국어</div></button>
+    <button class="action-row translate-lang" data-lang="fr"><span class="ico">🇫🇷</span><div style="flex:1; font-weight:700;">Français</div></button>
+    <button class="action-row translate-lang" data-lang="de"><span class="ico">🇩🇪</span><div style="flex:1; font-weight:700;">Deutsch</div></button>
+    <button class="action-row translate-lang" data-lang="vi"><span class="ico">🇻🇳</span><div style="flex:1; font-weight:700;">Tiếng Việt</div></button>
+    <button class="action-row translate-lang" data-lang="ru"><span class="ico">🇷🇺</span><div style="flex:1; font-weight:700;">Русский</div></button>
+    <button class="action-row translate-lang" data-lang="ar"><span class="ico">🇸🇦</span><div style="flex:1; font-weight:700;">العربية</div></button>
+    <button class="action-row translate-lang" data-lang="hi"><span class="ico">🇮🇳</span><div style="flex:1; font-weight:700;">हिन्दी</div></button>
+    <button class="action-row translate-lang" data-lang="th"><span class="ico">🇹🇭</span><div style="flex:1; font-weight:700;">ไทย</div></button>
+    <button class="action-row translate-lang" data-lang="pt"><span class="ico">🇵🇹</span><div style="flex:1; font-weight:700;">Português</div></button>
+  </div>
+
+  <button class="action-row" id="translate-stop" style="background: #ffe5e5; border-color: var(--red);">
+    <span class="ico">🚫</span><div style="flex:1; font-weight:700; color: var(--red);">停止翻译 / Stop Translation</div>
+  </button>
+
+  <!-- Google Translate widget mounts here (hidden — its own bar shows up at the top) -->
+  <div id="google_translate_element" style="display:none;"></div>
+</div>
+<div class="sheet-footer">
+  <button class="sheet-cancel" data-close>关闭 / Close</button>
+</div>
+```
+
   </div>
 </div>
 
@@ -1322,6 +1538,7 @@ function renderListView() {
         cell.className = 'slot' + (slot.modelId ? '' : ' empty') + (isShelf ? '' : ' pallet-slot');
         cell.dataset.ai = ai; cell.dataset.ci = ci; cell.dataset.si = si;
         if (slot.modelId) cell.dataset.mid = slot.modelId;
+        if (slot.modelId) cell.dataset.mid = slot.modelId;
         const m = slot.modelId ? getModel(slot.modelId) : null;
         const modelHtml = slot.modelId
           ? `<div class="model-cell has-model" draggable="true" data-mid="${slot.modelId}" data-ai="${ai}" data-ci="${ci}" data-si="${si}" data-table="${currentTable}">${escapeHtml(m ? m.name : '?')}</div>`
@@ -1343,7 +1560,25 @@ function renderListView() {
               ? `<div class="restock-cell ${slot.restock > 0 ? 'has-val' : ''}" data-ai="${ai}" data-ci="${ci}" data-si="${si}" title="补货数量(双击)">${slot.restock > 0 ? slot.restock : ''}</div>`
               : `<div class="restock-cell" style="visibility:hidden"></div>`)
           : '';
-        cell.innerHTML = `<div class="slot-num">${slot.modelId ? serial : '—'}</div>${modelHtml}${colorHtml}${qtyHtml}${unitHtml}${restockHtml}`;
+        // Product info row (image + EN/CN names) — only render for filled slots
+        let infoRowHtml = '';
+        if (slot.modelId) {
+          const m = getModel(slot.modelId);
+          const enName = (m && m.enName) ? m.enName : '';
+          const cnName = (m && m.cnName) ? m.cnName : '';
+          const imgUrl = (m && m.imageUrl) ? m.imageUrl : '';
+          const imgInner = imgUrl
+            ? `<img src="${escapeHtml(imgUrl)}" alt="">`
+            : `<span class="img-plus">+</span>`;
+          infoRowHtml = `<div class="slot-info-row">
+            <div class="product-img-cell ${imgUrl ? 'has-img' : ''}" data-mid="${slot.modelId}" title="点击上传产品图片">${imgInner}</div>
+            <div class="product-names">
+              <div class="product-name en ${enName ? '' : 'empty'}" data-field="enName" data-mid="${slot.modelId}">${enName ? escapeHtml(enName) : 'English Name (点击输入)'}</div>
+              <div class="product-name cn ${cnName ? '' : 'empty'}" data-field="cnName" data-mid="${slot.modelId}">${cnName ? escapeHtml(cnName) : '中文名称 (点击输入)'}</div>
+            </div>
+          </div>`;
+        }
+        cell.innerHTML = `<div class="slot-num">${slot.modelId ? serial : '—'}</div>${modelHtml}${colorHtml}${qtyHtml}${unitHtml}${restockHtml}${infoRowHtml}`;
         cblock.appendChild(cell);
       });
       // FIX (二): "+" divider at the BOTTOM of each container — clicks duplicate this entire layer (with all slot data) below
@@ -1409,7 +1644,7 @@ function renderGridView() {
         container[sk].forEach((slot, si) => {
           const gs = document.createElement('div');
           gs.className = 'grid-slot' + (slot.modelId ? '' : ' empty');
-          gs.dataset.ai = ai; gs.dataset.ci = ci; gs.dataset.si = si;
+          gs.dataset.ai = ai; gs.dataset.ci = ci; gs.dataset.si = si; if (slot.modelId) gs.dataset.mid = slot.modelId;
           const m = slot.modelId ? getModel(slot.modelId) : null;
           const num = slotSerial[`${ai}|${ci}|${si}`];
           const modelHtml = slot.modelId
@@ -1450,7 +1685,7 @@ function renderGridView() {
       container[sk].forEach((slot, si) => {
         const gs = document.createElement('div');
         gs.className = 'grid-slot' + (slot.modelId ? '' : ' empty');
-        gs.dataset.ai = ai; gs.dataset.ci = ci; gs.dataset.si = si;
+        gs.dataset.ai = ai; gs.dataset.ci = ci; gs.dataset.si = si; if (slot.modelId) gs.dataset.mid = slot.modelId;
         const m = slot.modelId ? getModel(slot.modelId) : null;
         const num = slotSerial[`${ai}|${ci}|${si}`];
         const modelHtml = slot.modelId
@@ -1488,6 +1723,10 @@ function attachListHandlers(root) {
   });
   root.querySelectorAll('.color-cell[data-ai]').forEach(el => attachColorCellHandlers(el));
   root.querySelectorAll('.unit-cell[data-ai]').forEach(el => attachUnitCellHandlers(el));
+  // NEW: product image cells — click opens upload dialog
+  root.querySelectorAll('.product-img-cell[data-mid]').forEach(el => attachProductImageHandler(el));
+  // NEW: product name cells (EN/CN) — click to edit, with autocomplete
+  root.querySelectorAll('.product-name[data-mid]').forEach(el => attachProductNameHandler(el));
   // NEW: qty-cell — double-tap opens 4-method input picker for the quantity
   root.querySelectorAll('.qty-cell[data-ai]').forEach(el => attachQtyCellHandlers(el));
   // NEW: restock-cell (pallets only) — double-tap opens restock input + flow
@@ -1651,6 +1890,212 @@ function attachUnitCellHandlers(el) {
     openUnitEditor(+el.dataset.ai, +el.dataset.ci, +el.dataset.si);
   });
 }
+
+// === Product image cell — click to upload/replace product photo ===
+function attachProductImageHandler(el) {
+  el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    openProductImageUpload(el.dataset.mid);
+  });
+}
+
+let pendingImageMid = null;
+function openProductImageUpload(mid) {
+  pendingImageMid = mid;
+  const m = getModel(mid);
+  const sheet = document.getElementById('product-img-sheet');
+  if (sheet) {
+    const titleEl = document.getElementById('product-img-title');
+    if (titleEl) titleEl.textContent = m ? `${m.name} · 产品图片` : '产品图片';
+    const previewEl = document.getElementById('product-img-preview');
+    if (previewEl) {
+      if (m && m.imageUrl) {
+        previewEl.innerHTML = `<img src="${escapeHtml(m.imageUrl)}" style="width:100%; max-height:200px; object-fit:contain; background:#f0f0f0; border-radius:8px;">`;
+      } else {
+        previewEl.innerHTML = `<div style="padding:30px; text-align:center; color:var(--muted); border:2px dashed var(--line); border-radius:8px;">暂无图片<br>No image yet</div>`;
+      }
+    }
+    showSheet('product-img-sheet');
+  }
+}
+
+// === Product name cell — click to edit with autocomplete ===
+let activeNameSuggest = null;
+function attachProductNameHandler(el) {
+  el.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (el.querySelector('input')) return; // already editing
+    startEditProductName(el);
+  });
+}
+function startEditProductName(el) {
+  const mid = el.dataset.mid;
+  const field = el.dataset.field; // 'enName' or 'cnName'
+  const m = getModel(mid);
+  if (!m) return;
+  const currentValue = (m && m[field]) ? m[field] : '';
+
+  // Replace cell content with an input
+  el.classList.remove('empty');
+  el.innerHTML = '';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = currentValue;
+  input.placeholder = field === 'enName' ? 'English name...' : '中文名称...';
+  input.autocomplete = 'off';
+  input.spellcheck = false;
+  el.appendChild(input);
+  // Focus + cursor at end
+  setTimeout(() => {
+    input.focus();
+    try { input.setSelectionRange(input.value.length, input.value.length); } catch(e) {}
+  }, 30);
+
+  removeNameSuggest();
+
+  let highlightIndex = -1;
+  let suggestions = [];
+
+  const updateSuggest = () => {
+    const q = (input.value || '').trim().toLowerCase();
+    suggestions = [];
+    if (q.length < 1) { removeNameSuggest(); return; }
+    // Find similar values from other models in the same field
+    const seen = new Set();
+    for (const mm of state.models) {
+      if (mm.id === mid) continue;
+      const v = (mm[field] || '').trim();
+      if (!v) continue;
+      const vl = v.toLowerCase();
+      if (vl === q) continue; // exact match — no point suggesting
+      if (seen.has(vl)) continue;
+      // Match if value starts with q OR contains q (prefix preferred)
+      const prefixMatch = vl.startsWith(q);
+      const containsMatch = vl.includes(q);
+      if (prefixMatch || containsMatch) {
+        seen.add(vl);
+        suggestions.push({ text: v, prefix: prefixMatch });
+      }
+    }
+    // Prefix matches first, then alphabetical
+    suggestions.sort((a, b) => {
+      if (a.prefix !== b.prefix) return a.prefix ? -1 : 1;
+      return a.text.localeCompare(b.text);
+    });
+    suggestions = suggestions.slice(0, 8);
+    if (!suggestions.length) { removeNameSuggest(); return; }
+    showNameSuggest(el, input, q, suggestions, (chosen) => {
+      input.value = chosen;
+      try { input.setSelectionRange(q.length, chosen.length); } catch(e) {} // select the auto-completed part
+      input.focus();
+    });
+  };
+
+  input.addEventListener('input', updateSuggest);
+  input.addEventListener('focus', updateSuggest);
+
+  input.addEventListener('keydown', (e) => {
+    if (!activeNameSuggest) return;
+    const items = activeNameSuggest.querySelectorAll('.name-suggest-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      highlightIndex = (highlightIndex + 1) % items.length;
+      items.forEach((it, i) => it.classList.toggle('highlight', i === highlightIndex));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      highlightIndex = (highlightIndex - 1 + items.length) % items.length;
+      items.forEach((it, i) => it.classList.toggle('highlight', i === highlightIndex));
+    } else if (e.key === 'Enter' && highlightIndex >= 0) {
+      e.preventDefault();
+      input.value = suggestions[highlightIndex].text;
+      removeNameSuggest();
+    } else if (e.key === 'Tab' && suggestions.length) {
+      e.preventDefault();
+      input.value = suggestions[0].text;
+      removeNameSuggest();
+    } else if (e.key === 'Escape') {
+      removeNameSuggest();
+      input.blur();
+    }
+  });
+
+  const finish = (cancel) => {
+    removeNameSuggest();
+    const newVal = (input.value || '').trim();
+    if (!cancel) {
+      const mm = getModel(mid);
+      if (mm) {
+        if (newVal) mm[field] = newVal;
+        else delete mm[field];
+        saveState();
+      }
+    }
+    // Re-render just this cell to its display state
+    const finalVal = newVal;
+    if (finalVal) {
+      el.classList.remove('empty');
+      el.textContent = finalVal;
+    } else {
+      el.classList.add('empty');
+      el.textContent = field === 'enName' ? 'English Name (点击输入)' : '中文名称 (点击输入)';
+    }
+  };
+
+  input.addEventListener('blur', () => {
+    setTimeout(() => finish(false), 100); // small delay so suggestion clicks register
+  });
+}
+
+function showNameSuggest(parentCell, input, query, suggestions, onPick) {
+  removeNameSuggest();
+  const list = document.createElement('div');
+  list.className = 'name-suggest';
+  // Position below the cell
+  const rect = parentCell.getBoundingClientRect();
+  list.style.left = rect.left + 'px';
+  list.style.top = (rect.bottom + 2 + window.scrollY) + 'px';
+  list.style.minWidth = rect.width + 'px';
+
+  list.innerHTML = suggestions.map(s => {
+    // Highlight matched portion
+    const lowerText = s.text.toLowerCase();
+    const idx = lowerText.indexOf(query.toLowerCase());
+    let html;
+    if (idx >= 0) {
+      const before = escapeHtml(s.text.substring(0, idx));
+      const matched = escapeHtml(s.text.substring(idx, idx + query.length));
+      const after = escapeHtml(s.text.substring(idx + query.length));
+      html = `${before}<span class="matched">${matched}</span><span class="completion">${after}</span>`;
+    } else {
+      html = escapeHtml(s.text);
+    }
+    return `<div class="name-suggest-item" data-text="${escapeHtml(s.text)}">${html}</div>`;
+  }).join('');
+
+  list.querySelectorAll('.name-suggest-item').forEach(it => {
+    const handler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onPick(it.dataset.text);
+      removeNameSuggest();
+    };
+    it.addEventListener('mousedown', handler);
+    it.addEventListener('touchstart', handler, { passive: false });
+  });
+
+  document.body.appendChild(list);
+  activeNameSuggest = list;
+}
+function removeNameSuggest() {
+  if (activeNameSuggest) { activeNameSuggest.remove(); activeNameSuggest = null; }
+}
+// Close suggest if user taps elsewhere
+document.addEventListener('click', (e) => {
+  if (activeNameSuggest && !activeNameSuggest.contains(e.target) && !e.target.closest('.product-name input')) {
+    removeNameSuggest();
+  }
+});
 
 // NEW: Quantity cell — double-tap opens the multi-input number picker
 // Single tap also opens it (numbers don't have a meaningful single-tap action)
@@ -2566,6 +3011,14 @@ async function startBarcodeScanner() {
   if (status) { status.style.display = ''; status.textContent = '⏳ 启动摄像头...'; }
 
   try {
+    // Try to lock screen orientation to portrait so the scan frame doesn't rotate
+    // (Most browsers only allow this in fullscreen; we attempt without fullscreen — graceful no-op if denied)
+    try {
+      if (screen.orientation && typeof screen.orientation.lock === 'function') {
+        screen.orientation.lock('portrait').catch(() => {/* silently ignore */});
+      }
+    } catch(e) { /* not supported, no-op */ }
+
     barcodeStream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } },
       audio: false
@@ -2629,83 +3082,152 @@ async function loadZxingAndScan() {
   const video = document.getElementById('barcode-video');
   if (status) { status.style.display = ''; status.textContent = '⏳ 加载扫码库 (首次需要联网)...'; }
 
-  // Use @zxing/library directly — more reliable on iOS Safari than @zxing/browser
-  if (!window.ZXing) {
-    try {
-      await new Promise((resolve, reject) => {
-        let attempts = 0;
-        const cdns = [
-          'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js',
-          'https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js',
-          'https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js'
-        ];
-        function tryNext() {
-          if (attempts >= cdns.length) {
-            reject(new Error('所有 CDN 都加载失败,请检查网络'));
-            return;
-          }
+  // Try multiple ZXing distributions — different APIs available in each
+  if (!window.ZXing && !window.ZXingBrowser) {
+    const cdns = [
+      // @zxing/browser — has BrowserMultiFormatReader.decodeFromVideoDevice (preferred for iOS)
+      'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.4/umd/index.min.js',
+      'https://unpkg.com/@zxing/browser@0.1.4/umd/index.min.js',
+      // Fallback: @zxing/library
+      'https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js',
+      'https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js'
+    ];
+    let loadedFrom = null;
+    for (const url of cdns) {
+      try {
+        await new Promise((resolve, reject) => {
           const s = document.createElement('script');
-          s.src = cdns[attempts++];
-          s.onload = () => {
-            if (window.ZXing) resolve();
-            else { s.remove(); tryNext(); }
-          };
-          s.onerror = () => { s.remove(); tryNext(); };
+          s.src = url;
+          s.onload = () => resolve();
+          s.onerror = () => { s.remove(); reject(new Error('网络/CDN 失败')); };
+          // Timeout after 10s per CDN
+          const timer = setTimeout(() => { s.onerror = null; reject(new Error('超时')); }, 10000);
+          s.onload = () => { clearTimeout(timer); resolve(); };
           document.head.appendChild(s);
+        });
+        if (window.ZXing || window.ZXingBrowser) {
+          loadedFrom = url;
+          break;
         }
-        tryNext();
-      });
-    } catch (loadErr) {
-      if (status) status.textContent = '❌ ' + (loadErr.message || '扫码库加载失败');
-      toast('扫码库加载失败 — 请检查网络后重试');
+      } catch (e) {
+        // Continue to next CDN
+        continue;
+      }
+    }
+    if (!window.ZXing && !window.ZXingBrowser) {
+      const msg = '所有 CDN 加载失败,请确保有网络连接后再试';
+      if (status) status.textContent = '❌ ' + msg;
+      toast(msg);
       return;
     }
+    console.log('Loaded ZXing from:', loadedFrom);
   }
 
-  if (!window.ZXing) {
+  const ZXB = window.ZXingBrowser; // @zxing/browser
+  const ZX = window.ZXing;          // @zxing/library
+  if (!ZXB && !ZX) {
     if (status) status.textContent = '❌ 扫码库未就绪';
     return;
   }
 
-  if (status) status.textContent = '🔍 扫描中...';
-  try {
-    // Use the universal MultiFormatReader — works on more iOS versions
-    const ZX = window.ZXing;
-    barcodeZxingReader = new ZX.BrowserMultiFormatReader();
+  if (status) status.textContent = '🔍 扫描中... 对准条码或二维码';
 
-    // decodeFromStream is the most reliable on iOS — pass the existing stream
-    barcodeZxingReader.decodeFromStream(barcodeStream, video, (result, err) => {
-      if (result) {
-        const text = result.getText ? result.getText() : (result.text || String(result));
-        let fmt = 'unknown';
-        try {
-          if (result.getBarcodeFormat) {
-            const f = result.getBarcodeFormat();
-            fmt = (ZX.BarcodeFormat && Object.keys(ZX.BarcodeFormat).find(k => ZX.BarcodeFormat[k] === f)) || String(f);
-          }
-        } catch(e) {}
-        handleBarcodeFound(text, fmt);
-      }
-      // Ignore "NotFoundException" — that's just "no code in this frame"
-    }).catch(streamErr => {
-      // decodeFromStream may not exist in some versions — fallback to decodeFromVideoElement
+  try {
+    // Strategy 1: @zxing/browser BrowserMultiFormatReader (most reliable on iOS Safari)
+    if (ZXB && ZXB.BrowserMultiFormatReader) {
+      barcodeZxingReader = new ZXB.BrowserMultiFormatReader();
+      // decodeFromVideoDevice is the documented API in @zxing/browser
+      // First arg null = "use the existing srcObject if any, or pick environment camera"
       try {
-        barcodeZxingReader.decodeFromVideoElement(video, (result, err) => {
+        barcodeZxingControls = await barcodeZxingReader.decodeFromVideoDevice(
+          undefined,  // device id - undefined = back camera
+          video,
+          (result, err) => {
+            if (result) {
+              let text = '';
+              try { text = result.getText ? result.getText() : (result.text || String(result)); } catch(e) {}
+              if (text) handleBarcodeFound(text, 'scan');
+            }
+            // err.NotFoundException is normal (no code in this frame), ignore
+          }
+        );
+        return;
+      } catch (e1) {
+        console.warn('decodeFromVideoDevice failed:', e1);
+        // Try the older decodeFromStream API
+        if (typeof barcodeZxingReader.decodeFromStream === 'function' && barcodeStream) {
+          try {
+            barcodeZxingControls = await barcodeZxingReader.decodeFromStream(
+              barcodeStream, video,
+              (result) => {
+                if (result) {
+                  const text = result.getText ? result.getText() : String(result);
+                  if (text) handleBarcodeFound(text, 'scan');
+                }
+              }
+            );
+            return;
+          } catch (e2) { console.warn('decodeFromStream failed:', e2); }
+        }
+      }
+    }
+
+    // Strategy 2: @zxing/library BrowserMultiFormatReader
+    if (ZX && ZX.BrowserMultiFormatReader) {
+      barcodeZxingReader = new ZX.BrowserMultiFormatReader();
+      try {
+        await barcodeZxingReader.decodeFromVideoElementContinuously(video, (result, err) => {
           if (result) {
-            const text = result.getText ? result.getText() : (result.text || String(result));
-            handleBarcodeFound(text, 'detected');
+            const text = result.getText ? result.getText() : String(result);
+            if (text) handleBarcodeFound(text, 'scan');
           }
         });
-      } catch(e2) {
-        if (status) status.textContent = '❌ 扫描启动失败: ' + (streamErr && streamErr.message ? streamErr.message : (e2 && e2.message ? e2.message : '未知错误'));
+        return;
+      } catch (e3) {
+        console.warn('decodeFromVideoElementContinuously failed:', e3);
+        // Try the simpler decodeFromVideoElement (one-shot)
+        try {
+          // Continuous polling
+          startContinuousZxingScan();
+          return;
+        } catch (e4) { console.warn('continuous polling failed:', e4); }
       }
-    });
-  } catch(e) {
-    if (status) {
-      const msg = (e && e.message) || (e && e.name) || (e ? String(e) : '未知错误');
-      status.textContent = '❌ 扫描失败: ' + msg;
     }
+
+    // All strategies failed
+    if (status) status.textContent = '❌ 扫描器无法启动 — 请尝试用拍照模式';
+    toast('扫描器初始化失败');
+  } catch(e) {
+    const msg = (e && e.message) || (e && e.name) || '未知错误';
+    if (status) status.textContent = '❌ 扫描失败: ' + msg;
+    console.error('barcode error:', e);
   }
+}
+
+// Continuous polling fallback when async APIs don't work
+function startContinuousZxingScan() {
+  const ZX = window.ZXing;
+  if (!ZX || !barcodeZxingReader) return;
+  const video = document.getElementById('barcode-video');
+  const tick = () => {
+    if (!barcodeStream) return;
+    try {
+      barcodeZxingReader.decodeOnceFromVideoElement(video).then(result => {
+        if (result) {
+          const text = result.getText ? result.getText() : String(result);
+          if (text) handleBarcodeFound(text, 'scan');
+        }
+      }).catch(() => {
+        // No code found, try again
+        if (barcodeStream) {
+          barcodeRafId = requestAnimationFrame(tick);
+        }
+      });
+    } catch(e) {
+      if (barcodeStream) barcodeRafId = requestAnimationFrame(tick);
+    }
+  };
+  tick();
 }
 
 function handleBarcodeFound(code, format) {
@@ -2771,6 +3293,12 @@ function handleBarcodeFound(code, format) {
 function stopBarcodeScanner() {
   if (barcodeRafId) { cancelAnimationFrame(barcodeRafId); barcodeRafId = null; }
   barcodeDetector = null;
+  // Release screen orientation lock
+  try {
+    if (screen.orientation && typeof screen.orientation.unlock === 'function') {
+      screen.orientation.unlock();
+    }
+  } catch(e) {}
   if (barcodeZxingControls && typeof barcodeZxingControls.stop === 'function') {
     try { barcodeZxingControls.stop(); } catch(e) {}
   }
@@ -3108,6 +3636,78 @@ function hideSheets() {
   if (typeof stopBarcodeScanner === 'function') stopBarcodeScanner();
 }
 document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', hideSheets));
+
+// === Product image upload handlers ===
+function setProductImage(dataUrl) {
+  if (!pendingImageMid) return;
+  const m = getModel(pendingImageMid);
+  if (!m) return;
+  if (dataUrl) m.imageUrl = dataUrl;
+  else delete m.imageUrl;
+  saveState();
+  hideSheets();
+  render();
+  toast(dataUrl ? '✅ 图片已保存' : '🗑️ 图片已移除');
+}
+
+function pickImageFile(useCamera) {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  if (useCamera) inp.capture = 'environment';
+  inp.onchange = (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    if (f.size > 5 * 1024 * 1024) {
+      toast('图片太大 (>5MB),请用相册编辑器先压缩');
+      return;
+    }
+    // Compress via canvas to keep localStorage small
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const maxDim = 600;
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            const scale = Math.min(maxDim / w, maxDim / h);
+            w = Math.round(w * scale);
+            h = Math.round(h * scale);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          const compressed = canvas.toDataURL('image/jpeg', 0.78);
+          setProductImage(compressed);
+        } catch (err) {
+          // Fallback: use original
+          setProductImage(ev.target.result);
+        }
+      };
+      img.onerror = () => toast('图片读取失败');
+      img.src = ev.target.result;
+    };
+    reader.onerror = () => toast('文件读取失败');
+    reader.readAsDataURL(f);
+  };
+  inp.click();
+}
+
+const _imgCamBtn = document.getElementById('img-from-camera');
+if (_imgCamBtn) _imgCamBtn.addEventListener('click', () => pickImageFile(true));
+const _imgAlbumBtn = document.getElementById('img-from-album');
+if (_imgAlbumBtn) _imgAlbumBtn.addEventListener('click', () => pickImageFile(false));
+const _imgUrlBtn = document.getElementById('img-from-url');
+if (_imgUrlBtn) _imgUrlBtn.addEventListener('click', () => {
+  const url = prompt('请输入图片网址 (https://...):', '');
+  if (url && /^https?:\/\//i.test(url.trim())) setProductImage(url.trim());
+  else if (url) toast('网址格式不对');
+});
+const _imgRemoveBtn = document.getElementById('img-remove');
+if (_imgRemoveBtn) _imgRemoveBtn.addEventListener('click', () => {
+  if (confirm('确定移除此型号的图片?')) setProductImage(null);
+});
 document.querySelectorAll('.sheet-backdrop').forEach(s => s.addEventListener('click', e => { if (e.target === s) hideSheets(); }));
 
 // === MODEL LIBRARY UI (upload sheet) ===
@@ -3140,6 +3740,108 @@ document.getElementById('upload-btn').addEventListener('click', () => {
   refreshLibList('');
   const searchEl = document.getElementById('lib-search');
   if (searchEl) searchEl.value = '';
+});
+
+// === GOOGLE TRANSLATE WIDGET ===
+let googleTranslateLoaded = false;
+function loadGoogleTranslate() {
+  if (googleTranslateLoaded) return Promise.resolve();
+  return new Promise((resolve) => {
+    // Define init callback (Google's script will call this when ready)
+    window.googleTranslateElementInit = function() {
+      try {
+        new google.translate.TranslateElement({
+          pageLanguage: 'zh-CN',
+          includedLanguages: 'en,es,ja,ko,fr,de,vi,ru,ar,hi,th,pt,it,nl,pl,tr,id,ms',
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+          autoDisplay: false
+        }, 'google_translate_element');
+        googleTranslateLoaded = true;
+        resolve();
+      } catch(e) {
+        console.error('GT init failed:', e);
+        resolve();
+      }
+    };
+    // Inject the loader script
+    const s = document.createElement('script');
+    s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    s.onerror = () => { toast('翻译服务加载失败,请检查网络'); resolve(); };
+    document.head.appendChild(s);
+    // Safety timeout — if widget never initializes, give up after 8s
+    setTimeout(() => { if (!googleTranslateLoaded) resolve(); }, 8000);
+  });
+}
+
+function applyTranslation(targetLang) {
+  // Use Google's hidden <select> control to switch language
+  // The widget creates a <select class="goog-te-combo"> we can drive
+  const tryApply = () => {
+    const select = document.querySelector('select.goog-te-combo');
+    if (!select) return false;
+    select.value = targetLang;
+    // Fire change event so Google reacts
+    select.dispatchEvent(new Event('change'));
+    return true;
+  };
+  // Retry a few times in case widget is still mounting
+  let tries = 0;
+  const interval = setInterval(() => {
+    tries++;
+    if (tryApply() || tries > 20) {
+      clearInterval(interval);
+      if (tries > 20) toast('翻译启动失败,请重试');
+    }
+  }, 200);
+}
+
+function stopTranslation() {
+  // Set the select back to original language
+  const select = document.querySelector('select.goog-te-combo');
+  if (select) {
+    select.value = '';
+    select.dispatchEvent(new Event('change'));
+  }
+  // Also try clicking Google's "Show original" if visible
+  const restoreLink = document.querySelector('.goog-te-banner-frame');
+  if (restoreLink) {
+    // The banner is in an iframe — we can't easily click inside it, but resetting select usually works
+  }
+  // Force-reset by reloading translation cookie (the simplest reliable way)
+  try {
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.' + location.hostname;
+  } catch(e) {}
+  toast('已停止翻译 — 如未恢复请刷新页面');
+}
+
+document.getElementById('translate-btn').addEventListener('click', async () => {
+  showSheet('translate-sheet');
+  // Load widget on first open (lazy — saves bandwidth for users who never use it)
+  if (!googleTranslateLoaded) {
+    toast('⏳ 正在加载翻译服务...');
+    await loadGoogleTranslate();
+  }
+});
+
+document.querySelectorAll('.translate-lang').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const lang = btn.dataset.lang;
+    if (!googleTranslateLoaded) {
+      toast('⏳ 翻译服务未加载完,请稍等再点');
+      await loadGoogleTranslate();
+    }
+    hideSheets();
+    setTimeout(() => {
+      applyTranslation(lang);
+      toast(`🌐 切换为 ${btn.textContent.trim().split(' ').pop()}`);
+    }, 100);
+  });
+});
+
+document.getElementById('translate-stop').addEventListener('click', () => {
+  stopTranslation();
+  hideSheets();
 });
 
 const _libSearchEl = document.getElementById('lib-search');
@@ -3475,10 +4177,11 @@ const searchQueries = { shelfBlack: '', shelfWhite: '', pallet: '' };
 
 function applySearchHighlight() {
   const q = (searchQueries[currentTable] || '').trim().toLowerCase();
-  const root = document.getElementById(currentTable + '-list');
-  if (!root) return;
-  // Clear all hits first
-  root.querySelectorAll('.slot.search-hit').forEach(el => el.classList.remove('search-hit'));
+  const listRoot = document.getElementById(currentTable + '-list');
+  const gridRoot = document.getElementById(currentTable + '-grid');
+  // Clear all hits in both views
+  if (listRoot) listRoot.querySelectorAll('.slot.search-hit').forEach(el => el.classList.remove('search-hit'));
+  if (gridRoot) gridRoot.querySelectorAll('.grid-slot.search-hit').forEach(el => el.classList.remove('search-hit'));
   const infoEl = document.querySelector(`[data-search-info="${currentTable}"]`);
   if (!q) {
     if (infoEl) { infoEl.style.display = 'none'; infoEl.textContent = ''; infoEl.classList.remove('has-hits'); }
@@ -3489,18 +4192,37 @@ function applySearchHighlight() {
   if (!terms.length) return;
   let hitCount = 0;
   let firstHit = null;
-  root.querySelectorAll('.slot[data-mid]').forEach(slotEl => {
-    const mid = slotEl.dataset.mid;
-    const m = getModel(mid);
-    if (!m) return;
-    const name = m.name.toLowerCase();
-    const matches = terms.some(term => name.includes(term));
-    if (matches) {
-      slotEl.classList.add('search-hit');
-      hitCount++;
-      if (!firstHit) firstHit = slotEl;
-    }
-  });
+  // Highlight in LIST view
+  if (listRoot) {
+    listRoot.querySelectorAll('.slot[data-mid]').forEach(slotEl => {
+      const mid = slotEl.dataset.mid;
+      const m = getModel(mid);
+      if (!m) return;
+      const name = m.name.toLowerCase();
+      if (terms.some(term => name.includes(term))) {
+        slotEl.classList.add('search-hit');
+        hitCount++;
+        if (!firstHit) firstHit = slotEl;
+      }
+    });
+  }
+  // Highlight in GRID/总览 view
+  let gridHits = 0;
+  if (gridRoot) {
+    gridRoot.querySelectorAll('.grid-slot[data-mid]').forEach(slotEl => {
+      const mid = slotEl.dataset.mid;
+      const m = getModel(mid);
+      if (!m) return;
+      const name = m.name.toLowerCase();
+      if (terms.some(term => name.includes(term))) {
+        slotEl.classList.add('search-hit');
+        gridHits++;
+        if (!firstHit) firstHit = slotEl;
+      }
+    });
+  }
+  // If list mode is hidden (grid mode active), use grid count
+  if (hitCount === 0) hitCount = gridHits;
   if (infoEl) {
     if (hitCount > 0) {
       infoEl.style.display = '';
