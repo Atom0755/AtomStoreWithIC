@@ -403,7 +403,8 @@ line-height: 1;
 .grid-slot .gcolor[data-color=“yellow”] { background: var(–yellow); border-color: #c79900; }
 .grid-slot .gcolor[data-color=“green”] { background: var(–green); border-color: var(–green); color: white; }
 .grid-slot.empty .gmodel { color: var(–muted); font-style: italic; }
-.fab { position: fixed; right: 14px; bottom: calc(14px + var(–safe-bottom)); width: 52px; height: 52px; border-radius: 50%; background: var(–ink); color: var(–paper); border: 0; font-size: 24px; font-weight: 300; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25); z-index: 50; }
+.fab { position: fixed; right: 14px; bottom: calc(14px + var(–safe-bottom)); width: 46px; height: 46px; border-radius: 50%; background: var(–ink); color: var(–paper); border: 0; font-size: 22px; font-weight: 300; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25); z-index: 50; opacity: 0.85; }
+.fab:hover { opacity: 1; }
 .fab:active { transform: scale(0.9); }
 .sheet-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: flex-end; justify-content: center; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
 .sheet-backdrop.show { display: flex; }
@@ -664,7 +665,7 @@ margin: 8px 0;
 <div class="app">
   <header>
     <h1>MUG 库存标注</h1>
-    <button class="icon-btn" id="upload-btn" title="导入型号">📋</button>
+    <button class="icon-btn" id="upload-btn" title="📋 型号库管理 (查看/上传新型号清单)" aria-label="型号库管理">📋</button>
     <button class="icon-btn" id="save-btn" title="保存">💾</button>
   </header>
 
@@ -737,7 +738,7 @@ margin: 8px 0;
       <div class="grid-view" id="pallet-grid"></div>
     </div>
   </main>
-  <button class="fab" id="add-aisle">+</button>
+  <button class="fab" id="add-aisle" title="新增通道/排" aria-label="新增通道">+</button>
   <div class="delete-zone" id="delete-zone">🗑️ 拖到这里删除整箱(已搬走)</div>
 </div>
 
@@ -832,15 +833,39 @@ margin: 8px 0;
 <div class="sheet-backdrop" id="upload-sheet">
   <div class="sheet">
     <div class="sheet-body">
-      <h3>导入型号清单</h3>
-      <div class="actions-list">
-        <button class="action-row" data-act="upload-replace"><span class="ico">🔄</span>替换型号库 (清空两表重建)</button>
-        <button class="action-row" data-act="upload-append"><span class="ico">➕</span>追加型号 (加到货架/型号库)</button>
-      </div>
+      <h3>📋 型号库管理 / Model Library</h3>
+
+```
+  <!-- Current models in library, with search -->
+  <div style="background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px; margin-bottom: 12px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+      <div style="font-size: 13px; font-weight: 700; color: var(--ink);">📚 当前型号库 <span id="lib-count" style="color: var(--red); font-family: 'JetBrains Mono', monospace;">0</span> 个型号</div>
+      <button id="lib-export" style="font-size:10px; padding:4px 8px; border-radius:4px; border:1px solid var(--line); background:var(--paper); cursor:pointer; font-weight:600;">📤 导出 TXT</button>
     </div>
-    <div class="sheet-footer">
-      <button class="sheet-cancel" data-close>取消</button>
-    </div>
+    <input type="text" id="lib-search" placeholder="🔍 搜索型号库..." autocomplete="off" style="width:100%; padding:6px 8px; border:1px solid var(--line); border-radius:6px; font-size:12px; margin-bottom:6px; background:var(--paper); -webkit-user-select:text; user-select:text;">
+    <div id="lib-list" style="max-height: 180px; overflow-y: auto; border: 1px solid rgba(0,0,0,0.08); border-radius: 6px; background: var(--paper); -webkit-overflow-scrolling: touch;"></div>
+  </div>
+
+  <!-- Upload sources -->
+  <div style="font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.05em;">⬆️ 上传新型号清单 / UPLOAD NEW LIST</div>
+  <div class="actions-list">
+    <button class="action-row" data-act="upload-paste"><span class="ico">⌨️</span><div style="flex:1;"><div style="font-weight:700;">手动粘贴清单</div><div style="font-size:11px; color:var(--muted);">从微信、邮件、便签复制后粘贴</div></div></button>
+    <button class="action-row" data-act="upload-file"><span class="ico">📁</span><div style="flex:1;"><div style="font-weight:700;">从本地选文件</div><div style="font-size:11px; color:var(--muted);">支持 .txt / .csv / .json (本地、iCloud、Drive 都从这里选)</div></div></button>
+    <button class="action-row" data-act="upload-share"><span class="ico">📤</span><div style="flex:1;"><div style="font-weight:700;">从分享菜单接收</div><div style="font-size:11px; color:var(--muted);">微信/邮件里 → 分享 → "在 Safari 中打开"</div></div></button>
+  </div>
+
+  <div style="font-size: 12px; font-weight: 700; color: var(--muted); margin: 14px 0 8px; letter-spacing: 0.05em;">📥 添加方式 / IMPORT MODE</div>
+  <div class="actions-list">
+    <button class="action-row" data-act="upload-append-only" style="background: #e8f5e8; border-color: var(--green);"><span class="ico">📚</span><div style="flex:1;"><div style="font-weight:700;">仅扩充型号库 (推荐)</div><div style="font-size:11px; color:var(--muted);">不动货架,只加到型号库以备拍照匹配</div></div></button>
+    <button class="action-row" data-act="upload-append"><span class="ico">➕</span><div style="flex:1;"><div style="font-weight:700;">追加到货架</div><div style="font-size:11px; color:var(--muted);">填进零散货架的空位</div></div></button>
+    <button class="action-row" data-act="upload-replace" style="background: #ffe5e5; border-color: var(--red);"><span class="ico">🔄</span><div style="flex:1;"><div style="font-weight:700;">替换全部 (危险)</div><div style="font-size:11px; color:var(--muted);">清空两表重建</div></div></button>
+  </div>
+</div>
+<div class="sheet-footer">
+  <button class="sheet-cancel" data-close>关闭</button>
+</div>
+```
+
   </div>
 </div>
 
@@ -1367,6 +1392,10 @@ function renderGridView() {
     const flatRow = document.createElement('div');
     flatRow.className = 'aisles-row pallet-flat';
     flatRow.style.setProperty('--cols', cols);
+    // Belt + suspenders: also set gridTemplateColumns directly (CSS-var attribute selectors can be flaky on iOS Safari)
+    flatRow.style.display = 'grid';
+    flatRow.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+    flatRow.style.gap = '6px';
     t.aisles.forEach((aisle, ai) => {
       aisle[ck].forEach((container, ci) => {
         // Each container becomes its own column item — show aisle prefix so user sees 左·上 / A·A1板 etc
@@ -1404,6 +1433,9 @@ function renderGridView() {
   const row = document.createElement('div');
   row.className = 'aisles-row';
   row.style.setProperty('--cols', t.aisles.length);
+  row.style.display = 'grid';
+  row.style.gridTemplateColumns = `repeat(${t.aisles.length}, minmax(0, 1fr))`;
+  row.style.gap = '6px';
   t.aisles.forEach((aisle, ai) => {
     const acol = document.createElement('div');
     acol.className = 'grid-aisle';
@@ -2561,8 +2593,9 @@ async function startBarcodeScanner() {
     // Fallback: load ZXing dynamically and use it
     await loadZxingAndScan();
   } catch(e) {
-    if (status) status.textContent = '❌ 启动失败: ' + (e.message || e.name);
-    toast('无法打开摄像头: ' + (e.message || e.name));
+    const msg = (e && e.message) || (e && e.name) || (e ? String(e) : '未知错误,请确认已授权摄像头');
+    if (status) status.textContent = '❌ 启动失败: ' + msg;
+    toast('启动失败: ' + msg);
     stopBtn.style.display = 'none';
     startBtn.style.display = '';
   }
@@ -2594,45 +2627,84 @@ function scanLoopNative() {
 async function loadZxingAndScan() {
   const status = document.getElementById('barcode-status');
   const video = document.getElementById('barcode-video');
-  if (status) status.textContent = '⏳ 加载扫码库...';
+  if (status) { status.style.display = ''; status.textContent = '⏳ 加载扫码库 (首次需要联网)...'; }
 
-  // Load ZXing UMD bundle from CDN
-  if (!window.ZXingBrowser && !window.ZXing) {
-    await new Promise((resolve, reject) => {
-      const s = document.createElement('script');
-      s.src = 'https://unpkg.com/@zxing/browser@0.1.5/umd/index.min.js';
-      s.onload = resolve;
-      s.onerror = () => {
-        // Try alternate CDN
-        const s2 = document.createElement('script');
-        s2.src = 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/umd/index.min.js';
-        s2.onload = resolve;
-        s2.onerror = reject;
-        document.head.appendChild(s2);
-      };
-      document.head.appendChild(s);
-    });
+  // Use @zxing/library directly — more reliable on iOS Safari than @zxing/browser
+  if (!window.ZXing) {
+    try {
+      await new Promise((resolve, reject) => {
+        let attempts = 0;
+        const cdns = [
+          'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js',
+          'https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js',
+          'https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js'
+        ];
+        function tryNext() {
+          if (attempts >= cdns.length) {
+            reject(new Error('所有 CDN 都加载失败,请检查网络'));
+            return;
+          }
+          const s = document.createElement('script');
+          s.src = cdns[attempts++];
+          s.onload = () => {
+            if (window.ZXing) resolve();
+            else { s.remove(); tryNext(); }
+          };
+          s.onerror = () => { s.remove(); tryNext(); };
+          document.head.appendChild(s);
+        }
+        tryNext();
+      });
+    } catch (loadErr) {
+      if (status) status.textContent = '❌ ' + (loadErr.message || '扫码库加载失败');
+      toast('扫码库加载失败 — 请检查网络后重试');
+      return;
+    }
   }
 
-  const ZX = window.ZXingBrowser || window.ZXing;
-  if (!ZX) {
-    if (status) status.textContent = '❌ 扫码库加载失败,请检查网络';
-    toast('扫码库加载失败');
+  if (!window.ZXing) {
+    if (status) status.textContent = '❌ 扫码库未就绪';
     return;
   }
 
   if (status) status.textContent = '🔍 扫描中...';
   try {
+    // Use the universal MultiFormatReader — works on more iOS versions
+    const ZX = window.ZXing;
     barcodeZxingReader = new ZX.BrowserMultiFormatReader();
-    barcodeZxingControls = await barcodeZxingReader.decodeFromVideoElement(video, (result, err) => {
+
+    // decodeFromStream is the most reliable on iOS — pass the existing stream
+    barcodeZxingReader.decodeFromStream(barcodeStream, video, (result, err) => {
       if (result) {
-        const text = result.getText ? result.getText() : (result.text || '');
-        const fmt = result.getBarcodeFormat ? String(result.getBarcodeFormat()) : 'unknown';
+        const text = result.getText ? result.getText() : (result.text || String(result));
+        let fmt = 'unknown';
+        try {
+          if (result.getBarcodeFormat) {
+            const f = result.getBarcodeFormat();
+            fmt = (ZX.BarcodeFormat && Object.keys(ZX.BarcodeFormat).find(k => ZX.BarcodeFormat[k] === f)) || String(f);
+          }
+        } catch(e) {}
         handleBarcodeFound(text, fmt);
+      }
+      // Ignore "NotFoundException" — that's just "no code in this frame"
+    }).catch(streamErr => {
+      // decodeFromStream may not exist in some versions — fallback to decodeFromVideoElement
+      try {
+        barcodeZxingReader.decodeFromVideoElement(video, (result, err) => {
+          if (result) {
+            const text = result.getText ? result.getText() : (result.text || String(result));
+            handleBarcodeFound(text, 'detected');
+          }
+        });
+      } catch(e2) {
+        if (status) status.textContent = '❌ 扫描启动失败: ' + (streamErr && streamErr.message ? streamErr.message : (e2 && e2.message ? e2.message : '未知错误'));
       }
     });
   } catch(e) {
-    if (status) status.textContent = '❌ 扫描失败: ' + (e.message || e.name);
+    if (status) {
+      const msg = (e && e.message) || (e && e.name) || (e ? String(e) : '未知错误');
+      status.textContent = '❌ 扫描失败: ' + msg;
+    }
   }
 }
 
@@ -3038,55 +3110,163 @@ function hideSheets() {
 document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', hideSheets));
 document.querySelectorAll('.sheet-backdrop').forEach(s => s.addEventListener('click', e => { if (e.target === s) hideSheets(); }));
 
-document.getElementById('upload-btn').addEventListener('click', () => showSheet('upload-sheet'));
-document.querySelectorAll('#upload-sheet .action-row').forEach(b => {
-  b.addEventListener('click', () => {
-    const mode = b.dataset.act === 'upload-replace' ? 'replace' : 'append';
-    hideSheets();
-    setTimeout(() => {
-      const txt = prompt('请输入或粘贴型号清单 (每行一个,会自动去除前面的序号):', mode === 'replace' ? INITIAL_MODELS.slice(0, 5).join('\n') : '');
-      if (!txt) return;
-      const lines = txt.split('\n').map(l => l.trim().replace(/^[\d①-⑳]+[.、\s]*/, '')).filter(Boolean);
-      if (!lines.length) return;
-      if (mode === 'replace') {
-        state.models = lines.map((n,i) => ({ id: 'm_'+i+'_'+Date.now(), name: n }));
-        for (const tableKey of ['shelfBlackTable', 'shelfWhiteTable']) {
-          state[tableKey].aisles = SHELF_AISLE_NAMES.map(n => ({ name: n, shelves: SHELF_NAMES.map(sn => ({ name: sn, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) }));
-          let mi = 0;
-          for (const a of state[tableKey].aisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) {
-            if (mi < state.models.length) { s.slots[i].modelId = state.models[mi].id; mi++; }
-          }
-          if (mi < state.models.length) {
-            const la = state[tableKey].aisles[state[tableKey].aisles.length-1];
-            while (mi < state.models.length) {
-              const idx = la.shelves.length;
-              const slots = Array.from({length: SLOTS_PER_SHELF}, () => newSlot());
-              for (let i=0;i<SLOTS_PER_SHELF && mi < state.models.length; i++) { slots[i].modelId = state.models[mi].id; mi++; }
-              la.shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots });
-            }
-          }
-        }
-        state.palletTable.aisles = PALLET_AISLE_NAMES.map(n => ({ name: n, pallets: Array.from({length: PALLETS_PER_AISLE}, (_, pi) => ({ name: 'P'+(pi+1), layers: Array.from({length: LAYERS_PER_PALLET}, () => newSlot()) })) }));
-      } else {
-        const newModels = lines.map((n,i) => ({ id: 'm_'+Date.now()+'_'+i, name: n }));
-        state.models.push(...newModels);
-        for (const tableKey of ['shelfBlackTable', 'shelfWhiteTable']) {
-          let mi = 0;
-          outer: for (const a of state[tableKey].aisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) if (!s.slots[i].modelId) { s.slots[i].modelId = newModels[mi].id; mi++; if (mi >= newModels.length) break outer; }
-          if (mi < newModels.length) {
-            const la = state[tableKey].aisles[state[tableKey].aisles.length-1];
-            while (mi < newModels.length) {
-              const idx = la.shelves.length;
-              const slots = Array.from({length: SLOTS_PER_SHELF}, () => newSlot());
-              for (let i=0;i<SLOTS_PER_SHELF && mi < newModels.length; i++) { slots[i].modelId = newModels[mi].id; mi++; }
-              la.shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots });
-            }
-          }
+// === MODEL LIBRARY UI (upload sheet) ===
+let pendingImportLines = null; // when user picks a source, the parsed lines wait here for "mode" choice
+
+function refreshLibList(filter) {
+  const listEl = document.getElementById('lib-list');
+  const countEl = document.getElementById('lib-count');
+  if (!listEl) return;
+  const q = (filter || '').toLowerCase().trim();
+  const matches = q
+    ? state.models.filter(m => m.name.toLowerCase().includes(q))
+    : state.models.slice();
+  countEl.textContent = state.models.length + (q ? ` (匹配 ${matches.length})` : '');
+  if (!matches.length) {
+    listEl.innerHTML = `<div style="padding:14px; text-align:center; color:var(--muted); font-size:12px; font-style:italic;">${q ? '没有匹配的型号' : '型号库为空,请上传清单'}</div>`;
+    return;
+  }
+  // Sort alphabetically for easier scanning
+  matches.sort((a,b) => a.name.localeCompare(b.name));
+  listEl.innerHTML = matches.map((m,i) => `<div style="padding:6px 10px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:12px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+    <span style="flex:1; min-width:0; word-break:break-word;">${escapeHtml(m.name)}${m.boxToSetRatio && m.boxToSetRatio !== 1 ? ` <span style="color:var(--muted); font-size:10px;">(1箱=${m.boxToSetRatio}套)</span>` : ''}</span>
+    <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted);">#${i+1}</span>
+  </div>`).join('');
+}
+
+document.getElementById('upload-btn').addEventListener('click', () => {
+  showSheet('upload-sheet');
+  pendingImportLines = null;
+  refreshLibList('');
+  const searchEl = document.getElementById('lib-search');
+  if (searchEl) searchEl.value = '';
+});
+
+const _libSearchEl = document.getElementById('lib-search');
+if (_libSearchEl) _libSearchEl.addEventListener('input', e => refreshLibList(e.target.value));
+
+const _libExportBtn = document.getElementById('lib-export');
+if (_libExportBtn) _libExportBtn.addEventListener('click', () => {
+  if (!state.models.length) { toast('型号库为空'); return; }
+  const text = state.models.map(m => m.name).join('\n');
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  triggerDownload(blob, `model-library-${dateStamp()}.txt`);
+  toast(`已导出 ${state.models.length} 个型号`);
+});
+
+function parseModelLines(txt) {
+  if (!txt) return [];
+  // Try JSON first (for re-importing exported lib)
+  const trimmed = txt.trim();
+  if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+    try {
+      const data = JSON.parse(trimmed);
+      const arr = Array.isArray(data) ? data : (data.models || []);
+      return arr.map(x => typeof x === 'string' ? x : (x && x.name ? x.name : '')).filter(Boolean);
+    } catch(e) {}
+  }
+  return txt.split('\n').map(l => l.trim().replace(/^[\d①-⑳]+[.、\s,]*/, '').replace(/^[-*•]\s*/, '').trim()).filter(Boolean);
+}
+
+function applyImportMode(mode) {
+  const lines = pendingImportLines;
+  if (!lines || !lines.length) { toast('请先选择来源并提供清单'); return; }
+  if (mode === 'append-only') {
+    // Just append to model library, don't touch shelves
+    const existing = new Set(state.models.map(m => m.name.toLowerCase()));
+    let added = 0;
+    for (const name of lines) {
+      if (!existing.has(name.toLowerCase())) {
+        state.models.push({ id: 'm_'+Date.now()+'_'+added, name, boxToSetRatio: 1 });
+        existing.add(name.toLowerCase());
+        added++;
+      }
+    }
+    toast(`✅ 已扩充型号库: 新增 ${added} 个 (跳过 ${lines.length-added} 个重复)`);
+  } else if (mode === 'append') {
+    const newModels = lines.map((n,i) => ({ id: 'm_'+Date.now()+'_'+i, name: n, boxToSetRatio: 1 }));
+    state.models.push(...newModels);
+    for (const tableKey of ['shelfBlackTable', 'shelfWhiteTable']) {
+      let mi = 0;
+      outer: for (const a of state[tableKey].aisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) if (!s.slots[i].modelId) { s.slots[i].modelId = newModels[mi].id; mi++; if (mi >= newModels.length) break outer; }
+      if (mi < newModels.length) {
+        const la = state[tableKey].aisles[state[tableKey].aisles.length-1];
+        while (mi < newModels.length) {
+          const idx = la.shelves.length;
+          const slots = Array.from({length: SLOTS_PER_SHELF}, () => newSlot());
+          for (let i=0;i<SLOTS_PER_SHELF && mi < newModels.length; i++) { slots[i].modelId = newModels[mi].id; mi++; }
+          la.shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots });
         }
       }
-      render();
-      toast(`已${mode === 'replace' ? '替换' : '追加'} ${lines.length} 个型号`);
-    }, 100);
+    }
+    toast(`✅ 已追加 ${lines.length} 个型号到货架`);
+  } else if (mode === 'replace') {
+    if (!confirm('⚠️ 确认清空所有数据并用此清单重建?\nThis will erase ALL data.')) return;
+    state.models = lines.map((n,i) => ({ id: 'm_'+i+'_'+Date.now(), name: n, boxToSetRatio: 1 }));
+    for (const tableKey of ['shelfBlackTable', 'shelfWhiteTable']) {
+      state[tableKey].aisles = SHELF_AISLE_NAMES.map(n => ({ name: n, shelves: SHELF_NAMES.map(sn => ({ name: sn, slots: Array.from({length: SLOTS_PER_SHELF}, () => newSlot()) })) }));
+      let mi = 0;
+      for (const a of state[tableKey].aisles) for (const s of a.shelves) for (let i=0;i<s.slots.length;i++) {
+        if (mi < state.models.length) { s.slots[i].modelId = state.models[mi].id; mi++; }
+      }
+      if (mi < state.models.length) {
+        const la = state[tableKey].aisles[state[tableKey].aisles.length-1];
+        while (mi < state.models.length) {
+          const idx = la.shelves.length;
+          const slots = Array.from({length: SLOTS_PER_SHELF}, () => newSlot());
+          for (let i=0;i<SLOTS_PER_SHELF && mi < state.models.length; i++) { slots[i].modelId = state.models[mi].id; mi++; }
+          la.shelves.push({ name: SHELF_NAMES[idx] || ('第'+(idx+1)+'层'), slots });
+        }
+      }
+    }
+    state.palletTable.aisles = PALLET_AISLE_NAMES.map(n => ({ name: n, pallets: Array.from({length: PALLETS_PER_AISLE}, (_, pi) => ({ name: 'P'+(pi+1), layers: Array.from({length: LAYERS_PER_PALLET}, () => newSlot()) })) }));
+    toast(`✅ 已用 ${lines.length} 个型号重建`);
+  }
+  pendingImportLines = null;
+  hideSheets();
+  render();
+}
+
+document.querySelectorAll('#upload-sheet .action-row').forEach(b => {
+  b.addEventListener('click', () => {
+    const act = b.dataset.act;
+    if (act === 'upload-paste') {
+      // Pop up textarea-style prompt
+      setTimeout(() => {
+        const txt = prompt('请粘贴型号清单 (每行一个,可带或不带序号):', '');
+        if (!txt) return;
+        const lines = parseModelLines(txt);
+        if (!lines.length) { toast('未识别到型号'); return; }
+        pendingImportLines = lines;
+        toast(`✅ 已读取 ${lines.length} 个型号 — 请选择添加方式`);
+      }, 100);
+    } else if (act === 'upload-file') {
+      const inp = document.createElement('input');
+      inp.type = 'file';
+      inp.accept = '.txt,.csv,.json,text/plain,text/csv,application/json';
+      inp.onchange = e => {
+        const f = e.target.files[0]; if (!f) return;
+        const r = new FileReader();
+        r.onload = () => {
+          const lines = parseModelLines(r.result);
+          if (!lines.length) { toast('文件未识别到型号'); return; }
+          pendingImportLines = lines;
+          toast(`✅ 已读取 ${lines.length} 个型号 — 请选择添加方式`);
+        };
+        r.onerror = () => toast('读取失败');
+        r.readAsText(f);
+      };
+      inp.click();
+    } else if (act === 'upload-share') {
+      // Inform user how to use share-to-Safari workflow
+      alert('从微信/邮件分享型号清单文本到本网页:\n\n1. 在微信/邮件里长按文本 → 拷贝\n2. 回到本网页 → 点"手动粘贴清单"\n\n或者: 把 .txt 文件存到 iCloud/Drive → 点"从本地选文件" → 选 iCloud Drive');
+    } else if (act === 'upload-append-only') {
+      applyImportMode('append-only');
+    } else if (act === 'upload-append') {
+      applyImportMode('append');
+    } else if (act === 'upload-replace') {
+      applyImportMode('replace');
+    }
   });
 });
 
