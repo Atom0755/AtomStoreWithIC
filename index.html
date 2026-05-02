@@ -532,6 +532,61 @@ transition: transform .12s;
 /* Handwriting canvas */
 .handwrite-wrap { display: none; margin-bottom: 10px; }
 .handwrite-wrap.show { display: block; }
+
+/* Barcode/QR scanner */
+.barcode-wrap { display: none; margin-bottom: 10px; position: relative; }
+.barcode-wrap.show { display: block; }
+.barcode-frame {
+position: relative;
+width: 100%;
+aspect-ratio: 4/3;
+margin-bottom: 10px;
+pointer-events: none;
+}
+.barcode-wrap .camera-preview {
+border-radius: 10px;
+}
+/* Position the frame overlay on top of the video */
+.barcode-wrap {
+position: relative;
+}
+.barcode-wrap #barcode-video {
+width: 100%;
+border-radius: 10px;
+margin-bottom: 10px;
+}
+.barcode-frame {
+position: absolute;
+top: 22px;
+left: 0;
+right: 0;
+aspect-ratio: 4/3;
+pointer-events: none;
+}
+.barcode-frame-corner {
+position: absolute;
+width: 30px;
+height: 30px;
+border: 4px solid #4a9b3f;
+}
+.barcode-frame-corner.tl { top: 18%; left: 12%; border-right: 0; border-bottom: 0; }
+.barcode-frame-corner.tr { top: 18%; right: 12%; border-left: 0; border-bottom: 0; }
+.barcode-frame-corner.bl { bottom: 18%; left: 12%; border-right: 0; border-top: 0; }
+.barcode-frame-corner.br { bottom: 18%; right: 12%; border-left: 0; border-top: 0; }
+.barcode-laser {
+position: absolute;
+left: 12%;
+right: 12%;
+top: 50%;
+height: 2px;
+background: linear-gradient(90deg, transparent, #4a9b3f, transparent);
+box-shadow: 0 0 8px #4a9b3f;
+animation: laser 1.6s ease-in-out infinite;
+}
+@keyframes laser {
+0%, 100% { transform: translateY(-30px); opacity: 0.8; }
+50% { transform: translateY(30px); opacity: 1; }
+}
 .handwrite-canvas {
 width: 100%;
 height: 180px;
@@ -888,9 +943,10 @@ margin: 8px 0;
 
 ```
   <!-- Input method selector -->
-  <div class="input-methods">
+  <div class="input-methods" style="grid-template-columns: repeat(5, 1fr);">
     <button class="input-method-btn active" data-method="type"><span class="imico">⌨️</span><span>打字</span></button>
     <button class="input-method-btn" data-method="camera"><span class="imico">📷</span><span>拍照</span></button>
+    <button class="input-method-btn" data-method="barcode"><span class="imico">📊</span><span>扫码</span></button>
     <button class="input-method-btn" data-method="handwrite"><span class="imico">✍️</span><span>手写</span></button>
     <button class="input-method-btn" data-method="voice"><span class="imico">🎤</span><span>语音</span></button>
   </div>
@@ -904,6 +960,25 @@ margin: 8px 0;
       <button id="camera-retake" style="display:none;">↻ 重拍</button>
     </div>
     <div id="ocr-status" style="display:none; padding: 8px 12px; background: #fff8d6; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; margin-bottom: 10px;"></div>
+  </div>
+
+  <!-- Barcode / QR Scanner -->
+  <div class="barcode-wrap" id="barcode-wrap">
+    <div style="font-size:11px; color:var(--muted); margin-bottom:6px; font-weight:600;">📊 对准条码或二维码,自动识别 / Point at barcode or QR</div>
+    <video id="barcode-video" class="camera-preview" autoplay playsinline muted style="display:none;"></video>
+    <div class="barcode-frame" id="barcode-frame" style="display:none;">
+      <div class="barcode-frame-corner tl"></div>
+      <div class="barcode-frame-corner tr"></div>
+      <div class="barcode-frame-corner bl"></div>
+      <div class="barcode-frame-corner br"></div>
+      <div class="barcode-laser"></div>
+    </div>
+    <div class="camera-controls">
+      <button id="barcode-start">📊 开始扫码</button>
+      <button id="barcode-stop" style="display:none;">⏹️ 停止</button>
+    </div>
+    <div id="barcode-status" style="display:none; padding: 8px 12px; background: #fff8d6; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; margin-bottom: 10px;"></div>
+    <div id="barcode-result" style="display:none; padding: 10px 12px; background: #e8f5e8; border: 2px solid var(--green); border-radius: 8px; font-size: 13px; font-weight: 600; margin-bottom: 10px; word-break: break-all;"></div>
   </div>
 
   <!-- Handwriting -->
@@ -1268,6 +1343,64 @@ function renderGridView() {
   const ck = getContainerKey(), sk = getSlotsKey();
   const slotSerial = {}; let n = 0;
   t.aisles.forEach((aisle, ai) => aisle[ck].forEach((c, ci) => c[sk].forEach((slot, si) => { n++; slotSerial[`${ai}|${ci}|${si}`] = n; })));
+
+  // FIX: For pallet table specifically — when there's only 1 aisle (or aisles have many pallets),
+  // flatten the pallets into a multi-column horizontal grid to mimic the shelf table's compact layout.
+  // This way 整箱货堆 with 15 pallets in F-aisle becomes 4-5 columns wide, fits on one screen.
+  const isPallet = !isShelf;
+  const totalContainers = t.aisles.reduce((sum, a) => sum + a[ck].length, 0);
+  // FIX: Apply flat multi-column grid in either case:
+  //   - Pallet table (always benefits from horizontal layout)
+  //   - Shelf table when there are many containers (>6) — covers cases like "single A-aisle with many duplicated layers"
+  const useFlatPalletGrid = isPallet || totalContainers > 6 || t.aisles.length === 1;
+
+  if (useFlatPalletGrid) {
+    // Compute optimal column count based on viewport
+    const w = (window.innerWidth || 400);
+    let cols;
+    if (w < 380) cols = 3;
+    else if (w < 500) cols = 4;
+    else if (w < 700) cols = 5;
+    else cols = 6;
+
+    // Render a single flat grid of all containers across all aisles
+    const flatRow = document.createElement('div');
+    flatRow.className = 'aisles-row pallet-flat';
+    flatRow.style.setProperty('--cols', cols);
+    t.aisles.forEach((aisle, ai) => {
+      aisle[ck].forEach((container, ci) => {
+        // Each container becomes its own column item — show aisle prefix so user sees 左·上 / A·A1板 etc
+        const cont = document.createElement('div');
+        cont.className = 'grid-container' + (isShelf ? '' : ' pallet');
+        // Show "aisle·container" if there are multiple aisles, otherwise just container name
+        const headerName = t.aisles.length > 1
+          ? `${escapeHtml(aisle.name)}·${escapeHtml(container.name)}`
+          : escapeHtml(container.name);
+        cont.innerHTML = `<div class="grid-container-name editable" data-ai="${ai}" data-ci="${ci}">${headerName}</div>`;
+        container[sk].forEach((slot, si) => {
+          const gs = document.createElement('div');
+          gs.className = 'grid-slot' + (slot.modelId ? '' : ' empty');
+          gs.dataset.ai = ai; gs.dataset.ci = ci; gs.dataset.si = si;
+          const m = slot.modelId ? getModel(slot.modelId) : null;
+          const num = slotSerial[`${ai}|${ci}|${si}`];
+          const modelHtml = slot.modelId
+            ? `<div class="gmodel" draggable="true" data-mid="${slot.modelId}" data-ai="${ai}" data-ci="${ci}" data-si="${si}" data-table="${currentTable}">${escapeHtml(m ? m.name : '?')}</div>`
+            : `<div class="gmodel">${isShelf ? '空' : '—'}</div>`;
+          const colorHtml = slot.modelId
+            ? `<div class="gcolor" data-color="${slot.color||''}" data-ai="${ai}" data-ci="${ci}" data-si="${si}">${slot.qty>0 ? slot.qty : ''}</div>`
+            : `<div class="gcolor" style="visibility:hidden"></div>`;
+          gs.innerHTML = `<div class="gnum">${slot.modelId ? num : ''}</div>${modelHtml}${colorHtml}`;
+          cont.appendChild(gs);
+        });
+        flatRow.appendChild(cont);
+      });
+    });
+    root.appendChild(flatRow);
+    attachGridHandlers(root);
+    return;
+  }
+
+  // Original layout for shelf tables (左/中/右 columns)
   const row = document.createElement('div');
   row.className = 'aisles-row';
   row.style.setProperty('--cols', t.aisles.length);
@@ -2012,6 +2145,11 @@ function openModelPicker(ai, ci, si, withCamera, callback) {
   switchInputMethod('type');
   document.getElementById('camera-title').textContent = '添加 / 修改型号';
   document.getElementById('model-search').value = '';
+  // Clear any previous barcode scan result
+  const prevResult = document.getElementById('barcode-result');
+  if (prevResult) prevResult.style.display = 'none';
+  const prevStatus = document.getElementById('barcode-status');
+  if (prevStatus) prevStatus.style.display = 'none';
   // Pre-fill ratio if there's already a model in this slot
   const ratioInp = document.getElementById('model-ratio-input');
   if (ratioInp) {
@@ -2042,10 +2180,13 @@ function switchInputMethod(method) {
   document.getElementById('camera-wrap').classList.toggle('show', method === 'camera');
   document.getElementById('handwrite-wrap').classList.toggle('show', method === 'handwrite');
   document.getElementById('voice-wrap').classList.toggle('show', method === 'voice');
+  const bw = document.getElementById('barcode-wrap');
+  if (bw) bw.classList.toggle('show', method === 'barcode');
 
   // Stop other methods when switching
   if (method !== 'camera') stopCamera();
   if (method !== 'voice') stopVoice();
+  if (method !== 'barcode') stopBarcodeScanner();
   if (method === 'handwrite') initHandwrite();
 }
 
@@ -2359,6 +2500,235 @@ function stopVoice() {
 }
 document.getElementById('voice-mic').addEventListener('click', startVoice);
 
+// ===== BARCODE / QR SCANNER =====
+// Uses native BarcodeDetector API (iOS 17+, modern Android Chrome) with ZXing fallback for older browsers.
+// Scanned codes are remembered: same code → same model next time.
+let barcodeStream = null;
+let barcodeDetector = null;
+let barcodeRafId = null;
+let barcodeZxingReader = null;
+let barcodeZxingControls = null;
+
+// Get barcode-to-model bindings from localStorage (so scanning same code re-matches the chosen model)
+function getBarcodeBindings() {
+  try { return JSON.parse(localStorage.getItem('barcodeBindings') || '{}'); }
+  catch(e) { return {}; }
+}
+function saveBarcodeBinding(code, modelId) {
+  try {
+    const b = getBarcodeBindings();
+    b[code] = modelId;
+    localStorage.setItem('barcodeBindings', JSON.stringify(b));
+  } catch(e) {}
+}
+
+async function startBarcodeScanner() {
+  const video = document.getElementById('barcode-video');
+  const startBtn = document.getElementById('barcode-start');
+  const stopBtn = document.getElementById('barcode-stop');
+  const frame = document.getElementById('barcode-frame');
+  const status = document.getElementById('barcode-status');
+  const resultBox = document.getElementById('barcode-result');
+
+  if (resultBox) resultBox.style.display = 'none';
+  if (status) { status.style.display = ''; status.textContent = '⏳ 启动摄像头...'; }
+
+  try {
+    barcodeStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } },
+      audio: false
+    });
+    video.srcObject = barcodeStream;
+    video.style.display = '';
+    if (frame) frame.style.display = '';
+    startBtn.style.display = 'none';
+    stopBtn.style.display = '';
+    if (status) status.textContent = '🔍 扫描中... 请将条码/二维码对准框内';
+
+    // Try native BarcodeDetector first
+    if ('BarcodeDetector' in window) {
+      try {
+        const supportedFormats = await window.BarcodeDetector.getSupportedFormats();
+        barcodeDetector = new window.BarcodeDetector({
+          formats: supportedFormats // accept everything supported
+        });
+        scanLoopNative();
+        return;
+      } catch(e) {
+        console.warn('BarcodeDetector failed, falling back to ZXing:', e);
+      }
+    }
+    // Fallback: load ZXing dynamically and use it
+    await loadZxingAndScan();
+  } catch(e) {
+    if (status) status.textContent = '❌ 启动失败: ' + (e.message || e.name);
+    toast('无法打开摄像头: ' + (e.message || e.name));
+    stopBtn.style.display = 'none';
+    startBtn.style.display = '';
+  }
+}
+
+function scanLoopNative() {
+  const video = document.getElementById('barcode-video');
+  const status = document.getElementById('barcode-status');
+  if (!barcodeStream || !barcodeDetector) return;
+
+  const tick = async () => {
+    if (!barcodeStream || !barcodeDetector) return;
+    if (video.readyState >= 2) {
+      try {
+        const codes = await barcodeDetector.detect(video);
+        if (codes && codes.length) {
+          handleBarcodeFound(codes[0].rawValue, codes[0].format);
+          return; // stop scanning
+        }
+      } catch(e) {
+        // Detection errors are common on bad frames, just keep going
+      }
+    }
+    barcodeRafId = requestAnimationFrame(tick);
+  };
+  tick();
+}
+
+async function loadZxingAndScan() {
+  const status = document.getElementById('barcode-status');
+  const video = document.getElementById('barcode-video');
+  if (status) status.textContent = '⏳ 加载扫码库...';
+
+  // Load ZXing UMD bundle from CDN
+  if (!window.ZXingBrowser && !window.ZXing) {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://unpkg.com/@zxing/browser@0.1.5/umd/index.min.js';
+      s.onload = resolve;
+      s.onerror = () => {
+        // Try alternate CDN
+        const s2 = document.createElement('script');
+        s2.src = 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/umd/index.min.js';
+        s2.onload = resolve;
+        s2.onerror = reject;
+        document.head.appendChild(s2);
+      };
+      document.head.appendChild(s);
+    });
+  }
+
+  const ZX = window.ZXingBrowser || window.ZXing;
+  if (!ZX) {
+    if (status) status.textContent = '❌ 扫码库加载失败,请检查网络';
+    toast('扫码库加载失败');
+    return;
+  }
+
+  if (status) status.textContent = '🔍 扫描中...';
+  try {
+    barcodeZxingReader = new ZX.BrowserMultiFormatReader();
+    barcodeZxingControls = await barcodeZxingReader.decodeFromVideoElement(video, (result, err) => {
+      if (result) {
+        const text = result.getText ? result.getText() : (result.text || '');
+        const fmt = result.getBarcodeFormat ? String(result.getBarcodeFormat()) : 'unknown';
+        handleBarcodeFound(text, fmt);
+      }
+    });
+  } catch(e) {
+    if (status) status.textContent = '❌ 扫描失败: ' + (e.message || e.name);
+  }
+}
+
+function handleBarcodeFound(code, format) {
+  if (!code) return;
+  // Already scanned? avoid duplicate firing
+  if (window._lastBarcodeHandled === code) return;
+  window._lastBarcodeHandled = code;
+  setTimeout(() => { window._lastBarcodeHandled = null; }, 1500);
+
+  if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+  toast('✅ 扫到: ' + code);
+
+  const status = document.getElementById('barcode-status');
+  const resultBox = document.getElementById('barcode-result');
+  if (status) status.style.display = 'none';
+  if (resultBox) {
+    resultBox.style.display = '';
+    resultBox.innerHTML = `<div style="font-size:10px; color:var(--muted); margin-bottom:4px;">扫码结果 / Scan Result (${escapeHtml(format||'')})</div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:700; color:var(--ink);">${escapeHtml(code)}</div>`;
+  }
+
+  // Stop the scanner
+  stopBarcodeScanner();
+
+  const searchInput = document.getElementById('model-search');
+
+  // Step 1: Check saved bindings (was this code scanned before?)
+  const bindings = getBarcodeBindings();
+  if (bindings[code]) {
+    const m = getModel(bindings[code]);
+    if (m) {
+      searchInput.value = m.name;
+      selectedSuggestionId = m.id;
+      renderSuggestions(searchInput.value);
+      toast(`✅ 自动匹配上次绑定: ${m.name}`);
+      return;
+    } else {
+      // Binding pointed to a deleted model — clear it
+      delete bindings[code];
+      try { localStorage.setItem('barcodeBindings', JSON.stringify(bindings)); } catch(e) {}
+    }
+  }
+
+  // Step 2: Try fuzzy match against model library by code text
+  searchInput.value = code;
+  renderSuggestions(code);
+  setTimeout(() => {
+    const top = document.querySelector('#model-suggestions .suggestion[data-mid]');
+    if (top) {
+      const score = parseInt(top.querySelector('.match-score')?.textContent || '0');
+      if (score >= 60) {
+        top.click();
+        toast('✅ 已识别 — 检查无误后点确定保存绑定');
+      } else {
+        toast('已扫到码 — 请从下方选型号或修改文字,确定后会记住绑定');
+      }
+    } else {
+      toast('已扫到码 — 输入或选择型号后,确定时会记住此码 → 该型号');
+    }
+  }, 200);
+}
+
+function stopBarcodeScanner() {
+  if (barcodeRafId) { cancelAnimationFrame(barcodeRafId); barcodeRafId = null; }
+  barcodeDetector = null;
+  if (barcodeZxingControls && typeof barcodeZxingControls.stop === 'function') {
+    try { barcodeZxingControls.stop(); } catch(e) {}
+  }
+  if (barcodeZxingReader && typeof barcodeZxingReader.reset === 'function') {
+    try { barcodeZxingReader.reset(); } catch(e) {}
+  }
+  barcodeZxingControls = null;
+  barcodeZxingReader = null;
+  if (barcodeStream) {
+    try { barcodeStream.getTracks().forEach(t => t.stop()); } catch(e) {}
+    barcodeStream = null;
+  }
+  const video = document.getElementById('barcode-video');
+  if (video) { video.srcObject = null; video.style.display = 'none'; }
+  const frame = document.getElementById('barcode-frame');
+  if (frame) frame.style.display = 'none';
+  const startBtn = document.getElementById('barcode-start');
+  const stopBtn = document.getElementById('barcode-stop');
+  if (startBtn) { startBtn.style.display = ''; startBtn.textContent = '📊 开始扫码'; }
+  if (stopBtn) stopBtn.style.display = 'none';
+}
+
+(function bindBarcodeButtons() {
+  const startBtn = document.getElementById('barcode-start');
+  const stopBtn = document.getElementById('barcode-stop');
+  if (startBtn) startBtn.addEventListener('click', startBarcodeScanner);
+  if (stopBtn) stopBtn.addEventListener('click', stopBarcodeScanner);
+})();
+// ===== END BARCODE SCANNER =====
+
 function fuzzyMatch(query, name) {
   if (!query) return 1;
   const q = query.toLowerCase().replace(/\s+/g,'');
@@ -2426,8 +2796,24 @@ function commitModelChoice() {
     return;
   }
   pendingModelTarget = null;
+  // If a barcode was scanned and the result box is showing, save the binding (code → model)
+  try {
+    const resultBox = document.getElementById('barcode-result');
+    if (resultBox && resultBox.style.display !== 'none' && resultBox.textContent) {
+      // Extract the code from the displayed result
+      const codeEl = resultBox.querySelector('div:last-child');
+      if (codeEl) {
+        const code = codeEl.textContent.trim();
+        if (code) {
+          saveBarcodeBinding(code, model.id);
+          toast(`📊 已记住: ${code.substring(0,16)}${code.length>16?'...':''} → ${model.name}`);
+        }
+      }
+    }
+  } catch(e) {}
   stopCamera();
   stopVoice();
+  if (typeof stopBarcodeScanner === 'function') stopBarcodeScanner();
   hideSheets();
   render();
 }
@@ -2647,6 +3033,7 @@ function hideSheets() {
   document.querySelectorAll('.sheet-backdrop').forEach(s => s.classList.remove('show'));
   stopCamera();
   stopVoice();
+  if (typeof stopBarcodeScanner === 'function') stopBarcodeScanner();
 }
 document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', hideSheets));
 document.querySelectorAll('.sheet-backdrop').forEach(s => s.addEventListener('click', e => { if (e.target === s) hideSheets(); }));
